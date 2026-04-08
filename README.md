@@ -1,6 +1,12 @@
-# SID-Based Training-Free LLM Recommender
+<p align="center">
+  <img src="artifacts/branding/zeroalign-rec-logo.svg" alt="ZeroAlign-Rec logo" width="760">
+</p>
 
-`SID` 기반 training-free 추천 시스템을 실험하기 위한 Python 개발 환경이다.
+<h1 align="center">ZeroAlign-Rec</h1>
+
+<p align="center"><strong>Training-free semantic recommendation with SID, local MLX inference, and taxonomy-aware item alignment.</strong></p>
+
+`ZeroAlign-Rec`은 `SID` 기반 training-free 추천 시스템을 실험하기 위한 Python 개발 환경이다.
 로컬 추론 백엔드는 `MLX`를 사용하며 기본 모델은 `Qwen3.5-9B`와 `Qwen3-Embedding-4B`다.
 
 ## Stack
