@@ -6,7 +6,9 @@
 
 <p align="center"><strong>Training-free semantic recommendation with SID, local MLX inference, and taxonomy-aware item alignment.</strong></p>
 
-`ZeroAlign-Rec`은 `SID` 기반 training-free 추천 시스템을 로컬 환경에서 실험하기 위한 Python 코드베이스다. Apple Silicon에서 `MLX`를 사용해 생성형 LLM과 임베딩 모델을 로컬로 실행하고, Food.com 데이터셋 전처리부터 taxonomy dictionary 생성, taxonomy-aligned item structuring까지 한 흐름으로 검증할 수 있다.
+<p align="center"><strong>English</strong> | <a href="./README.ko.md">한국어</a></p>
+
+`ZeroAlign-Rec` is a Python codebase for experimenting with `SID`-based training-free recommendation in a local environment. It uses `MLX` on Apple Silicon to run both generative and embedding models locally, and supports an end-to-end workflow from Food.com preprocessing to taxonomy dictionary generation and taxonomy-aligned item structuring.
 
 ## Table of Contents
 
@@ -23,28 +25,28 @@
 
 ## Why ZeroAlign-Rec
 
-- **Training-free recommendation experiments**: SID 기반 추천 흐름을 별도 model training 없이 빠르게 검증할 수 있다.
-- **Local-first inference**: `mlx-lm`과 `mlx-embeddings`를 사용해 Apple Silicon에서 로컬 추론을 수행한다.
-- **Taxonomy-aware pipeline**: dataset preparation, neighbor index, taxonomy dictionary, item structuring을 단계별로 분리해 재현 가능하게 다룬다.
-- **Agent-friendly repository**: Copilot/Codex용 `.github/`, `.agents/skills/`, `.harness/`, `AGENTS.md`가 함께 정리되어 있다.
+- **Training-free recommendation experiments**: validate SID-based recommendation flows without separate model training.
+- **Local-first inference**: run `mlx-lm` and `mlx-embeddings` locally on Apple Silicon.
+- **Taxonomy-aware pipeline**: separate dataset preparation, neighbor index construction, taxonomy dictionary generation, and item structuring into reproducible steps.
+- **Agent-friendly repository**: keep `.github/`, `.agents/skills/`, `.harness/`, and `AGENTS.md` organized for Copilot/Codex workflows.
 
 ## Requirements
 
 - `macOS` on Apple Silicon
 - Python `3.12`
 - [`uv`](https://docs.astral.sh/uv/)
-- 로컬 터미널 세션 권장
+- A local interactive terminal session is recommended
 
-기본 로컬 모델:
+Default local models:
 
 - Generative LLM: `mlx-community/Qwen3.5-9B-OptiQ-4bit`
 - Embedding model: `mlx-community/Qwen3-Embedding-4B-4bit-DWQ`
 
-지원 환경과 관련해 가장 중요한 점:
+Important environment notes:
 
-- **권장**: 로그인된 로컬 macOS Apple Silicon 세션
-- **best-effort**: SSH, CI, 샌드박스, 헤드리스 세션
-- MLX/Metal 상태 점검은 `uv run sid-reco smoke-mlx`를 먼저 실행하는 것이 안전하다
+- **Recommended**: a logged-in local macOS Apple Silicon session
+- **Best-effort only**: SSH, CI, sandboxed, or headless sessions
+- For MLX/Metal diagnostics, start with `uv run sid-reco smoke-mlx`
 
 ## Installation
 
@@ -54,20 +56,20 @@ source .venv/bin/activate
 cp .env.example .env
 ```
 
-`.env`는 필요한 값만 채우면 된다. 상세 변수는 아래 [Configuration](#configuration)을 참고한다.
+Fill in only the values you need in `.env`. See [Configuration](#configuration) for the main variables.
 
 ## Quick Start
 
-가장 빠른 smoke path는 아래 순서다.
+The fastest smoke path is:
 
 ```bash
 uv run sid-reco doctor
 uv run sid-reco smoke-mlx
-uv run sid-reco smoke-llm "사용자 취향을 요약해줘"
-uv run sid-reco smoke-embed "범죄 스릴러 영화 추천"
+uv run sid-reco smoke-llm "Summarize a user's preferences"
+uv run sid-reco smoke-embed "crime thriller recommendations"
 ```
 
-이후 end-to-end 실험은 다음 순서로 이어간다.
+For an end-to-end experiment, continue with:
 
 ```bash
 uv run sid-reco prepare-foodcom --raw-dir data/raw/foodcom --out-dir data/processed/foodcom
@@ -82,9 +84,9 @@ uv run sid-reco structure-taxonomy-batch \
 
 ## Core Workflows
 
-### 1. Prepare Food.com dataset
+### 1. Prepare the Food.com dataset
 
-원본 CSV를 small-scale 실험용 catalog와 split으로 정리한다.
+Convert the raw CSV files into a compact experiment-ready catalog and split set.
 
 ```bash
 uv run sid-reco prepare-foodcom \
@@ -95,16 +97,16 @@ uv run sid-reco prepare-foodcom \
   --positive-threshold 4
 ```
 
-주요 산출물:
+Main outputs:
 
 - `data/processed/foodcom/recipes.csv`
 - `data/processed/foodcom/interactions.csv`
 - `data/processed/foodcom/splits/{train,valid,test}.csv`
 - `data/processed/foodcom/manifest.json`
 
-### 2. Build taxonomy step 1 neighbor index
+### 2. Build the taxonomy step 1 neighbor index
 
-item metadata embedding과 FAISS 기반 top-k neighbor context를 생성한다.
+Generate item metadata embeddings and FAISS-based top-k neighbor context.
 
 ```bash
 uv run sid-reco build-taxonomy-step1 \
@@ -113,16 +115,16 @@ uv run sid-reco build-taxonomy-step1 \
   --top-k 5
 ```
 
-주요 산출물:
+Main outputs:
 
 - `items_with_embeddings.csv`
 - `neighbor_context.csv`
 - `item_index.faiss`
 - `manifest.json`
 
-### 3. Generate taxonomy dictionary
+### 3. Generate the taxonomy dictionary
 
-로컬 LLM으로 domain taxonomy dictionary를 생성한다.
+Use a local LLM to generate a domain taxonomy dictionary.
 
 ```bash
 uv run sid-reco build-taxonomy-dictionary \
@@ -131,16 +133,16 @@ uv run sid-reco build-taxonomy-dictionary \
   --max-tokens 4096
 ```
 
-주요 산출물:
+Main outputs:
 
 - `food_taxonomy_dictionary.json`
 - `prompt_snapshot.json`
 
 ### 4. Structure items into taxonomy-aligned JSON
 
-taxonomy dictionary와 step 1 neighbor context를 함께 사용해 item별 structured output을 만든다.
+Use the taxonomy dictionary together with step 1 neighbor context to produce structured outputs for each item.
 
-단일 item:
+Single item:
 
 ```bash
 uv run sid-reco structure-taxonomy-item \
@@ -150,7 +152,7 @@ uv run sid-reco structure-taxonomy-item \
   --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json
 ```
 
-batch:
+Batch:
 
 ```bash
 uv run sid-reco structure-taxonomy-batch \
@@ -162,18 +164,18 @@ uv run sid-reco structure-taxonomy-batch \
 
 ## Configuration
 
-`.env.example`를 기준으로 `.env`를 만들고 필요한 값만 조정하면 된다.
+Create `.env` from `.env.example` and adjust only the variables you need.
 
 | Variable | Description |
 | --- | --- |
-| `SID_RECO_LLM_BACKEND` | 현재는 `mlx` 사용 |
-| `SID_RECO_LLM_MODEL` | 생성형 LLM 모델 이름 |
-| `SID_RECO_EMBED_MODEL` | 임베딩 모델 이름 |
-| `SID_RECO_CATALOG_PATH` | item metadata catalog 경로 |
-| `SID_RECO_CACHE_DIR` | intermediate artifacts / cache 경로 |
-| `SID_RECO_LLM_MAX_TOKENS` | 기본 생성 토큰 수 |
-| `SID_RECO_LLM_TEMPERATURE` | 기본 temperature |
-| `SID_RECO_LLM_TOP_P` | 기본 nucleus sampling 값 |
+| `SID_RECO_LLM_BACKEND` | currently `mlx` |
+| `SID_RECO_LLM_MODEL` | generative LLM model name |
+| `SID_RECO_EMBED_MODEL` | embedding model name |
+| `SID_RECO_CATALOG_PATH` | path to the item metadata catalog |
+| `SID_RECO_CACHE_DIR` | path for intermediate artifacts and cache |
+| `SID_RECO_LLM_MAX_TOKENS` | default generation token count |
+| `SID_RECO_LLM_TEMPERATURE` | default temperature |
+| `SID_RECO_LLM_TOP_P` | default nucleus sampling value |
 
 ## Validation
 
@@ -201,7 +203,7 @@ uv run mypy src
 
 ## Docs and Knowledge Base
 
-상세 설명은 README에 길게 중복하기보다 `docs/`와 위키 문서에 정리한다.
+Instead of duplicating long operational details in the README, this repository keeps deeper material in `docs/` and the wiki.
 
 - [docs/README.md](docs/README.md)
 - [docs/wiki/entities/dev-environment.md](docs/wiki/entities/dev-environment.md)
@@ -215,15 +217,15 @@ uv run mypy src
 
 ## Copilot and Agent Harness
 
-이 저장소는 Copilot/Codex 친화적인 harness를 함께 유지한다.
+This repository also maintains a Copilot/Codex-friendly harness.
 
-- Copilot 프로젝트 지침: `.github/copilot-instructions.md`
+- Copilot project instructions: `.github/copilot-instructions.md`
 - specialized personas: `.github/agents/`
 - repo-local skills: `.agents/skills/`
 - harness support assets: `.harness/`
 - local adaptation rules: `.harness/reference/local-adaptation.md`
 
-주요 shortcut:
+Main shortcuts:
 
 - `/docs-manager` or `/doc-manager`
 - `/spec`
@@ -233,4 +235,4 @@ uv run mypy src
 - `/code-simplify`
 - `/ship`
 
-문서/위키 작업에서는 일반 workflow보다 `docs-manager`와 `AGENTS.md` 규칙이 우선한다.
+For docs/wiki work, `docs-manager` and `AGENTS.md` rules take priority over generic workflows.
