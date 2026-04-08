@@ -1,0 +1,48 @@
+<svg width="960" height="320" viewBox="0 0 960 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">ZeroAlign-Rec logo</title>
+  <desc id="desc">ZeroAlign-Rec wordmark with a semantic recommendation icon, centered alignment axis, and graph-inspired node motif.</desc>
+  <defs>
+    <linearGradient id="panel" x1="40" y1="40" x2="280" y2="280" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="0.55" stop-color="#1E1B4B"/>
+      <stop offset="1" stop-color="#0B1120"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="96" y1="64" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67E8F9"/>
+      <stop offset="0.5" stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#34D399"/>
+    </linearGradient>
+    <filter id="shadow" x="16" y="16" width="296" height="296" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#020617" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <rect x="40" y="40" width="248" height="248" rx="64" fill="url(#panel)"/>
+    <path d="M164 90V238" stroke="url(#accent)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M164 124L116 144L196 196L146 216" stroke="#E2E8F0" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M164 108L112 132" stroke="url(#accent)" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+    <path d="M116 144L92 190" stroke="url(#accent)" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+    <path d="M196 196L236 182" stroke="url(#accent)" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+    <path d="M164 224L214 204" stroke="url(#accent)" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+    <circle cx="164" cy="108" r="14" fill="#67E8F9"/>
+    <circle cx="112" cy="132" r="12" fill="#A78BFA"/>
+    <circle cx="92" cy="190" r="12" fill="#34D399"/>
+    <circle cx="236" cy="182" r="12" fill="#34D399"/>
+    <circle cx="214" cy="204" r="12" fill="#A78BFA"/>
+    <circle cx="164" cy="166" r="34" fill="#0B1120" stroke="url(#accent)" stroke-width="8"/>
+    <circle cx="164" cy="166" r="10" fill="#F8FAFC"/>
+  </g>
+
+  <g fill="#0F172A">
+    <text x="344" y="146" font-family="Inter, SF Pro Display, Segoe UI, Arial, sans-serif" font-size="72" font-weight="800" letter-spacing="-2.4">ZeroAlign</text>
+    <text x="715" y="146" font-family="Inter, SF Pro Display, Segoe UI, Arial, sans-serif" font-size="72" font-weight="800" letter-spacing="-1.6" fill="#7C3AED">-Rec</text>
+    <text x="346" y="192" font-family="Inter, SF Pro Display, Segoe UI, Arial, sans-serif" font-size="24" font-weight="600" fill="#334155" letter-spacing="1.8">TRAINING-FREE SEMANTIC RECOMMENDATION</text>
+  </g>
+
+  <g>
+    <rect x="346" y="222" width="118" height="14" rx="7" fill="#67E8F9"/>
+    <rect x="476" y="222" width="148" height="14" rx="7" fill="#8B5CF6"/>
+    <rect x="636" y="222" width="104" height="14" rx="7" fill="#34D399"/>
+  </g>
+</svg>
