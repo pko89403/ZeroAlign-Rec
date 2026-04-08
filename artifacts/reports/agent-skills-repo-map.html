@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>agent-skills Repository Map</title>
+    <style>
+      :root {
+        --bg: #f4efe8;
+        --panel: rgba(255, 251, 247, 0.92);
+        --panel-strong: #fffdfa;
+        --ink: #191514;
+        --muted: #6d625d;
+        --line: rgba(110, 93, 83, 0.16);
+        --accent: #b1532f;
+        --accent-2: #1f6f78;
+        --accent-3: #5a7a2c;
+        --accent-soft: rgba(177, 83, 47, 0.12);
+        --shadow: 0 24px 70px rgba(43, 31, 24, 0.10);
+        --radius-xl: 28px;
+        --radius-lg: 22px;
+        --radius-md: 16px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Avenir Next", "Noto Sans KR", "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(177, 83, 47, 0.16), transparent 30%),
+          radial-gradient(circle at top right, rgba(31, 111, 120, 0.12), transparent 24%),
+          linear-gradient(180deg, #fbf7f3 0%, var(--bg) 100%);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(109, 98, 93, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(109, 98, 93, 0.04) 1px, transparent 1px);
+        background-size: 28px 28px;
+        mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 88%);
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .shell {
+        width: min(1200px, calc(100vw - 36px));
+        margin: 28px auto 56px;
+      }
+
+      .hero,
+      .panel {
+        background: var(--panel);
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(16px);
+      }
+
+      .hero {
+        border-radius: 34px;
+        padding: 30px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        line-height: 1.08;
+        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+      }
+
+      h1 {
+        margin-top: 16px;
+        font-size: clamp(34px, 5vw, 64px);
+        max-width: 12ch;
+      }
+
+      .lead {
+        margin: 18px 0 0;
+        max-width: 74ch;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.72;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 20px;
+        margin-top: 26px;
+      }
+
+      .snapshot {
+        padding: 20px;
+        border-radius: var(--radius-lg);
+        background: rgba(255, 255, 255, 0.58);
+        border: 1px solid var(--line);
+      }
+
+      .snapshot h3 {
+        font-size: 22px;
+        margin-bottom: 14px;
+      }
+
+      .meta-grid,
+      .score-grid,
+      .compat-grid,
+      .map-grid,
+      .roadmap,
+      .mini-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .meta-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .stat {
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: var(--panel-strong);
+        border: 1px solid var(--line);
+      }
+
+      .stat strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .stat span {
+        display: block;
+        font-size: 26px;
+        font-weight: 800;
+      }
+
+      .quick-take {
+        display: grid;
+        gap: 12px;
+      }
+
+      .callout {
+        padding: 16px 18px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.60));
+      }
+
+      .callout strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 15px;
+      }
+
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 18px 0 0;
+      }
+
+      .nav a {
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid var(--line);
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .panel {
+        border-radius: var(--radius-xl);
+        padding: 26px;
+        margin-top: 20px;
+      }
+
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .panel-header p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .section-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 18px;
+      }
+
+      .repo-tree,
+      .notes,
+      .anatomy,
+      .compat-card,
+      .map-card,
+      .roadmap-step,
+      .skill-card,
+      .source-card {
+        padding: 18px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.68);
+      }
+
+      .repo-tree pre,
+      .anatomy pre {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        font-family: "SFMono-Regular", "Menlo", "Consolas", monospace;
+      }
+
+      .notes ul,
+      .compat-card ul,
+      .map-card ul,
+      .roadmap-step ul,
+      .source-card ul {
+        margin: 10px 0 0;
+        padding-left: 18px;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .phase-bar {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+
+      .phase-node {
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.66);
+      }
+
+      .phase-node small {
+        display: block;
+        color: var(--muted);
+        margin-bottom: 6px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .phase-node strong {
+        display: block;
+        font-size: 18px;
+      }
+
+      .phase-node span {
+        display: block;
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .filter-btn {
+        border: 0;
+        border-radius: 999px;
+        padding: 10px 14px;
+        background: #efe4d9;
+        color: #573528;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .filter-btn.active {
+        background: var(--accent);
+        color: #fffaf7;
+      }
+
+      .skill-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .skill-card h3 {
+        font-size: 19px;
+        margin-bottom: 8px;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+
+      .pill.define {
+        background: rgba(177, 83, 47, 0.12);
+        color: var(--accent);
+      }
+
+      .pill.plan {
+        background: rgba(90, 122, 44, 0.12);
+        color: var(--accent-3);
+      }
+
+      .pill.build {
+        background: rgba(31, 111, 120, 0.12);
+        color: var(--accent-2);
+      }
+
+      .pill.verify {
+        background: rgba(122, 86, 181, 0.10);
+        color: #6341a7;
+      }
+
+      .pill.review {
+        background: rgba(213, 146, 50, 0.14);
+        color: #8b5914;
+      }
+
+      .pill.ship {
+        background: rgba(184, 66, 105, 0.12);
+        color: #9f2352;
+      }
+
+      .skill-card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.62;
+      }
+
+      .compat-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .compat-card strong,
+      .map-card strong,
+      .roadmap-step strong,
+      .source-card strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 18px;
+      }
+
+      .map-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .map-card code,
+      .source-card code,
+      .notes code {
+        display: inline-block;
+        padding: 3px 7px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.06);
+        font-size: 13px;
+      }
+
+      .roadmap {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .roadmap-step {
+        position: relative;
+      }
+
+      .roadmap-step::before {
+        content: attr(data-step);
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        color: rgba(0, 0, 0, 0.15);
+        font-size: 36px;
+        font-weight: 800;
+      }
+
+      .source-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .footnote {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      @media (max-width: 1080px) {
+        .hero-grid,
+        .section-grid,
+        .skill-grid,
+        .compat-grid,
+        .map-grid,
+        .roadmap,
+        .source-list,
+        .meta-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .phase-bar {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 720px) {
+        .shell {
+          width: min(100vw - 20px, 1200px);
+          margin-top: 10px;
+        }
+
+        .hero,
+        .panel {
+          padding: 20px;
+          border-radius: 24px;
+        }
+
+        .phase-bar {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <span class="eyebrow">Repository Briefing · 2026-04-08 Snapshot</span>
+        <h1>agent-skills를 전체 이식하기 전에 한 번에 보는 저장소 지도</h1>
+        <p class="lead">
+          이 페이지는 <code>addyosmani/agent-skills</code>의 목적, 디렉터리 구조, 19개 스킬의
+          역할, Codex에서 그대로 쓸 수 있는 범위, 그리고
+          <code>Training-Free-SID-Reco</code>로 가져올 때의 배치 전략을 한 장으로 정리한
+          브리핑 자료다. 목표는 “이 리포가 정확히 무엇이고, 무엇을 어디에 옮겨야 하는지”를
+          빠르게 파악하는 것이다.
+        </p>
+
+        <div class="hero-grid">
+          <div class="snapshot">
+            <h3>저장소 스냅샷</h3>
+            <div class="meta-grid">
+              <div class="stat">
+                <strong>Commits</strong>
+                <span>78</span>
+              </div>
+              <div class="stat">
+                <strong>Stars</strong>
+                <span>7k</span>
+              </div>
+              <div class="stat">
+                <strong>Forks</strong>
+                <span>684</span>
+              </div>
+              <div class="stat">
+                <strong>Open PRs</strong>
+                <span>3</span>
+              </div>
+            </div>
+            <div class="footnote">
+              기준: GitHub `main` 트리와 README/문서 페이지를 2026-04-08에 확인한 값.
+            </div>
+          </div>
+
+          <div class="quick-take">
+            <div class="callout">
+              <strong>핵심 정체성</strong>
+              코드 프레임워크가 아니라, 에이전트가 따를 엔지니어링 워크플로를
+              <code>SKILL.md</code>로 패키징한 저장소다.
+            </div>
+            <div class="callout">
+              <strong>Codex 적용 범위</strong>
+              문서가 명시적으로 말하는 범위는 “Markdown 지침을 읽는 모든 에이전트”다.
+              즉 Codex도 사용 가능하지만, Claude 전용 slash command는 직접 변환해야 한다.
+            </div>
+            <div class="callout">
+              <strong>우리 저장소 관점</strong>
+              이미 로컬 문서 스킬이 있었으므로, 완전한
+              이식은 새로운 체계를 도입하는 것이 아니라 기존 로컬 스킬 체계를 확장하는 작업이다.
+            </div>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="섹션 이동">
+          <a href="#structure">리포 구조</a>
+          <a href="#skills">19개 스킬</a>
+          <a href="#codex">Codex 호환 범위</a>
+          <a href="#mapping">우리 저장소 매핑</a>
+          <a href="#roadmap">이식 순서</a>
+          <a href="#sources">확인한 소스</a>
+        </nav>
+      </section>
+
+      <section class="panel" id="structure">
+        <div class="panel-header">
+          <div>
+            <h2>1. 저장소 구조는 어떻게 읽어야 하나</h2>
+            <p>
+              이 리포는 “실행 코드”보다 “운영 규칙” 중심이다. 핵심 자산은 스킬, 에이전트
+              페르소나, 참조 체크리스트, Claude용 명령 래퍼, 도구별 설치 가이드다.
+            </p>
+          </div>
+        </div>
+
+        <div class="section-grid">
+          <div class="repo-tree">
+            <pre>agent-skills/
+├── skills/                    19개 핵심 워크플로 스킬
+│   ├── idea-refine/
+│   ├── spec-driven-development/
+│   ├── planning-and-task-breakdown/
+│   ├── incremental-implementation/
+│   ├── test-driven-development/
+│   ├── code-review-and-quality/
+│   └── ...
+├── agents/                    코드리뷰/테스트/보안 페르소나
+├── references/                테스트·성능·보안·접근성 체크리스트
+├── .claude/commands/          Claude Code slash commands
+├── docs/                      Cursor/Gemini/Copilot/Codex 가이드
+├── hooks/                     세션 라이프사이클용 훅
+├── AGENTS.md                  기여/패키징 규칙
+└── README.md                  전체 개념도와 카탈로그</pre>
+          </div>
+
+          <div class="notes">
+            <h3>빠른 해석</h3>
+            <ul>
+              <li><code>skills/</code>가 본체다. 각 디렉터리의 <code>SKILL.md</code>가 실제 재사용 단위다.</li>
+              <li><code>agents/</code>는 별도 모델이 아니라 리뷰 관점 프롬프트에 가깝다.</li>
+              <li><code>references/</code>는 필요할 때만 읽는 보조 체크리스트다.</li>
+              <li><code>.claude/commands/</code>는 Claude Code에서 스킬을 쉽게 호출하기 위한 래퍼다.</li>
+              <li><code>docs/getting-started.md</code>는 Codex 같은 비-Claude 환경을 위한 범용 사용법이다.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>2. 스킬 한 개는 어떤 모양인가</h2>
+            <p>
+              이식 단위는 전체 저장소가 아니라 “스킬 파일 하나”다. 문서상으로도
+              <code>SKILL.md</code>를 시스템 프롬프트, 규칙 파일, 대화 컨텍스트에 넣는 방식을
+              권장한다.
+            </p>
+          </div>
+        </div>
+
+        <div class="section-grid">
+          <div class="anatomy">
+            <pre>skills/
+  skill-name/
+    SKILL.md
+    supporting-file.md (optional)
+
+SKILL.md anatomy
+├── YAML frontmatter
+│   ├── name
+│   └── description
+├── Overview
+├── When to Use
+├── Core Process / Workflow
+├── Specific Techniques / Patterns
+├── Common Rationalizations
+├── Red Flags
+└── Verification</pre>
+          </div>
+
+          <div class="notes">
+            <h3>이 포맷이 중요한 이유</h3>
+            <ul>
+              <li>지식 문서가 아니라 “행동 절차”를 담는다.</li>
+              <li>설명보다 검증과 반-합리화 항목이 강하다.</li>
+              <li>에이전트가 요약만 읽고 끝내지 않도록 <code>description</code>은 트리거만 담는다.</li>
+              <li>큰 참고 자료는 supporting file로 분리하는 progressive disclosure 구조다.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="skills">
+        <div class="panel-header">
+          <div>
+            <h2>3. 19개 스킬을 개발 단계별로 보면</h2>
+            <p>
+              아래 필터를 눌러 단계별 스킬을 볼 수 있다. 이 리포의 설계 핵심은 “기능별 기술 문서”가
+              아니라 “개발 단계별 운영 프로세스”로 묶는 것이다.
+            </p>
+          </div>
+        </div>
+
+        <div class="phase-bar">
+          <div class="phase-node">
+            <small>Define</small>
+            <strong>정의</strong>
+            <span>아이디어 정제, PRD 작성</span>
+          </div>
+          <div class="phase-node">
+            <small>Plan</small>
+            <strong>분해</strong>
+            <span>작업 단위, 의존성 정리</span>
+          </div>
+          <div class="phase-node">
+            <small>Build</small>
+            <strong>구현</strong>
+            <span>점진 구현, TDD, UI, API</span>
+          </div>
+          <div class="phase-node">
+            <small>Verify</small>
+            <strong>검증</strong>
+            <span>브라우저 확인, 디버깅</span>
+          </div>
+          <div class="phase-node">
+            <small>Review</small>
+            <strong>품질 게이트</strong>
+            <span>리뷰, 보안, 성능, 단순화</span>
+          </div>
+          <div class="phase-node">
+            <small>Ship</small>
+            <strong>출시</strong>
+            <span>git, CI/CD, 문서화, 배포</span>
+          </div>
+        </div>
+
+        <div class="filter-row" role="toolbar" aria-label="단계 필터">
+          <button class="filter-btn active" data-phase="all">전체</button>
+          <button class="filter-btn" data-phase="define">Define</button>
+          <button class="filter-btn" data-phase="plan">Plan</button>
+          <button class="filter-btn" data-phase="build">Build</button>
+          <button class="filter-btn" data-phase="verify">Verify</button>
+          <button class="filter-btn" data-phase="review">Review</button>
+          <button class="filter-btn" data-phase="ship">Ship</button>
+        </div>
+
+        <div class="skill-grid">
+          <article class="skill-card" data-phase="define">
+            <span class="pill define">Define</span>
+            <h3>idea-refine</h3>
+            <p>모호한 아이디어를 제안 가능한 수준으로 정제한다.</p>
+          </article>
+          <article class="skill-card" data-phase="define">
+            <span class="pill define">Define</span>
+            <h3>spec-driven-development</h3>
+            <p>코드보다 먼저 목표, 경계, 테스트, 구조를 문서화한다.</p>
+          </article>
+          <article class="skill-card" data-phase="plan">
+            <span class="pill plan">Plan</span>
+            <h3>planning-and-task-breakdown</h3>
+            <p>작업을 작은 검증 가능 단위로 쪼개고 의존성을 정리한다.</p>
+          </article>
+          <article class="skill-card" data-phase="build">
+            <span class="pill build">Build</span>
+            <h3>incremental-implementation</h3>
+            <p>얇은 수직 슬라이스로 구현하고 매 단계에서 검증한다.</p>
+          </article>
+          <article class="skill-card" data-phase="build">
+            <span class="pill build">Build</span>
+            <h3>test-driven-development</h3>
+            <p>실패하는 테스트를 먼저 만들고 동작을 증명한다.</p>
+          </article>
+          <article class="skill-card" data-phase="build">
+            <span class="pill build">Build</span>
+            <h3>context-engineering</h3>
+            <p>적절한 문맥만 선택적으로 로드해 에이전트 품질을 높인다.</p>
+          </article>
+          <article class="skill-card" data-phase="build">
+            <span class="pill build">Build</span>
+            <h3>frontend-ui-engineering</h3>
+            <p>컴포넌트 구조, 반응형, 접근성을 포함한 UI 작업 규칙이다.</p>
+          </article>
+          <article class="skill-card" data-phase="build">
+            <span class="pill build">Build</span>
+            <h3>api-and-interface-design</h3>
+            <p>API와 공개 인터페이스를 계약 중심으로 설계한다.</p>
+          </article>
+          <article class="skill-card" data-phase="verify">
+            <span class="pill verify">Verify</span>
+            <h3>browser-testing-with-devtools</h3>
+            <p>브라우저 런타임 데이터로 UI/웹 동작을 검증한다.</p>
+          </article>
+          <article class="skill-card" data-phase="verify">
+            <span class="pill verify">Verify</span>
+            <h3>debugging-and-error-recovery</h3>
+            <p>재현, 국소화, 축소, 수정, 회귀 방지 순으로 장애를 다룬다.</p>
+          </article>
+          <article class="skill-card" data-phase="review">
+            <span class="pill review">Review</span>
+            <h3>code-review-and-quality</h3>
+            <p>병합 전 다축 리뷰와 변경 크기 관리 원칙을 적용한다.</p>
+          </article>
+          <article class="skill-card" data-phase="review">
+            <span class="pill review">Review</span>
+            <h3>code-simplification</h3>
+            <p>동작을 유지한 채 복잡도를 줄이고 가독성을 높인다.</p>
+          </article>
+          <article class="skill-card" data-phase="review">
+            <span class="pill review">Review</span>
+            <h3>security-and-hardening</h3>
+            <p>OWASP, 비밀 관리, 경계 검증을 코드 리뷰에 포함한다.</p>
+          </article>
+          <article class="skill-card" data-phase="review">
+            <span class="pill review">Review</span>
+            <h3>performance-optimization</h3>
+            <p>측정 기반으로 병목을 찾고 체계적으로 최적화한다.</p>
+          </article>
+          <article class="skill-card" data-phase="ship">
+            <span class="pill ship">Ship</span>
+            <h3>git-workflow-and-versioning</h3>
+            <p>원자적 커밋과 trunk-based 흐름으로 변경을 정리한다.</p>
+          </article>
+          <article class="skill-card" data-phase="ship">
+            <span class="pill ship">Ship</span>
+            <h3>ci-cd-and-automation</h3>
+            <p>Shift Left와 빠른 피드백을 중심으로 파이프라인을 다룬다.</p>
+          </article>
+          <article class="skill-card" data-phase="ship">
+            <span class="pill ship">Ship</span>
+            <h3>deprecation-and-migration</h3>
+            <p>기존 시스템 제거와 사용자 마이그레이션을 구조적으로 관리한다.</p>
+          </article>
+          <article class="skill-card" data-phase="ship">
+            <span class="pill ship">Ship</span>
+            <h3>documentation-and-adrs</h3>
+            <p>왜 그런 결정을 했는지 문서화하고 ADR로 남긴다.</p>
+          </article>
+          <article class="skill-card" data-phase="ship">
+            <span class="pill ship">Ship</span>
+            <h3>shipping-and-launch</h3>
+            <p>출시 전 체크리스트, 롤백, 모니터링 준비를 표준화한다.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="codex">
+        <div class="panel-header">
+          <div>
+            <h2>4. Codex에서 무엇을 그대로 쓸 수 있고, 무엇은 바꿔야 하나</h2>
+            <p>
+              문서상 근거는 분명하다. <code>docs/getting-started.md</code>는
+              “Markdown instructions를 받아들이는 어떤 AI coding agent에도 동작한다”고 말한다.
+              다만 Claude Code 통합 요소까지 그대로 작동한다는 뜻은 아니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="compat-grid">
+          <div class="compat-card">
+            <strong>그대로 사용 가능</strong>
+            <ul>
+              <li><code>skills/*/SKILL.md</code> 본문</li>
+              <li><code>agents/*.md</code> 페르소나 문서</li>
+              <li><code>references/*.md</code> 체크리스트</li>
+              <li>README의 단계별 분류 체계</li>
+              <li><code>using-agent-skills</code> 같은 메타-스킬 라우팅 방식</li>
+            </ul>
+          </div>
+
+          <div class="compat-card">
+            <strong>우리 환경에 맞게 변환 필요</strong>
+            <ul>
+              <li><code>.claude/commands/*</code> → Codex용 repo-local 규칙 문서</li>
+              <li>검증 명령 예시 → <code>uv run pytest</code>, <code>uv run ruff check .</code> 등으로 치환</li>
+              <li>UI/API 예시 → 우리 프로젝트의 CLI/MLX/taxonomy 파이프라인 중심으로 재서술</li>
+              <li>리뷰 기준 → Python, 로컬 데이터 파이프라인, 문서 위키 운영에 맞게 보정</li>
+            </ul>
+          </div>
+
+          <div class="compat-card">
+            <strong>직접 이식하면 안 되는 것</strong>
+            <ul>
+              <li>Claude Marketplace 설치 절차</li>
+              <li>Claude 전용 slash command UX를 그대로 전제하는 설명</li>
+              <li>현재 저장소와 무관한 웹앱/프론트엔드 중심 검증 문구</li>
+              <li>우리 <code>AGENTS.md</code>의 3-레이어 지식 저장소 규약을 덮어쓰는 방식</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="mapping">
+        <div class="panel-header">
+          <div>
+            <h2>5. Training-Free-SID-Reco로 옮길 때의 배치 지도</h2>
+            <p>
+              현재 저장소에는 Codex용 로컬 skill 체계를 둘 수 있다. 즉 agent-skills는 새 체계가 아니라,
+              기존 체계 옆에 들어올 “확장 레이어”로 배치하는 편이 안전하다.
+            </p>
+          </div>
+        </div>
+
+        <div class="map-grid">
+          <div class="map-card">
+            <strong>레이어 A · 유지할 것</strong>
+            <ul>
+              <li><code>AGENTS.md</code>의 3-레이어 지식 저장소 정의</li>
+              <li><code>docs/wiki/</code> 페이지 타입, 인제스트/쿼리/린트 규약</li>
+              <li><code>docs-manager</code> 로컬 스킬과 `AGENTS.md` 기반 문서 규칙</li>
+            </ul>
+          </div>
+
+          <div class="map-card">
+            <strong>레이어 B · 새로 넣을 것</strong>
+            <ul>
+              <li><code>.agents/skills/</code> 아래에 phase별 스킬 추가</li>
+              <li>예: <code>spec-driven-development</code>, <code>test-driven-development</code>, <code>code-review-and-quality</code></li>
+              <li>짧은 `/spec`, `/plan` 같은 호출은 wrapper skill로 제공</li>
+            </ul>
+          </div>
+
+          <div class="map-card">
+            <strong>레이어 C · 우리 식으로 재작성할 것</strong>
+            <ul>
+              <li>검증 명령: <code>uv run pytest</code>, <code>uv run ruff check .</code>, <code>uv run mypy src</code></li>
+              <li>도메인 예시: Food.com 전처리, taxonomy step1, taxonomy dictionary, MLX 추론</li>
+              <li>문서화: ADR 생성은 <code>docs/wiki/decisions/</code> 규약에 맞춤</li>
+            </ul>
+          </div>
+
+          <div class="map-card">
+            <strong>레이어 D · 나중에 볼 것</strong>
+            <ul>
+              <li><code>frontend-ui-engineering</code>처럼 현재 repo와 직접 관련이 낮은 스킬</li>
+              <li>브라우저 전용 검증 체계</li>
+              <li>세션 hook 자동화</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="roadmap">
+        <div class="panel-header">
+          <div>
+            <h2>6. 전체 이식을 원할 때의 현실적인 순서</h2>
+            <p>
+              “전체 이식”은 19개 디렉터리를 복사하는 작업이 아니다. 현재 저장소 문맥으로 재검증하며
+              단계적으로 옮겨야 유지보수 가능한 자산이 된다.
+            </p>
+          </div>
+        </div>
+
+        <div class="roadmap">
+          <div class="roadmap-step" data-step="01">
+            <strong>기반 정리</strong>
+            <ul>
+              <li><code>.agents/skills/</code>를 기준으로 skill 디렉터리 구조를 고정한다.</li>
+              <li><code>AGENTS.md</code>에 “문서 스키마”와 “개발 워크플로”의 책임 경계를 명시한다.</li>
+            </ul>
+          </div>
+
+          <div class="roadmap-step" data-step="02">
+            <strong>핵심 스킬 포팅</strong>
+            <ul>
+              <li>Define, Build, Review 축의 핵심 스킬부터 한국어/로컬 검증 명령으로 재작성한다.</li>
+              <li>각 스킬에 우리 코드베이스 예시를 넣는다.</li>
+            </ul>
+          </div>
+
+          <div class="roadmap-step" data-step="03">
+            <strong>명령 레이어 연결</strong>
+            <ul>
+              <li>필요한 짧은 호출은 wrapper skill로 추가한다.</li>
+              <li><code>docs-manager</code>와 일반 구현 스킬의 우선순위를 분리한다.</li>
+            </ul>
+          </div>
+
+          <div class="roadmap-step" data-step="04">
+            <strong>실전 검증</strong>
+            <ul>
+              <li>버그 수정, CLI 변경, 위키 업데이트 같은 실제 작업에 적용한다.</li>
+              <li>불필요한 단계와 중복 규칙을 줄여 최종 체계로 고정한다.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="sources">
+        <div class="panel-header">
+          <div>
+            <h2>7. 이 브리핑이 근거로 삼은 문서</h2>
+            <p>
+              아래 문서를 읽어 구조와 Codex 호환 범위를 정리했다. 원하면 다음 단계에서 이 자료를
+              바탕으로 실제 이식 패치까지 바로 진행할 수 있다.
+            </p>
+          </div>
+        </div>
+
+        <div class="source-list">
+          <div class="source-card">
+            <strong>Remote: 핵심 개요</strong>
+            <ul>
+              <li><a href="https://github.com/addyosmani/agent-skills/tree/main">Repository tree</a></li>
+              <li><a href="https://github.com/addyosmani/agent-skills/blob/main/README.md">README.md</a></li>
+              <li><a href="https://github.com/addyosmani/agent-skills/blob/main/docs/getting-started.md">docs/getting-started.md</a></li>
+              <li><a href="https://github.com/addyosmani/agent-skills/blob/main/docs/skill-anatomy.md">docs/skill-anatomy.md</a></li>
+              <li><a href="https://github.com/addyosmani/agent-skills/blob/main/AGENTS.md">AGENTS.md</a></li>
+            </ul>
+          </div>
+
+          <div class="source-card">
+            <strong>Local: 현재 저장소 맥락</strong>
+            <ul>
+              <li><code>README.md</code></li>
+              <li><code>AGENTS.md</code></li>
+              <li><code>.agents/skills/docs-manager/SKILL.md</code></li>
+              <li><code>.harness/reference/local-adaptation.md</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <p class="footnote">
+          이 페이지는 외부 라이브러리 없이 동작하는 단일 HTML 파일이다. 로컬에서 열어서 구조 설명용
+          브리핑, 이식 논의용 자료, 또는 이후 문서화의 초안으로 재사용할 수 있다.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      const buttons = Array.from(document.querySelectorAll(".filter-btn"));
+      const cards = Array.from(document.querySelectorAll(".skill-card"));
+
+      function applyFilter(phase) {
+        buttons.forEach((button) => {
+          button.classList.toggle("active", button.dataset.phase === phase);
+        });
+
+        cards.forEach((card) => {
+          const shouldShow = phase === "all" || card.dataset.phase === phase;
+          card.classList.toggle("hidden", !shouldShow);
+        });
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => applyFilter(button.dataset.phase));
+      });
+    </script>
+  </body>
+</html>
