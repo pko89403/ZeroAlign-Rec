@@ -90,5 +90,6 @@ uv run sid-reco build-taxonomy-dictionary \
 - [ADR-004: Taxonomy Dictionary 생성 방식 결정](../decisions/adr-004-taxonomy-dictionary-generation.md) — superseded된 초기 생성 정책
 - [ADR-005: Taxonomy Dictionary 생성 hardening 결정](../decisions/adr-005-taxonomy-dictionary-hardening.md) — 현재 bounded input/validation 정책
 - [Taxonomy Item Structuring](taxonomy-item-structuring.md) — dictionary를 참조해 item별 TID를 생성하는 downstream 단계
+- [SID 컴파일 및 인덱싱](sid-compilation-indexing.md) — structured item taxonomy를 serialization/embedding artifact로 넘기는 다음 단계
 - [ADR-006: Strict TID hardening 결정](../decisions/adr-006-strict-tid-hardening.md) — downstream canonicalization과 validator 정책
 - [Taxonomy Dictionary 개발 이슈 개요](../overviews/taxonomy-dictionary-development-issues.md) — 구현 및 검증 중 발생한 오류 기록

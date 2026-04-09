@@ -10,6 +10,8 @@
 
 `ZeroAlign-Rec`은 `SID` 기반 training-free 추천 시스템을 로컬 환경에서 실험하기 위한 Python 코드베이스다. Apple Silicon에서 `MLX`를 사용해 생성형 LLM과 임베딩 모델을 로컬로 실행하고, Food.com 데이터셋 전처리부터 taxonomy dictionary 생성, taxonomy-aligned item structuring까지 한 흐름으로 검증할 수 있다.
 
+현재 Phase 1 진행 상태에는 `src/sid_reco/sid/` 패키지와 public `compile-sid-index` CLI도 포함된다. 이 흐름은 `data/processed/foodcom/sid_index/` 아래에 deterministic structured-item serialization 산출물, MLX embedding 산출물, CPU residual K-means codebook 결과, FAISS indexing 산출물을 저장한다.
+
 ## 목차
 
 - [왜 ZeroAlign-Rec인가](#왜-zeroalign-rec인가)
@@ -81,6 +83,10 @@ uv run sid-reco structure-taxonomy-batch \
   --neighbor-context-path data/processed/foodcom/neighbor_context/neighbor_context.csv \
   --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
   --out-path data/processed/foodcom/taxonomy_structured/items.jsonl
+uv run sid-reco compile-sid-index \
+  --structured-items-path data/processed/foodcom/taxonomy_structured/items.jsonl \
+  --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
+  --out-dir data/processed/foodcom/sid_index
 ```
 
 ## 핵심 워크플로
@@ -177,6 +183,29 @@ uv run sid-reco structure-taxonomy-batch \
   --out-path data/processed/foodcom/taxonomy_structured/items.jsonl
 ```
 
+### 5. 계층형 SID 및 FAISS 인덱스 컴파일
+
+structured item을 deterministic serialized text, dense embedding, hierarchical SID path, FAISS 인덱스로 컴파일한다.
+
+```bash
+uv run sid-reco compile-sid-index \
+  --structured-items-path data/processed/foodcom/taxonomy_structured/items.jsonl \
+  --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
+  --out-dir data/processed/foodcom/sid_index
+```
+
+주요 산출물:
+
+- `serialized_items.jsonl`
+- `embeddings.npy`
+- `embedding_manifest.json`
+- `compiled_sid.jsonl`
+- `item_to_sid.json`
+- `sid_to_items.json`
+- `id_map.jsonl`
+- `item_index.faiss`
+- `manifest.json`
+
 ## 설정
 
 `.env.example`를 기준으로 `.env`를 만들고 필요한 값만 조정하면 된다.
@@ -207,6 +236,7 @@ uv run mypy src
 | Path | Role |
 | --- | --- |
 | `src/sid_reco/` | application package |
+| `src/sid_reco/sid/` | Phase 1 SID serialization 및 embedding artifact helper |
 | `tests/` | automated tests |
 | `data/` | local datasets and processed artifacts |
 | `artifacts/` | generated reports, branding, and outputs |
@@ -225,10 +255,14 @@ uv run mypy src
 - [docs/wiki/entities/food-com-dataset.md](docs/wiki/entities/food-com-dataset.md)
 - [docs/wiki/entities/food-taxonomy-dictionary.md](docs/wiki/entities/food-taxonomy-dictionary.md)
 - [docs/wiki/entities/neighbor-context-index.md](docs/wiki/entities/neighbor-context-index.md)
+- [docs/wiki/entities/taxonomy-item-structuring.md](docs/wiki/entities/taxonomy-item-structuring.md)
+- [docs/wiki/entities/sid-compilation-indexing.md](docs/wiki/entities/sid-compilation-indexing.md)
+- [docs/wiki/overviews/sid-phase1-validation-run.md](docs/wiki/overviews/sid-phase1-validation-run.md)
 - [docs/wiki/decisions/adr-001-dev-environment.md](docs/wiki/decisions/adr-001-dev-environment.md)
 - [docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md](docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md)
 - [docs/wiki/decisions/adr-003-neighbor-context-retrieval.md](docs/wiki/decisions/adr-003-neighbor-context-retrieval.md)
 - [docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md](docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md)
+- [artifacts/reports/sid-phase1-validation.html](artifacts/reports/sid-phase1-validation.html)
 
 ## 연구 레퍼런스
 

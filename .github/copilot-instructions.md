@@ -5,7 +5,7 @@
 - SID-based training-free recommender experiment
 - Python 3.12, `uv`, `typer`, `rich`
 - Local MLX inference on Apple Silicon
-- Main code: `src/sid_reco/`
+- Main code: `src/sid_reco/` (including `src/sid_reco/sid/` for Phase 1 SID work)
 - Tests: `tests/`
 
 ## Load These First
@@ -41,6 +41,7 @@ Use domain-specific commands when relevant:
 - `uv run sid-reco build-taxonomy-dictionary --help`
 - `uv run sid-reco structure-taxonomy-item --help`
 - `uv run sid-reco structure-taxonomy-batch --help`
+- `uv run sid-reco compile-sid-index --help`
 
 ## Boundaries
 

@@ -66,4 +66,5 @@ uv run sid-reco build-neighbor-context \
 - [ADR-003: Neighbor Context 정책 결정](../decisions/adr-003-neighbor-context-retrieval.md) — neighbor context 정책 결정
 - [개발 환경 세팅](dev-environment.md) — MLX와 CLI가 실행되는 로컬 환경
 - [Taxonomy Item Structuring](taxonomy-item-structuring.md) — top-5 neighbor를 downstream evidence로 사용하는 단계
+- [SID 컴파일 및 인덱싱](sid-compilation-indexing.md) — structuring 이후 serialization/embedding 중간 산출물과 이어지는 downstream 단계
 - [ADR-006: Strict TID hardening 결정](../decisions/adr-006-strict-tid-hardening.md) — top-5 neighbor evidence의 downstream 사용 정책
