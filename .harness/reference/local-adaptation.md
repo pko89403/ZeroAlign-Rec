@@ -37,7 +37,7 @@ uv run sid-reco doctor
 ```bash
 uv run sid-reco smoke-llm "사용자 취향을 요약해줘"
 uv run sid-reco smoke-embed "미스터리 스릴러"
-uv run sid-reco build-taxonomy-step1 --help
+uv run sid-reco build-neighbor-context --help
 uv run sid-reco build-taxonomy-dictionary --help
 uv run sid-reco structure-taxonomy-item --help
 uv run sid-reco structure-taxonomy-batch --help
@@ -54,7 +54,7 @@ uv run sid-reco structure-taxonomy-batch --help
 ## Notes
 
 - imported references는 일반 체크리스트다. 프로젝트 특화 검증은 항상 `README.md`와 `AGENTS.md`를 함께 본다.
-- taxonomy 관련 작업은 `build-taxonomy-step1` → `build-taxonomy-dictionary` → `structure-taxonomy-item|batch` 순서의 파이프라인을 기본 흐름으로 읽는다.
+- taxonomy 관련 작업은 `build-neighbor-context` → `build-taxonomy-dictionary` → `structure-taxonomy-item|batch` 순서의 파이프라인을 기본 흐름으로 읽는다.
 - 브라우저/웹 접근성/Core Web Vitals 항목은 HTML 리포트나 UI 작업이 실제로 있을 때만 적용한다.
 - `npm audit`, `npm run build` 같은 문구는 일반 예시로 읽고, 실제 실행은 이 저장소의 `uv` 명령으로 치환한다.
 - Codex App에서 repo-local slash-like entrypoint가 필요하면 command 파일이 아니라 skill 이름으로 노출되도록 wrapper skill을 만든다.
