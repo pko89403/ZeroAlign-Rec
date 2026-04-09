@@ -1,4 +1,4 @@
-"""Step 1 pipeline for taxonomy item embeddings and neighbor search."""
+"""Neighbor-context pipeline for taxonomy item embeddings and nearest-neighbor export."""
 
 from __future__ import annotations
 
@@ -49,8 +49,8 @@ class EncodedCatalog:
 
 
 @dataclass(frozen=True, slots=True)
-class TaxonomyStep1Summary:
-    """High-level summary for the taxonomy step 1 export."""
+class NeighborContextSummary:
+    """High-level summary for the neighbor-context export."""
 
     items_rows: int
     neighbor_rows: int
@@ -61,7 +61,7 @@ class TaxonomyStep1Summary:
 
 
 def load_recipe_catalog(recipes_path: Path) -> pd.DataFrame:
-    """Load the processed recipe catalog required for taxonomy step 1."""
+    """Load the processed recipe catalog required for neighbor-context building."""
     if not recipes_path.exists():
         raise FileNotFoundError(f"Missing recipe catalog file: {recipes_path}")
 
@@ -93,7 +93,7 @@ def load_recipe_catalog(recipes_path: Path) -> pd.DataFrame:
 
 
 def build_embedding_text(catalog: pd.DataFrame) -> pd.DataFrame:
-    """Build the fixed embedding text used for taxonomy step 1."""
+    """Build the fixed embedding text used for neighbor-context retrieval."""
     items = catalog.copy()
     items["embedding_text"] = [
         _compose_embedding_text(
@@ -105,6 +105,11 @@ def build_embedding_text(catalog: pd.DataFrame) -> pd.DataFrame:
         for row in items.itertuples(index=False)
     ]
     return items
+
+
+def prepare_neighbor_catalog(recipes_path: Path) -> pd.DataFrame:
+    """Load and normalize the recipe catalog plus its embedding text."""
+    return build_embedding_text(load_recipe_catalog(recipes_path))
 
 
 def encode_catalog_with_adaptive_batches(
@@ -193,7 +198,7 @@ def search_topk_neighbors(
     if len(recipe_ids) != int(embeddings.shape[0]):
         raise ValueError("Recipe ID count must match the embedding matrix row count.")
 
-    search_width = len(recipe_ids)
+    search_width = min(len(recipe_ids), top_k + 1)
     scores, indices = index.search(embeddings, search_width)
     rows: list[dict[str, Any]] = []
     for source_position, source_recipe_id in enumerate(recipe_ids):
@@ -225,15 +230,15 @@ def search_topk_neighbors(
     return pd.DataFrame.from_records(rows, columns=NEIGHBOR_CONTEXT_COLUMNS)
 
 
-def write_step1_outputs(
+def write_neighbor_context_outputs(
     *,
     out_dir: Path,
     items: pd.DataFrame,
     neighbor_context: pd.DataFrame,
     index: faiss.IndexFlatIP,
     manifest: dict[str, Any],
-) -> TaxonomyStep1Summary:
-    """Persist step 1 tables, FAISS index, and manifest to disk."""
+) -> NeighborContextSummary:
+    """Persist neighbor-context tables, FAISS index, and manifest to disk."""
     out_dir.mkdir(parents=True, exist_ok=True)
     items.loc[:, ITEMS_WITH_EMBEDDINGS_COLUMNS].to_csv(
         out_dir / "items_with_embeddings.csv",
@@ -266,7 +271,7 @@ def write_step1_outputs(
         first_embedding = json.loads(items.iloc[0]["embedding"])
         embedding_dim = len(first_embedding)
 
-    return TaxonomyStep1Summary(
+    return NeighborContextSummary(
         items_rows=len(items),
         neighbor_rows=len(neighbor_context),
         embedding_dim=embedding_dim,
@@ -285,7 +290,7 @@ def build_manifest(
     top_k: int,
     encoded_catalog: EncodedCatalog,
 ) -> dict[str, Any]:
-    """Build metadata for the step 1 taxonomy export."""
+    """Build metadata for the neighbor-context export."""
     detected_total_memory_gb: float | None = None
     if encoded_catalog.detected_total_memory_bytes is not None:
         detected_total_memory_gb = round(
@@ -299,6 +304,7 @@ def build_manifest(
             "recipes_path": str(recipes_path),
         },
         "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "stage": "neighbor_context",
         "embedding_model": embed_model,
         "index_type": "faiss.IndexFlatIP",
         "item_rows": len(items),
@@ -315,7 +321,7 @@ def build_manifest(
     }
 
 
-def build_taxonomy_step1(
+def build_neighbor_context(
     *,
     recipes_path: Path,
     out_dir: Path,
@@ -323,10 +329,9 @@ def build_taxonomy_step1(
     top_k: int = DEFAULT_TOP_K,
     batch_size: int | None = None,
     encoder: MLXEmbeddingEncoder | None = None,
-) -> TaxonomyStep1Summary:
-    """Run the full taxonomy step 1 pipeline."""
-    items = load_recipe_catalog(recipes_path)
-    items = build_embedding_text(items)
+) -> NeighborContextSummary:
+    """Run the full neighbor-context pipeline."""
+    items = prepare_neighbor_catalog(recipes_path)
     resolved_encoder = encoder or MLXEmbeddingEncoder(model_id=embed_model)
     encoded_catalog = encode_catalog_with_adaptive_batches(
         items,
@@ -348,7 +353,7 @@ def build_taxonomy_step1(
         top_k=top_k,
         encoded_catalog=encoded_catalog,
     )
-    return write_step1_outputs(
+    return write_neighbor_context_outputs(
         out_dir=out_dir,
         items=encoded_catalog.items,
         neighbor_context=neighbor_context,

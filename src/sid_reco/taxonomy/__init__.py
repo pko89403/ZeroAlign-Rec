@@ -7,15 +7,15 @@ from sid_reco.taxonomy.item_projection import (
     structure_taxonomy_batch,
     structure_taxonomy_item,
 )
-from sid_reco.taxonomy.step1 import TaxonomyStep1Summary, build_taxonomy_step1
+from sid_reco.taxonomy.neighbor_context import NeighborContextSummary, build_neighbor_context
 
 __all__ = [
+    "NeighborContextSummary",
     "TaxonomyDictionarySummary",
     "StructuredTaxonomyBatchSummary",
     "StructuredTaxonomyItem",
-    "TaxonomyStep1Summary",
+    "build_neighbor_context",
     "build_taxonomy_dictionary",
-    "build_taxonomy_step1",
     "structure_taxonomy_batch",
     "structure_taxonomy_item",
 ]
