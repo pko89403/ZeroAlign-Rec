@@ -23,8 +23,8 @@ Current Phase 1 progress also includes an in-repository `sid` package plus a pub
 - [Validation](#validation)
 - [Repository Layout](#repository-layout)
 - [Docs and Knowledge Base](#docs-and-knowledge-base)
-- [Research References](#research-references)
 - [Copilot and Agent Harness](#copilot-and-agent-harness)
+- [Research References](#research-references)
 
 ## Why ZeroAlign-Rec
 
@@ -192,6 +192,22 @@ uv run sid-reco structure-taxonomy-batch \
 ### 5. Compile hierarchical SID and FAISS index
 
 Compile structured items into deterministic serialized text, dense embeddings, hierarchical SID paths, and a FAISS index.
+The text serialization step is informed by the common preprocessing pattern of flattening item
+metadata into a single document-like string before embedding, as used in
+[Beyond Relevance: An Adaptive Exploration-Based Framework for Personalized Recommendations](https://arxiv.org/html/2503.19525v1)
+and
+[Semantic IDs for Joint Generative Search and Recommendation](https://arxiv.org/html/2508.10478v1).
+This repository applies that pattern to taxonomy-structured TID fields rather than raw title /
+description metadata alone.
+The dense embedding step is likewise informed by recommendation pipelines that project item text
+into dense semantic vectors with a dedicated text embedding model. In particular,
+[Beyond Relevance: An Adaptive Exploration-Based Framework for Personalized Recommendations](https://arxiv.org/html/2503.19525v1)
+uses a sentence-transformer embedding backbone for item clustering. This repository follows the
+same broad pattern but uses the local MLX embedding model
+`mlx-community/Qwen3-Embedding-4B-4bit-DWQ` over taxonomy-structured serialized text.
+The current FAISS stage stores an offline exact inner-product index (`faiss.IndexFlatIP`) together
+with mapping artifacts. It prepares compiled items for later retrieval experiments, but does not
+yet implement query-time ANN search or LLM-conditioned top-k candidate compression.
 
 ```bash
 uv run sid-reco compile-sid-index \
@@ -286,27 +302,6 @@ Instead of duplicating long operational details in the README, this repository k
 - [docs/wiki/decisions/adr-006-strict-tid-hardening.md](docs/wiki/decisions/adr-006-strict-tid-hardening.md)
 - [artifacts/reports/sid-phase1-validation.html](artifacts/reports/sid-phase1-validation.html)
 
-## Research References
-
-Some subcomponents in this repository explicitly adapt ideas from prior work. When discussing or
-building on those specific ideas, please cite the original paper rather than this repository alone.
-
-### GRLM
-
-The `Taxonomy Item Structuring` stage reuses only the neighborhood-guided prompting idea from
-[Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers](https://arxiv.org/abs/2601.06798)
-and the accompanying [GRLM repository](https://github.com/ZY0025/GRLM).
-This repository does **not** implement the full GRLM training, grounding, or recommendation pipeline.
-
-```bibtex
-@article{zhang2026unleashing,
-  title={Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers},
-  author={Zhang, Zhiyang and She, Junda and Cai, Kuo and Chen, Bo and Wang, Shiyao and Luo, Xinchen and Luo, Qiang and Tang, Ruiming and Li, Han and Gai, Kun and others},
-  journal={arXiv preprint arXiv:2601.06798},
-  year={2026}
-}
-```
-
 ## Copilot and Agent Harness
 
 This repository also maintains a Copilot/Codex-friendly harness.
@@ -334,3 +329,44 @@ build-neighbor-context -> build-taxonomy-dictionary -> structure-taxonomy-item|b
 ```
 
 For docs/wiki work, `docs-manager` and `AGENTS.md` rules take priority over generic workflows.
+
+## Research References
+
+Some subcomponents in this repository explicitly adapt ideas from prior work. When discussing or
+building on those specific ideas, please cite the original papers rather than this repository alone.
+
+### TaxRec
+
+The `Taxonomy Dictionary` stage reuses only the one-time taxonomy categorization idea from
+[Taxonomy-Guided Zero-Shot Recommendations with LLMs](https://aclanthology.org/2025.coling-main.102/)
+and the accompanying [TaxRec repository](https://github.com/yueqingliang1/TaxRec).
+This repository does **not** implement the full TaxRec recommendation and evaluation pipeline.
+
+```bibtex
+@inproceedings{liang-etal-2025-taxonomy,
+  title={Taxonomy-Guided Zero-Shot Recommendations with LLMs},
+  author={Liang, Yueqing and Yang, Liangwei and Wang, Chen and Xu, Xiongxiao and Yu, Philip S. and Shu, Kai},
+  booktitle={Proceedings of the 31st International Conference on Computational Linguistics},
+  pages={1520--1530},
+  year={2025},
+  address={Abu Dhabi, UAE},
+  publisher={Association for Computational Linguistics},
+  url={https://aclanthology.org/2025.coling-main.102/}
+}
+```
+
+### GRLM
+
+The `Taxonomy Item Structuring` stage reuses only the neighborhood-guided prompting idea from
+[Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers](https://arxiv.org/abs/2601.06798)
+and the accompanying [GRLM repository](https://github.com/ZY0025/GRLM).
+This repository does **not** implement the full GRLM training, grounding, or recommendation pipeline.
+
+```bibtex
+@article{zhang2026unleashing,
+  title={Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers},
+  author={Zhang, Zhiyang and She, Junda and Cai, Kuo and Chen, Bo and Wang, Shiyao and Luo, Xinchen and Luo, Qiang and Tang, Ruiming and Li, Han and Gai, Kun and others},
+  journal={arXiv preprint arXiv:2601.06798},
+  year={2026}
+}
+```

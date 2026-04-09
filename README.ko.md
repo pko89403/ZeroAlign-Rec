@@ -23,8 +23,8 @@
 - [검증](#검증)
 - [저장소 구조](#저장소-구조)
 - [문서와 지식 베이스](#문서와-지식-베이스)
-- [연구 레퍼런스](#연구-레퍼런스)
 - [Copilot 및 Agent 하네스](#copilot-및-agent-하네스)
+- [연구 레퍼런스](#연구-레퍼런스)
 
 ## 왜 ZeroAlign-Rec인가
 
@@ -186,6 +186,22 @@ uv run sid-reco structure-taxonomy-batch \
 ### 5. 계층형 SID 및 FAISS 인덱스 컴파일
 
 structured item을 deterministic serialized text, dense embedding, hierarchical SID path, FAISS 인덱스로 컴파일한다.
+이 단계의 text serialization은 아이템 메타데이터를 임베딩 전에 하나의 document-like 문자열로
+평탄화하는 전처리 관행을 참고한다. 특히
+[Beyond Relevance: An Adaptive Exploration-Based Framework for Personalized Recommendations](https://arxiv.org/html/2503.19525v1)
+와
+[Semantic IDs for Joint Generative Search and Recommendation](https://arxiv.org/html/2508.10478v1)
+처럼 메타데이터를 단일 텍스트 표현으로 결합하는 방식을 참고하되,
+이 저장소는 raw title/description만이 아니라 taxonomy-structured TID 필드를 직렬화 대상으로 사용한다.
+Dense embedding 생성 역시 텍스트를 전용 embedding model로 의미 공간에 투영하는 최근 추천 연구의
+관행을 참고한다. 예를 들어
+[Beyond Relevance: An Adaptive Exploration-Based Framework for Personalized Recommendations](https://arxiv.org/html/2503.19525v1)
+는 sentence-transformer 기반 item embedding을 사용한다.
+이 저장소는 같은 큰 패턴을 따르되, `mlx-community/Qwen3-Embedding-4B-4bit-DWQ`를 사용해
+taxonomy-structured serialized text를 로컬 MLX 환경에서 임베딩한다.
+현재 FAISS 단계는 `faiss.IndexFlatIP` 기반의 offline exact 인덱스와 mapping artifact를
+저장하는 구현이다. 즉 이후 retrieval 실험을 위한 기반 산출물을 준비하는 단계이며,
+아직 query-time ANN 검색이나 LLM 조건부 top-k 후보 압축 계층까지는 포함하지 않는다.
 
 ```bash
 uv run sid-reco compile-sid-index \
@@ -264,28 +280,6 @@ uv run mypy src
 - [docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md](docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md)
 - [artifacts/reports/sid-phase1-validation.html](artifacts/reports/sid-phase1-validation.html)
 
-## 연구 레퍼런스
-
-이 저장소의 일부 컴포넌트는 선행 연구의 특정 아이디어를 부분적으로 참고한다.
-따라서 해당 아이디어를 설명하거나 재사용할 때는 이 저장소만이 아니라 원 논문도 함께 인용하는 것이 적절하다.
-
-### GRLM
-
-`Taxonomy Item Structuring` 단계는
-[Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers](https://arxiv.org/abs/2601.06798)
-및 [GRLM 공개 구현](https://github.com/ZY0025/GRLM)에서
-`similar-item neighborhood`를 LLM 입력의 문맥 가이드로 사용하는 발상을 참고한다.
-다만 이 저장소는 GRLM의 전체 학습, grounding, recommendation 파이프라인을 구현하지는 않는다.
-
-```bibtex
-@article{zhang2026unleashing,
-  title={Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers},
-  author={Zhang, Zhiyang and She, Junda and Cai, Kuo and Chen, Bo and Wang, Shiyao and Luo, Xinchen and Luo, Qiang and Tang, Ruiming and Li, Han and Gai, Kun and others},
-  journal={arXiv preprint arXiv:2601.06798},
-  year={2026}
-}
-```
-
 ## Copilot 및 Agent 하네스
 
 이 저장소는 Copilot/Codex 친화적인 harness를 함께 유지한다.
@@ -307,3 +301,46 @@ uv run mypy src
 - `/ship`
 
 문서/위키 작업에서는 일반 workflow보다 `docs-manager`와 `AGENTS.md` 규칙이 우선한다.
+
+## 연구 레퍼런스
+
+이 저장소의 일부 컴포넌트는 선행 연구의 특정 아이디어를 부분적으로 참고한다.
+따라서 해당 아이디어를 설명하거나 재사용할 때는 이 저장소만이 아니라 원 논문도 함께 인용하는 것이 적절하다.
+
+### TaxRec
+
+`Taxonomy Dictionary` 단계는
+[Taxonomy-Guided Zero-Shot Recommendations with LLMs](https://aclanthology.org/2025.coling-main.102/)
+및 [TaxRec 공개 구현](https://github.com/yueqingliang1/TaxRec)의
+one-time taxonomy categorization 아이디어만 참고한다.
+다만 이 저장소는 TaxRec의 전체 recommendation/evaluation 파이프라인을 구현하지는 않는다.
+
+```bibtex
+@inproceedings{liang-etal-2025-taxonomy,
+  title={Taxonomy-Guided Zero-Shot Recommendations with LLMs},
+  author={Liang, Yueqing and Yang, Liangwei and Wang, Chen and Xu, Xiongxiao and Yu, Philip S. and Shu, Kai},
+  booktitle={Proceedings of the 31st International Conference on Computational Linguistics},
+  pages={1520--1530},
+  year={2025},
+  address={Abu Dhabi, UAE},
+  publisher={Association for Computational Linguistics},
+  url={https://aclanthology.org/2025.coling-main.102/}
+}
+```
+
+### GRLM
+
+`Taxonomy Item Structuring` 단계는
+[Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers](https://arxiv.org/abs/2601.06798)
+및 [GRLM 공개 구현](https://github.com/ZY0025/GRLM)에서
+`similar-item neighborhood`를 LLM 입력의 문맥 가이드로 사용하는 발상을 참고한다.
+다만 이 저장소는 GRLM의 전체 학습, grounding, recommendation 파이프라인을 구현하지는 않는다.
+
+```bibtex
+@article{zhang2026unleashing,
+  title={Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers},
+  author={Zhang, Zhiyang and She, Junda and Cai, Kuo and Chen, Bo and Wang, Shiyao and Luo, Xinchen and Luo, Qiang and Tang, Ruiming and Li, Han and Gai, Kun and others},
+  journal={arXiv preprint arXiv:2601.06798},
+  year={2026}
+}
+```
