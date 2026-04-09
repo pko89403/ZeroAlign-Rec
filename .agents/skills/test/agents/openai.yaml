@@ -1,0 +1,5 @@
+interface:
+  display_name: "Test"
+  short_description: "Run TDD or Prove-It bug-fix workflow"
+  default_prompt: "Use $test to write the failing test first, fix the behavior, and prove the change with repository validations."
+

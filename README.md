@@ -54,9 +54,11 @@ Important environment notes:
 uv sync --all-groups
 source .venv/bin/activate
 cp .env.example .env
+git config core.hooksPath .githooks
 ```
 
 Fill in only the values you need in `.env`. See [Configuration](#configuration) for the main variables.
+The repository-managed hooks then apply `ruff check --fix` and `ruff format` before commit, and run the automated `ruff` + `mypy` + `pytest` gate before push.
 
 ## Quick Start
 
@@ -140,7 +142,12 @@ Main outputs:
 
 ### 4. Structure items into taxonomy-aligned JSON
 
-Use the taxonomy dictionary together with step 1 neighbor context to produce structured outputs for each item.
+Use the taxonomy dictionary together with step 1 neighbor context to produce structured outputs for each item. The item structuring stage now applies:
+
+- prompt-level duplicate/synonym suppression
+- a self-refine rewrite pass on draft JSON when labels drift outside the master vocabulary
+- conservative post-processing canonicalization toward the taxonomy dictionary
+- lightweight validators for obviously weak `cuisine` and contradictory `dietary_style` labels
 
 Single item:
 
@@ -177,14 +184,28 @@ Create `.env` from `.env.example` and adjust only the variables you need.
 | `SID_RECO_LLM_TEMPERATURE` | default temperature |
 | `SID_RECO_LLM_TOP_P` | default nucleus sampling value |
 
-## Validation
+## Automated Quality Gate
+
+```bash
+uv run ruff format --check .
+uv run pytest --ignore=tests/test_mlx_runtime.py --ignore=tests/test_cli_smoke_mlx.py
+uv run ruff check .
+uv run mypy src
+```
+
+The automated gate intentionally excludes MLX runtime validation tests.
+
+## Local Manual MLX Checks
+
+Run these only in a local Apple Silicon session when you want to confirm MLX/Metal behavior:
 
 ```bash
 uv run sid-reco doctor
 uv run sid-reco smoke-mlx
-uv run pytest
-uv run ruff check .
-uv run mypy src
+uv run sid-reco build-taxonomy-step1 --help
+uv run sid-reco build-taxonomy-dictionary --help
+uv run sid-reco structure-taxonomy-item --help
+uv run sid-reco structure-taxonomy-batch --help
 ```
 
 ## Repository Layout
@@ -209,11 +230,14 @@ Instead of duplicating long operational details in the README, this repository k
 - [docs/wiki/entities/dev-environment.md](docs/wiki/entities/dev-environment.md)
 - [docs/wiki/entities/food-com-dataset.md](docs/wiki/entities/food-com-dataset.md)
 - [docs/wiki/entities/food-taxonomy-dictionary.md](docs/wiki/entities/food-taxonomy-dictionary.md)
+- [docs/wiki/entities/taxonomy-item-structuring.md](docs/wiki/entities/taxonomy-item-structuring.md)
 - [docs/wiki/entities/taxonomy-step1-neighbor-index.md](docs/wiki/entities/taxonomy-step1-neighbor-index.md)
 - [docs/wiki/decisions/adr-001-dev-environment.md](docs/wiki/decisions/adr-001-dev-environment.md)
 - [docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md](docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md)
 - [docs/wiki/decisions/adr-003-taxonomy-step1-neighbor-index.md](docs/wiki/decisions/adr-003-taxonomy-step1-neighbor-index.md)
 - [docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md](docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md)
+- [docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md](docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md)
+- [docs/wiki/decisions/adr-006-strict-tid-hardening.md](docs/wiki/decisions/adr-006-strict-tid-hardening.md)
 
 ## Copilot and Agent Harness
 
@@ -227,12 +251,18 @@ This repository also maintains a Copilot/Codex-friendly harness.
 
 Main shortcuts:
 
-- `/docs-manager` or `/doc-manager`
+- `/docs-manager` or `/doc-manager` — wiki/ADR/index plus README and harness sync
 - `/spec`
 - `/plan`
 - `/build`
 - `/test`
 - `/code-simplify`
 - `/ship`
+
+For taxonomy work, the default repository pipeline is:
+
+```bash
+build-taxonomy-step1 -> build-taxonomy-dictionary -> structure-taxonomy-item|batch
+```
 
 For docs/wiki work, `docs-manager` and `AGENTS.md` rules take priority over generic workflows.
