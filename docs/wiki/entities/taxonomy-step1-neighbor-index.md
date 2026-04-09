@@ -58,9 +58,12 @@ uv run sid-reco build-taxonomy-step1 \
 - 벡터는 L2 normalize 후 `faiss.IndexFlatIP`에 적재한다
 - 각 item에 대해 self-match를 제외한 상위 `5`개 이웃을 저장한다
 - `neighbor_context.csv`는 `ids only` 정책이므로 이웃 메타데이터는 `items_with_embeddings.csv`에서 조회한다
+- downstream item structuring 단계는 각 recipe의 top-5 neighbor를 evidence로 재사용한다
 
 ## Related
 
 - [Food.com 데이터셋](food-com-dataset.md) — step 1의 원천 catalog
 - [ADR-003: Taxonomy Step 1 이웃 검색 정책 결정](../decisions/adr-003-taxonomy-step1-neighbor-index.md) — step 1 검색 정책 결정
 - [개발 환경 세팅](dev-environment.md) — MLX와 CLI가 실행되는 로컬 환경
+- [Taxonomy Item Structuring](taxonomy-item-structuring.md) — top-5 neighbor를 downstream evidence로 사용하는 단계
+- [ADR-006: Strict TID hardening 결정](../decisions/adr-006-strict-tid-hardening.md) — top-5 neighbor evidence의 downstream 사용 정책

@@ -73,4 +73,6 @@ Taxonomy dictionary 생성 정책을 아래와 같이 갱신한다.
 - [Food.com 데이터셋](../entities/food-com-dataset.md) — taxonomy dictionary 생성의 입력 데이터
 - [개발 환경 세팅](../entities/dev-environment.md) — 로컬 MLX LLM 실행 환경
 - [ADR-004: Taxonomy Dictionary 생성 방식 결정](adr-004-taxonomy-dictionary-generation.md) — superseded된 초기 결정
+- [Taxonomy Item Structuring](../entities/taxonomy-item-structuring.md) — hardening된 dictionary를 downstream에 사용하는 단계
+- [ADR-006: Strict TID hardening 결정](adr-006-strict-tid-hardening.md) — downstream TID canonicalization과 validator 정책
 - [Taxonomy Dictionary 개발 이슈 개요](../overviews/taxonomy-dictionary-development-issues.md) — 개발 중 확인된 문제와 해결 내역
