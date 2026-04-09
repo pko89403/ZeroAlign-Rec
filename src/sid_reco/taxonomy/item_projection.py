@@ -308,27 +308,15 @@ def generate_item_taxonomy(
             temperature=0.0,
             top_p=1.0,
         )
-        try:
-            taxonomy = _normalize_projected_taxonomy(
-                _parse_taxonomy_json(response),
-                required_keys=prompt_bundle.required_keys,
-            )
-        except ValueError:
-            repaired = repair_item_taxonomy_json(
-                generator=generator,
-                raw_output=response,
-                required_keys=prompt_bundle.required_keys,
-            )
-            try:
-                taxonomy = _normalize_projected_taxonomy(
-                    _parse_taxonomy_json(repaired),
-                    required_keys=prompt_bundle.required_keys,
-            )
-            except ValueError as exc:
-                raise ValueError(
-                    "Item taxonomy structuring failed: both initial and repair attempts "
-                    "produced invalid projection JSON.",
-                ) from exc
+        taxonomy = _parse_generated_taxonomy(
+            generator=generator,
+            raw_output=response,
+            required_keys=prompt_bundle.required_keys,
+            error_message=(
+                "Item taxonomy structuring failed: both initial and repair attempts "
+                "produced invalid projection JSON."
+            ),
+        )
         if _should_self_refine(
             taxonomy=taxonomy,
             taxonomy_dictionary=prompt_bundle.taxonomy_dictionary,
@@ -368,21 +356,11 @@ def refine_item_taxonomy(
         temperature=0.0,
         top_p=1.0,
     )
-    try:
-        return _normalize_projected_taxonomy(
-            _parse_taxonomy_json(response),
-            required_keys=prompt_bundle.required_keys,
-        )
-    except ValueError:
-        repaired = repair_item_taxonomy_json(
-            generator=generator,
-            raw_output=response,
-            required_keys=prompt_bundle.required_keys,
-        )
-        return _normalize_projected_taxonomy(
-            _parse_taxonomy_json(repaired),
-            required_keys=prompt_bundle.required_keys,
-        )
+    return _parse_generated_taxonomy(
+        generator=generator,
+        raw_output=response,
+        required_keys=prompt_bundle.required_keys,
+    )
 
 
 def finalize_item_taxonomy(
@@ -623,6 +601,35 @@ def build_self_refine_prompt(
     )
 
 
+def _parse_generated_taxonomy(
+    *,
+    generator: MLXTextGenerator,
+    raw_output: str,
+    required_keys: tuple[str, ...],
+    error_message: str | None = None,
+) -> dict[str, list[str]]:
+    try:
+        return _normalize_projected_taxonomy(
+            _parse_taxonomy_json(raw_output),
+            required_keys=required_keys,
+        )
+    except ValueError:
+        repaired = repair_item_taxonomy_json(
+            generator=generator,
+            raw_output=raw_output,
+            required_keys=required_keys,
+        )
+        try:
+            return _normalize_projected_taxonomy(
+                _parse_taxonomy_json(repaired),
+                required_keys=required_keys,
+            )
+        except ValueError as exc:
+            if error_message is None:
+                raise
+            raise ValueError(error_message) from exc
+
+
 def _normalize_projected_taxonomy(
     raw_taxonomy: dict[str, Any],
     *,
@@ -857,18 +864,11 @@ def _validate_dietary_style_values(
     context: ItemProjectionContext,
 ) -> list[str]:
     ingredient_tokens = _context_ingredient_tokens(context)
-    validated: list[str] = []
-    for value in values:
-        if value == "gluten_free" and ingredient_tokens.intersection(GLUTEN_INGREDIENT_TOKENS):
-            continue
-        if value == "vegetarian" and ingredient_tokens.intersection(MEAT_INGREDIENT_TOKENS):
-            continue
-        if value == "vegan" and ingredient_tokens.intersection(NON_VEGAN_INGREDIENT_TOKENS):
-            continue
-        if value == "dairy_free" and ingredient_tokens.intersection(DAIRY_INGREDIENT_TOKENS):
-            continue
-        validated.append(value)
-    return validated
+    return [
+        value
+        for value in values
+        if not ingredient_tokens.intersection(DIETARY_STYLE_CONFLICT_TOKENS.get(value, set()))
+    ]
 
 
 def _has_explicit_cuisine_evidence(*, label: str, evidence_text: str) -> bool:
@@ -1008,6 +1008,13 @@ NON_VEGAN_INGREDIENT_TOKENS = (
         "mayonnaise",
     }
 )
+
+DIETARY_STYLE_CONFLICT_TOKENS = {
+    "gluten_free": GLUTEN_INGREDIENT_TOKENS,
+    "vegetarian": MEAT_INGREDIENT_TOKENS,
+    "vegan": NON_VEGAN_INGREDIENT_TOKENS,
+    "dairy_free": DAIRY_INGREDIENT_TOKENS,
+}
 
 
 def _ensure_writable_path(path: Path, *, overwrite: bool) -> None:
