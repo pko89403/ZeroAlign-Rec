@@ -21,6 +21,7 @@
 - [Validation](#validation)
 - [Repository Layout](#repository-layout)
 - [Docs and Knowledge Base](#docs-and-knowledge-base)
+- [Research References](#research-references)
 - [Copilot and Agent Harness](#copilot-and-agent-harness)
 
 ## Why ZeroAlign-Rec
@@ -127,6 +128,12 @@ Main outputs:
 ### 3. Generate the taxonomy dictionary
 
 Use a local LLM to generate a domain taxonomy dictionary.
+This stage is inspired by the one-time taxonomy categorization idea in
+[Taxonomy-Guided Zero-Shot Recommendations with LLMs](https://aclanthology.org/2025.coling-main.102/)
+(Liang et al., COLING 2025) and the accompanying
+[TaxRec repository](https://github.com/yueqingliang1/TaxRec).
+This repository adapts the taxonomy dictionary construction idea only; it does not implement the
+full TaxRec recommendation and evaluation pipeline.
 
 ```bash
 uv run sid-reco build-taxonomy-dictionary \
@@ -143,6 +150,13 @@ Main outputs:
 ### 4. Structure items into taxonomy-aligned JSON
 
 Use the taxonomy dictionary together with neighbor context to produce structured outputs for each item. The item structuring stage now applies:
+
+This stage is inspired by the Context-aware Term Generation idea in
+[Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers](https://arxiv.org/abs/2601.06798)
+and the accompanying [GRLM repository](https://github.com/ZY0025/GRLM), specifically the use of
+similar-item neighborhoods as contextual guidance for LLM-based item structuring.
+This repository reuses the top-5 neighbor prompting idea only; it does not implement the full GRLM
+Term ID generation, instruction fine-tuning, or grounding pipeline.
 
 - prompt-level duplicate/synonym suppression
 - a self-refine rewrite pass on draft JSON when labels drift outside the master vocabulary
@@ -238,6 +252,27 @@ Instead of duplicating long operational details in the README, this repository k
 - [docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md](docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md)
 - [docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md](docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md)
 - [docs/wiki/decisions/adr-006-strict-tid-hardening.md](docs/wiki/decisions/adr-006-strict-tid-hardening.md)
+
+## Research References
+
+Some subcomponents in this repository explicitly adapt ideas from prior work. When discussing or
+building on those specific ideas, please cite the original paper rather than this repository alone.
+
+### GRLM
+
+The `Taxonomy Item Structuring` stage reuses only the neighborhood-guided prompting idea from
+[Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers](https://arxiv.org/abs/2601.06798)
+and the accompanying [GRLM repository](https://github.com/ZY0025/GRLM).
+This repository does **not** implement the full GRLM training, grounding, or recommendation pipeline.
+
+```bibtex
+@article{zhang2026unleashing,
+  title={Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers},
+  author={Zhang, Zhiyang and She, Junda and Cai, Kuo and Chen, Bo and Wang, Shiyao and Luo, Xinchen and Luo, Qiang and Tang, Ruiming and Li, Han and Gai, Kun and others},
+  journal={arXiv preprint arXiv:2601.06798},
+  year={2026}
+}
+```
 
 ## Copilot and Agent Harness
 
