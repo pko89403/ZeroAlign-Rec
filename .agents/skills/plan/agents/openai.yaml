@@ -1,0 +1,5 @@
+interface:
+  display_name: "Plan"
+  short_description: "Break accepted specs into ordered tasks"
+  default_prompt: "Use $plan to create tasks/plan.md and tasks/todo.md with ordered, verifiable work items."
+

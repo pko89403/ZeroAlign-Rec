@@ -1,0 +1,5 @@
+interface:
+  display_name: "Doc Manager"
+  short_description: "Alias for the repository wiki/docs workflow"
+  default_prompt: "Use $doc-manager to run the repository docs-manager workflow for docs/sources, docs/wiki, and AGENTS.md."
+
