@@ -68,7 +68,7 @@ uv run sid-reco smoke-mlx                           # MLX 런타임/Metal 진단
 uv run sid-reco smoke-llm "사용자 취향을 요약해줘"    # LLM smoke test
 uv run sid-reco smoke-embed "미스터리 스릴러 추천"    # 임베딩 smoke test
 uv run sid-reco prepare-foodcom                      # Food.com 데이터 전처리
-uv run sid-reco build-taxonomy-step1                # taxonomy step 1 인덱스 생성
+uv run sid-reco build-neighbor-context              # neighbor context 인덱스 생성
 uv run sid-reco build-taxonomy-dictionary           # taxonomy dictionary 생성
 ```
 
@@ -117,7 +117,7 @@ uv run mypy src              # 타입체크
 - [ADR-002: Food.com 전처리 정책 결정](../decisions/adr-002-foodcom-preprocessing-policy.md) — 데이터 전처리 규칙 결정
 - [Food.com 데이터셋](food-com-dataset.md) — 현재 로컬에 확보한 추천 실험용 데이터셋
 - [Food Taxonomy Dictionary](food-taxonomy-dictionary.md) — LLM 기반 domain taxonomy dictionary 생성 결과
-- [Taxonomy Step 1 이웃 인덱스](taxonomy-step1-neighbor-index.md) — item 임베딩과 FAISS 이웃 검색 산출물
+- [Neighbor Context 인덱스](neighbor-context-index.md) — item 임베딩과 FAISS 이웃 검색 산출물
 - [ADR-004: Taxonomy Dictionary 생성 방식 결정](../decisions/adr-004-taxonomy-dictionary-generation.md) — superseded된 초기 taxonomy dictionary 생성 정책
 - [ADR-005: Taxonomy Dictionary 생성 hardening 결정](../decisions/adr-005-taxonomy-dictionary-hardening.md) — 현재 bounded input과 validation 정책
 - [Taxonomy Dictionary 개발 이슈 개요](../overviews/taxonomy-dictionary-development-issues.md) — 개발 및 검증 중 실제 발생한 런타임 이슈

@@ -73,11 +73,11 @@ uv run sid-reco smoke-embed "범죄 스릴러 영화 추천"
 
 ```bash
 uv run sid-reco prepare-foodcom --raw-dir data/raw/foodcom --out-dir data/processed/foodcom
-uv run sid-reco build-taxonomy-step1
+uv run sid-reco build-neighbor-context
 uv run sid-reco build-taxonomy-dictionary
 uv run sid-reco structure-taxonomy-batch \
   --recipes-path data/processed/foodcom/recipes.csv \
-  --neighbor-context-path data/processed/foodcom/taxonomy_step1/neighbor_context.csv \
+  --neighbor-context-path data/processed/foodcom/neighbor_context/neighbor_context.csv \
   --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
   --out-path data/processed/foodcom/taxonomy_structured/items.jsonl
 ```
@@ -104,14 +104,14 @@ uv run sid-reco prepare-foodcom \
 - `data/processed/foodcom/splits/{train,valid,test}.csv`
 - `data/processed/foodcom/manifest.json`
 
-### 2. Taxonomy step 1 neighbor index 생성
+### 2. Neighbor context index 생성
 
 item metadata embedding과 FAISS 기반 top-k neighbor context를 생성한다.
 
 ```bash
-uv run sid-reco build-taxonomy-step1 \
+uv run sid-reco build-neighbor-context \
   --recipes-path data/processed/foodcom/recipes.csv \
-  --out-dir data/processed/foodcom/taxonomy_step1 \
+  --out-dir data/processed/foodcom/neighbor_context \
   --top-k 5
 ```
 
@@ -140,7 +140,7 @@ uv run sid-reco build-taxonomy-dictionary \
 
 ### 4. Taxonomy-aligned JSON으로 item 구조화
 
-taxonomy dictionary와 step 1 neighbor context를 함께 사용해 item별 structured output을 만든다.
+taxonomy dictionary와 neighbor context를 함께 사용해 item별 structured output을 만든다.
 
 단일 item:
 
@@ -148,7 +148,7 @@ taxonomy dictionary와 step 1 neighbor context를 함께 사용해 item별 struc
 uv run sid-reco structure-taxonomy-item \
   --recipe-id 101 \
   --recipes-path data/processed/foodcom/recipes.csv \
-  --neighbor-context-path data/processed/foodcom/taxonomy_step1/neighbor_context.csv \
+  --neighbor-context-path data/processed/foodcom/neighbor_context/neighbor_context.csv \
   --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json
 ```
 
@@ -157,7 +157,7 @@ batch:
 ```bash
 uv run sid-reco structure-taxonomy-batch \
   --recipes-path data/processed/foodcom/recipes.csv \
-  --neighbor-context-path data/processed/foodcom/taxonomy_step1/neighbor_context.csv \
+  --neighbor-context-path data/processed/foodcom/neighbor_context/neighbor_context.csv \
   --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
   --out-path data/processed/foodcom/taxonomy_structured/items.jsonl
 ```
@@ -209,11 +209,13 @@ uv run mypy src
 - [docs/wiki/entities/dev-environment.md](docs/wiki/entities/dev-environment.md)
 - [docs/wiki/entities/food-com-dataset.md](docs/wiki/entities/food-com-dataset.md)
 - [docs/wiki/entities/food-taxonomy-dictionary.md](docs/wiki/entities/food-taxonomy-dictionary.md)
-- [docs/wiki/entities/taxonomy-step1-neighbor-index.md](docs/wiki/entities/taxonomy-step1-neighbor-index.md)
+- [docs/wiki/entities/neighbor-context-index.md](docs/wiki/entities/neighbor-context-index.md)
 - [docs/wiki/decisions/adr-001-dev-environment.md](docs/wiki/decisions/adr-001-dev-environment.md)
 - [docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md](docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md)
-- [docs/wiki/decisions/adr-003-taxonomy-step1-neighbor-index.md](docs/wiki/decisions/adr-003-taxonomy-step1-neighbor-index.md)
+- [docs/wiki/decisions/adr-003-neighbor-context-retrieval.md](docs/wiki/decisions/adr-003-neighbor-context-retrieval.md)
 - [docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md](docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md)
+- [docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md](docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md)
+- [docs/wiki/decisions/adr-006-strict-tid-hardening.md](docs/wiki/decisions/adr-006-strict-tid-hardening.md)
 
 ## Copilot 및 Agent 하네스
 
