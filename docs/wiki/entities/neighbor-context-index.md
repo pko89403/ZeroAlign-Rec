@@ -1,17 +1,17 @@
 ---
-title: "Neighbor Context 인덱스"
+title: "Neighbor Context"
 date: 2026-04-07
 type: entity
 tags: [taxonomy, faiss, embedding, recommendation]
 sources: []
 ---
 
-# Neighbor Context 인덱스
+# Neighbor Context
 
 ## 개요
 
-`Neighbor Context`는 전처리된 Food.com recipe catalog를 기준으로
-각 recipe의 핵심 메타데이터를 임베딩한 뒤 FAISS 로컬 인덱스로 상위 이웃 item을 찾는 단계다.
+`Neighbor Context`는 전처리된 Food.com recipe catalog를 임베딩해
+각 recipe의 top-k neighbor evidence를 materialize하는 단계다.
 
 이 프로젝트에서는 `name + description + tags + ingredients`만 임베딩 본문으로 사용한다.
 
@@ -37,7 +37,7 @@ sources: []
   - `initial_batch_size`: `64`
   - `final_batch_size`: `64`
 
-즉, 현재 상태는 `Food.com recipe catalog에 대한 item embedding + FAISS top-5 neighbor context`가 로컬에 준비된 상태다.
+즉, 현재 상태는 `Food.com recipe catalog에 대한 item embedding + top-5 neighbor context`가 로컬에 준비된 상태다.
 
 ## 사용법/설정
 
@@ -63,7 +63,7 @@ uv run sid-reco build-neighbor-context \
 ## Related
 
 - [Food.com 데이터셋](food-com-dataset.md) — neighbor context의 원천 catalog
-- [ADR-003: Neighbor Context 검색 정책 결정](../decisions/adr-003-neighbor-context-retrieval.md) — neighbor context 검색 정책 결정
+- [ADR-003: Neighbor Context 정책 결정](../decisions/adr-003-neighbor-context-retrieval.md) — neighbor context 정책 결정
 - [개발 환경 세팅](dev-environment.md) — MLX와 CLI가 실행되는 로컬 환경
 - [Taxonomy Item Structuring](taxonomy-item-structuring.md) — top-5 neighbor를 downstream evidence로 사용하는 단계
 - [ADR-006: Strict TID hardening 결정](../decisions/adr-006-strict-tid-hardening.md) — top-5 neighbor evidence의 downstream 사용 정책

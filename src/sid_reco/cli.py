@@ -278,7 +278,7 @@ def build_neighbor_context_command(
         ),
     ] = None,
 ) -> None:
-    """Build item embeddings and a FAISS top-k neighbor-context export."""
+    """Build item embeddings and a FAISS top-k neighbor context."""
     ensure_project_directories()
     settings = Settings.from_env()
     try:

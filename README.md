@@ -106,7 +106,7 @@ Main outputs:
 - `data/processed/foodcom/splits/{train,valid,test}.csv`
 - `data/processed/foodcom/manifest.json`
 
-### 2. Build the neighbor context index
+### 2. Build the neighbor context
 
 Generate item metadata embeddings and FAISS-based top-k neighbor context.
 
@@ -142,7 +142,7 @@ Main outputs:
 
 ### 4. Structure items into taxonomy-aligned JSON
 
-Use the taxonomy dictionary together with the persisted neighbor context to produce structured outputs for each item. The item structuring stage now applies:
+Use the taxonomy dictionary together with neighbor context to produce structured outputs for each item. The item structuring stage now applies:
 
 - prompt-level duplicate/synonym suppression
 - a self-refine rewrite pass on draft JSON when labels drift outside the master vocabulary

@@ -77,7 +77,7 @@ uv run sid-reco structure-taxonomy-batch \
 ## Related
 
 - [Food Taxonomy Dictionary](food-taxonomy-dictionary.md) — item structuring이 참조하는 master vocabulary
-- [Neighbor Context 인덱스](neighbor-context-index.md) — top-5 neighbor evidence 제공 단계
-- [ADR-003: Neighbor Context 검색 정책 결정](../decisions/adr-003-neighbor-context-retrieval.md) — neighbor context 정책
+- [Neighbor Context](neighbor-context-index.md) — top-5 neighbor evidence 제공 단계
+- [ADR-003: Neighbor Context 정책 결정](../decisions/adr-003-neighbor-context-retrieval.md) — neighbor context 정책
 - [ADR-005: Taxonomy Dictionary 생성 hardening 결정](../decisions/adr-005-taxonomy-dictionary-hardening.md) — dictionary 생성과 입력 bounded 정책
 - [ADR-006: Strict TID hardening 결정](../decisions/adr-006-strict-tid-hardening.md) — self-refine, canonicalization, validator 정책
