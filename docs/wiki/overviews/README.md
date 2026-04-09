@@ -7,3 +7,4 @@
 | 파일 | 제목 | 날짜 | 소스 수 |
 |------|------|------|---------|
 | [taxonomy-dictionary-development-issues.md](taxonomy-dictionary-development-issues.md) | Taxonomy Dictionary 개발 이슈 개요 | 2026-04-08 | 0 |
+| [sid-phase1-validation-run.md](sid-phase1-validation-run.md) | SID Phase 1 실행 검증 개요 | 2026-04-09 | 0 |

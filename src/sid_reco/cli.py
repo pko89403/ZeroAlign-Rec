@@ -21,9 +21,19 @@ from sid_reco.datasets.foodcom import (
 from sid_reco.embedding import MLXEmbeddingEncoder
 from sid_reco.llm import MLXTextGenerator
 from sid_reco.mlx_runtime import get_runtime_environment_summary, probe_mlx_runtime
+from sid_reco.sid import (
+    assign_trained_residual_kmeans,
+    encode_serialized_items_with_mlx,
+    serialize_structured_items,
+    train_residual_codebooks,
+    write_embedded_items,
+    write_serialized_items,
+    write_sid_index_outputs,
+)
 from sid_reco.taxonomy.dictionary import DEFAULT_MAX_TOKENS, build_taxonomy_dictionary
 from sid_reco.taxonomy.item_projection import (
     DEFAULT_ITEM_MAX_TOKENS,
+    load_taxonomy_master_dictionary,
     structure_taxonomy_batch,
     structure_taxonomy_item,
     write_structured_taxonomy_item,
@@ -43,6 +53,7 @@ DEFAULT_TAXONOMY_DICTIONARY_PATH = (
 DEFAULT_TAXONOMY_STRUCTURED_OUT_PATH = (
     DEFAULT_FOODCOM_OUT_DIR / "taxonomy_structured" / "items.jsonl"
 )
+DEFAULT_SID_INDEX_OUT_DIR = DEFAULT_FOODCOM_OUT_DIR / "sid_index"
 app = typer.Typer(
     help="Utilities for the SID-based training-free recommender.",
     no_args_is_help=True,
@@ -570,6 +581,131 @@ def structure_taxonomy_batch_command(
     table.add_row("Items", str(summary.item_count))
     table.add_row("Taxonomy keys", str(summary.taxonomy_key_count))
     table.add_row("Tagged values", str(summary.total_tagged_value_count))
+    console.print(table)
+
+
+@app.command("compile-sid-index")
+def compile_sid_index_command(
+    structured_items_path: Annotated[
+        Path,
+        typer.Option(
+            "--structured-items-path",
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Structured taxonomy JSONL path produced by structure-taxonomy-batch.",
+        ),
+    ] = DEFAULT_TAXONOMY_STRUCTURED_OUT_PATH,
+    taxonomy_dictionary_path: Annotated[
+        Path,
+        typer.Option(
+            "--taxonomy-dictionary-path",
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Taxonomy dictionary JSON path used to preserve feature order.",
+        ),
+    ] = DEFAULT_TAXONOMY_DICTIONARY_PATH,
+    out_dir: Annotated[
+        Path,
+        typer.Option(
+            "--out-dir",
+            file_okay=False,
+            dir_okay=True,
+            writable=True,
+            help="Directory where SID compilation artifacts will be written.",
+        ),
+    ] = DEFAULT_SID_INDEX_OUT_DIR,
+    branching_factor: Annotated[
+        int,
+        typer.Option(
+            "--branching-factor",
+            min=1,
+            help="Maximum number of clusters per residual K-means level.",
+        ),
+    ] = 256,
+    depth: Annotated[
+        int,
+        typer.Option(
+            "--depth",
+            min=1,
+            help="Number of residual K-means levels used to build the SID path.",
+        ),
+    ] = 3,
+    normalize_residuals: Annotated[
+        bool,
+        typer.Option(
+            "--normalize-residuals/--no-normalize-residuals",
+            help="Normalize residuals before each residual K-means level.",
+        ),
+    ] = True,
+    max_iter: Annotated[
+        int,
+        typer.Option(
+            "--max-iter",
+            min=1,
+            help="Maximum number of deterministic K-means iterations per level.",
+        ),
+    ] = 50,
+    tolerance: Annotated[
+        float,
+        typer.Option(
+            "--tolerance",
+            min=0.0,
+            help="Convergence tolerance for deterministic residual K-means.",
+        ),
+    ] = 1e-6,
+) -> None:
+    """Compile structured taxonomy items into hierarchical SIDs and a FAISS index."""
+    ensure_project_directories()
+    settings = Settings.from_env()
+    try:
+        taxonomy_dictionary = load_taxonomy_master_dictionary(taxonomy_dictionary_path)
+        serialized_items = serialize_structured_items(
+            structured_items_path,
+            feature_order=tuple(taxonomy_dictionary.keys()),
+        )
+        serialized_summary = write_serialized_items(
+            serialized_items,
+            out_path=out_dir / "serialized_items.jsonl",
+        )
+        embedded = encode_serialized_items_with_mlx(serialized_items, settings=settings)
+        embedded_summary = write_embedded_items(embedded, out_dir=out_dir)
+        codebooks = train_residual_codebooks(
+            embedded.matrix,
+            branching_factor=branching_factor,
+            depth=depth,
+            normalize_residuals=normalize_residuals,
+            max_iter=max_iter,
+            tolerance=tolerance,
+        )
+        compiled = assign_trained_residual_kmeans(
+            [item.recipe_id for item in embedded.items],
+            embedded.matrix,
+            codebooks=codebooks,
+        )
+        index_summary = write_sid_index_outputs(
+            embedded=embedded,
+            compiled=compiled,
+            out_dir=out_dir,
+        )
+    except (FileNotFoundError, ValueError, RuntimeError) as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=1) from exc
+
+    table = Table(title="SID Compilation Index")
+    table.add_column("Metric", style="cyan", no_wrap=True)
+    table.add_column("Value", overflow="fold")
+    table.add_row("Output dir", str(out_dir))
+    table.add_row("Structured items", str(serialized_summary.item_count))
+    table.add_row("Embedding model", embedded.model_id)
+    table.add_row("Embedding dim", str(embedded_summary.embedding_dim))
+    table.add_row("Branching factor", str(branching_factor))
+    table.add_row("Depth", str(depth))
+    table.add_row("Unique SIDs", str(len({item.sid_string for item in compiled.items})))
+    table.add_row("Compiled items", str(index_summary.item_count))
+    table.add_row("Serialized path", str(serialized_summary.output_path))
+    table.add_row("Index path", str(index_summary.index_path))
     console.print(table)
 
 

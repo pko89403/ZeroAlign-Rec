@@ -55,6 +55,8 @@ uv run sid-reco structure-taxonomy-batch --help
 
 - imported references는 일반 체크리스트다. 프로젝트 특화 검증은 항상 `README.md`와 `AGENTS.md`를 함께 본다.
 - taxonomy 관련 작업은 `build-neighbor-context` → `build-taxonomy-dictionary` → `structure-taxonomy-item|batch` 순서의 파이프라인을 기본 흐름으로 읽는다.
+- Phase 1 SID 작업은 `structure-taxonomy-batch` 이후에 이어지며, 현재 구현 기준으로는 `compile-sid-index` CLI와 `src/sid_reco/sid/` 모듈이 `sid_index/serialized_items.jsonl`, `embeddings.npy`, `embedding_manifest.json`, `compiled_sid.jsonl`, `item_to_sid.json`, `sid_to_items.json`, `id_map.jsonl`, `item_index.faiss`, `manifest.json` 까지 산출한다.
+- `structured taxonomy` 입력에는 중복 `recipe_id`가 허용되지 않으며, 중복이 있으면 serialization 단계에서 즉시 실패한다.
 - 브라우저/웹 접근성/Core Web Vitals 항목은 HTML 리포트나 UI 작업이 실제로 있을 때만 적용한다.
 - `npm audit`, `npm run build` 같은 문구는 일반 예시로 읽고, 실제 실행은 이 저장소의 `uv` 명령으로 치환한다.
 - Codex App에서 repo-local slash-like entrypoint가 필요하면 command 파일이 아니라 skill 이름으로 노출되도록 wrapper skill을 만든다.

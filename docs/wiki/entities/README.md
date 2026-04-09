@@ -11,3 +11,4 @@
 | [food-taxonomy-dictionary.md](food-taxonomy-dictionary.md) | Food Taxonomy Dictionary | 2026-04-08 | taxonomy, llm, json, recommendation |
 | [taxonomy-item-structuring.md](taxonomy-item-structuring.md) | Taxonomy Item Structuring | 2026-04-09 | taxonomy, llm, json, tid, recommendation |
 | [neighbor-context-index.md](neighbor-context-index.md) | Neighbor Context | 2026-04-07 | taxonomy, faiss, embedding, recommendation |
+| [sid-compilation-indexing.md](sid-compilation-indexing.md) | SID 컴파일 및 인덱싱 | 2026-04-09 | sid, embedding, kmeans, faiss, indexing |
