@@ -23,8 +23,7 @@ FULL_CATALOG_SAMPLING_STRATEGY = "full_catalog"
 EVENLY_SPACED_SAMPLING_STRATEGY = "evenly_spaced"
 
 SYSTEM_PROMPT = (
-    "You are an expert in food recommendations and domain taxonomy design. "
-    "Return only valid JSON."
+    "You are an expert in food recommendations and domain taxonomy design. Return only valid JSON."
 )
 
 FEW_SHOT_EXAMPLES: tuple[dict[str, Any], ...] = (
@@ -176,8 +175,7 @@ def build_bounded_taxonomy_payload(
             sampled_items = items
         else:
             sampled_items = [
-                items[index]
-                for index in _evenly_spaced_indices(items_count, sample_size)
+                items[index] for index in _evenly_spaced_indices(items_count, sample_size)
             ]
         dataset_payload = serialize_taxonomy_payload(sampled_items)
         if len(dataset_payload) <= max_payload_chars:

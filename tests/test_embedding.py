@@ -21,8 +21,8 @@ def test_encode_returns_python_float_vectors(monkeypatch) -> None:
 
     fake_mlx_embeddings = ModuleType("mlx_embeddings")
     fake_mlx_embeddings.load = lambda model_id: ("model", "tokenizer")
-    fake_mlx_embeddings.generate = (
-        lambda model, tokenizer, texts, padding, truncation: SimpleNamespace(
+    fake_mlx_embeddings.generate = lambda model, tokenizer, texts, padding, truncation: (
+        SimpleNamespace(
             text_embeds=_FakeArray([[0.1, 0.2], [0.3, 0.4]]),
         )
     )

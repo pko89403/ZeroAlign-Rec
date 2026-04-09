@@ -76,42 +76,42 @@ def test_prepare_foodcom_cli_writes_processed_outputs(tmp_path: Path) -> None:
     for user_id in range(1, 6):
         interaction_rows.extend(
             [
-                    {
-                        "user_id": user_id,
-                        "recipe_id": 101,
-                        "date": f"2024-01-{((user_id - 1) * 5) + 1:02d}",
-                        "rating": 5,
-                        "review": f"user-{user_id}-a",
-                    },
-                    {
-                        "user_id": user_id,
-                        "recipe_id": 103,
-                        "date": f"2024-01-{((user_id - 1) * 5) + 2:02d}",
-                        "rating": 5,
-                        "review": "",
-                    },
-                    {
-                        "user_id": user_id,
-                        "recipe_id": 101,
-                        "date": f"2024-01-{((user_id - 1) * 5) + 3:02d}",
-                        "rating": 4,
-                        "review": f"user-{user_id}-b",
-                    },
-                    {
-                        "user_id": user_id,
-                        "recipe_id": 103,
-                        "date": f"2024-01-{((user_id - 1) * 5) + 4:02d}",
-                        "rating": 5,
-                        "review": "",
-                    },
-                    {
-                        "user_id": user_id,
-                        "recipe_id": 101,
-                        "date": f"2024-01-{((user_id - 1) * 5) + 5:02d}",
-                        "rating": 5,
-                        "review": f"user-{user_id}-c",
-                    },
-                ]
+                {
+                    "user_id": user_id,
+                    "recipe_id": 101,
+                    "date": f"2024-01-{((user_id - 1) * 5) + 1:02d}",
+                    "rating": 5,
+                    "review": f"user-{user_id}-a",
+                },
+                {
+                    "user_id": user_id,
+                    "recipe_id": 103,
+                    "date": f"2024-01-{((user_id - 1) * 5) + 2:02d}",
+                    "rating": 5,
+                    "review": "",
+                },
+                {
+                    "user_id": user_id,
+                    "recipe_id": 101,
+                    "date": f"2024-01-{((user_id - 1) * 5) + 3:02d}",
+                    "rating": 4,
+                    "review": f"user-{user_id}-b",
+                },
+                {
+                    "user_id": user_id,
+                    "recipe_id": 103,
+                    "date": f"2024-01-{((user_id - 1) * 5) + 4:02d}",
+                    "rating": 5,
+                    "review": "",
+                },
+                {
+                    "user_id": user_id,
+                    "recipe_id": 101,
+                    "date": f"2024-01-{((user_id - 1) * 5) + 5:02d}",
+                    "rating": 5,
+                    "review": f"user-{user_id}-c",
+                },
+            ]
         )
     interaction_rows.append(
         {

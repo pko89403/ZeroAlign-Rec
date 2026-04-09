@@ -54,9 +54,11 @@ Important environment notes:
 uv sync --all-groups
 source .venv/bin/activate
 cp .env.example .env
+git config core.hooksPath .githooks
 ```
 
 Fill in only the values you need in `.env`. See [Configuration](#configuration) for the main variables.
+The repository-managed hooks then apply `ruff check --fix` and `ruff format` before commit, and run the automated `ruff` + `mypy` + `pytest` gate before push.
 
 ## Quick Start
 
@@ -182,7 +184,20 @@ Create `.env` from `.env.example` and adjust only the variables you need.
 | `SID_RECO_LLM_TEMPERATURE` | default temperature |
 | `SID_RECO_LLM_TOP_P` | default nucleus sampling value |
 
-## Validation
+## Automated Quality Gate
+
+```bash
+uv run ruff format --check .
+uv run pytest --ignore=tests/test_mlx_runtime.py --ignore=tests/test_cli_smoke_mlx.py
+uv run ruff check .
+uv run mypy src
+```
+
+The automated gate intentionally excludes MLX runtime validation tests.
+
+## Local Manual MLX Checks
+
+Run these only in a local Apple Silicon session when you want to confirm MLX/Metal behavior:
 
 ```bash
 uv run sid-reco doctor
@@ -191,9 +206,6 @@ uv run sid-reco build-taxonomy-step1 --help
 uv run sid-reco build-taxonomy-dictionary --help
 uv run sid-reco structure-taxonomy-item --help
 uv run sid-reco structure-taxonomy-batch --help
-uv run pytest
-uv run ruff check .
-uv run mypy src
 ```
 
 ## Repository Layout

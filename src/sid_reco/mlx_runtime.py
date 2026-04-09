@@ -94,9 +94,7 @@ def probe_mlx_runtime(*, imports: tuple[str, ...]) -> MLXRuntimeProbeResult:
     )
 
     diagnostic_parts = [
-        part.strip()
-        for part in (completed.stderr, completed.stdout)
-        if part and part.strip()
+        part.strip() for part in (completed.stderr, completed.stdout) if part and part.strip()
     ]
     diagnostic = diagnostic_parts[0] if diagnostic_parts else "No diagnostic output captured."
 
@@ -111,14 +109,10 @@ def probe_mlx_runtime(*, imports: tuple[str, ...]) -> MLXRuntimeProbeResult:
             imports=imports,
             returncode=completed.returncode,
             metal_available=(
-                bool(parsed.get("metal_available"))
-                if "metal_available" in parsed
-                else None
+                bool(parsed.get("metal_available")) if "metal_available" in parsed else None
             ),
             default_device=(
-                str(parsed.get("default_device"))
-                if "default_device" in parsed
-                else None
+                str(parsed.get("default_device")) if "default_device" in parsed else None
             ),
             diagnostic=diagnostic,
         )
