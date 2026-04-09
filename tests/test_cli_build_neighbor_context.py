@@ -21,9 +21,9 @@ class _FakeEncoder:
         return vectors
 
 
-def test_build_taxonomy_step1_cli_writes_outputs(tmp_path: Path, monkeypatch) -> None:
+def test_build_neighbor_context_cli_writes_outputs(tmp_path: Path, monkeypatch) -> None:
     recipes_path = tmp_path / "recipes.csv"
-    out_dir = tmp_path / "taxonomy_step1"
+    out_dir = tmp_path / "neighbor_context"
     pd.DataFrame(
         [
             {
@@ -50,12 +50,12 @@ def test_build_taxonomy_step1_cli_writes_outputs(tmp_path: Path, monkeypatch) ->
         ]
     ).to_csv(recipes_path, index=False)
 
-    monkeypatch.setattr("sid_reco.taxonomy.step1.MLXEmbeddingEncoder", _FakeEncoder)
+    monkeypatch.setattr("sid_reco.taxonomy.neighbor_context.MLXEmbeddingEncoder", _FakeEncoder)
 
     result = runner.invoke(
         app,
         [
-            "build-taxonomy-step1",
+            "build-neighbor-context",
             "--recipes-path",
             str(recipes_path),
             "--out-dir",

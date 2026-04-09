@@ -1,4 +1,4 @@
-"""Step 1 pipeline for taxonomy item embeddings and neighbor search."""
+"""Neighbor-context pipeline for taxonomy item embeddings and retrieval."""
 
 from __future__ import annotations
 
@@ -49,8 +49,8 @@ class EncodedCatalog:
 
 
 @dataclass(frozen=True, slots=True)
-class TaxonomyStep1Summary:
-    """High-level summary for the taxonomy step 1 export."""
+class NeighborContextSummary:
+    """High-level summary for the neighbor-context export."""
 
     items_rows: int
     neighbor_rows: int
@@ -61,7 +61,7 @@ class TaxonomyStep1Summary:
 
 
 def load_recipe_catalog(recipes_path: Path) -> pd.DataFrame:
-    """Load the processed recipe catalog required for taxonomy step 1."""
+    """Load the processed recipe catalog required for neighbor-context generation."""
     if not recipes_path.exists():
         raise FileNotFoundError(f"Missing recipe catalog file: {recipes_path}")
 
@@ -93,7 +93,7 @@ def load_recipe_catalog(recipes_path: Path) -> pd.DataFrame:
 
 
 def build_embedding_text(catalog: pd.DataFrame) -> pd.DataFrame:
-    """Build the fixed embedding text used for taxonomy step 1."""
+    """Build the fixed embedding text used for neighbor-context generation."""
     items = catalog.copy()
     items["embedding_text"] = [
         _compose_embedding_text(
@@ -140,6 +140,8 @@ def encode_catalog_with_adaptive_batches(
         try:
             batch_vectors = encoder.encode(batch_texts)
         except (MemoryError, RuntimeError) as exc:
+            if not _is_batch_pressure_error(exc):
+                raise
             if current_batch_size <= min_batch_size:
                 raise RuntimeError(
                     f"Embedding failed at the minimum batch size of {current_batch_size}.",
@@ -193,22 +195,15 @@ def search_topk_neighbors(
     if len(recipe_ids) != int(embeddings.shape[0]):
         raise ValueError("Recipe ID count must match the embedding matrix row count.")
 
-    search_width = len(recipe_ids)
-    scores, indices = index.search(embeddings, search_width)
     rows: list[dict[str, Any]] = []
     for source_position, source_recipe_id in enumerate(recipe_ids):
-        candidates: list[tuple[float, int]] = []
-        for raw_score, neighbor_position in zip(
-            scores[source_position].tolist(),
-            indices[source_position].tolist(),
-            strict=True,
-        ):
-            if neighbor_position < 0 or neighbor_position == source_position:
-                continue
-            neighbor_recipe_id = recipe_ids[neighbor_position]
-            candidates.append((float(raw_score), int(neighbor_recipe_id)))
-
-        candidates.sort(key=lambda item: (-item[0], item[1]))
+        candidates = _search_neighbor_candidates_for_source(
+            index=index,
+            query=embeddings[source_position : source_position + 1],
+            recipe_ids=recipe_ids,
+            source_position=source_position,
+            top_k=top_k,
+        )
         for rank, (cosine_similarity, neighbor_recipe_id) in enumerate(
             candidates[:top_k],
             start=1,
@@ -225,15 +220,68 @@ def search_topk_neighbors(
     return pd.DataFrame.from_records(rows, columns=NEIGHBOR_CONTEXT_COLUMNS)
 
 
-def write_step1_outputs(
+def _search_neighbor_candidates_for_source(
+    *,
+    index: faiss.IndexFlatIP,
+    query: FloatMatrix,
+    recipe_ids: list[int],
+    source_position: int,
+    top_k: int,
+) -> list[tuple[float, int]]:
+    total_items = len(recipe_ids)
+    search_width = min(total_items, top_k + 1)
+
+    while True:
+        scores, indices = index.search(query, search_width)
+        raw_scores = scores[0].tolist()
+        raw_indices = indices[0].tolist()
+        candidates = _ordered_neighbor_candidates(
+            raw_scores=raw_scores,
+            raw_indices=raw_indices,
+            recipe_ids=recipe_ids,
+            source_position=source_position,
+        )
+
+        if search_width == total_items or len(candidates) < top_k:
+            return candidates
+
+        kth_score = candidates[top_k - 1][0]
+        lowest_retrieved_score = float(raw_scores[-1])
+        if lowest_retrieved_score < kth_score:
+            return candidates
+
+        next_width = min(total_items, max(search_width + 1, search_width * 2))
+        if next_width == search_width:
+            return candidates
+        search_width = next_width
+
+
+def _ordered_neighbor_candidates(
+    *,
+    raw_scores: list[float],
+    raw_indices: list[int],
+    recipe_ids: list[int],
+    source_position: int,
+) -> list[tuple[float, int]]:
+    candidates: list[tuple[float, int]] = []
+    for raw_score, neighbor_position in zip(raw_scores, raw_indices, strict=True):
+        if neighbor_position < 0 or neighbor_position == source_position:
+            continue
+        neighbor_recipe_id = recipe_ids[neighbor_position]
+        candidates.append((float(raw_score), int(neighbor_recipe_id)))
+    candidates.sort(key=lambda item: (-item[0], item[1]))
+    return candidates
+
+
+def write_neighbor_context_outputs(
     *,
     out_dir: Path,
     items: pd.DataFrame,
     neighbor_context: pd.DataFrame,
     index: faiss.IndexFlatIP,
     manifest: dict[str, Any],
-) -> TaxonomyStep1Summary:
-    """Persist step 1 tables, FAISS index, and manifest to disk."""
+) -> NeighborContextSummary:
+    """Persist neighbor-context tables, FAISS index, and manifest to disk."""
     out_dir.mkdir(parents=True, exist_ok=True)
     items.loc[:, ITEMS_WITH_EMBEDDINGS_COLUMNS].to_csv(
         out_dir / "items_with_embeddings.csv",
@@ -266,7 +314,7 @@ def write_step1_outputs(
         first_embedding = json.loads(items.iloc[0]["embedding"])
         embedding_dim = len(first_embedding)
 
-    return TaxonomyStep1Summary(
+    return NeighborContextSummary(
         items_rows=len(items),
         neighbor_rows=len(neighbor_context),
         embedding_dim=embedding_dim,
@@ -276,7 +324,7 @@ def write_step1_outputs(
     )
 
 
-def build_manifest(
+def build_neighbor_context_manifest(
     *,
     recipes_path: Path,
     items: pd.DataFrame,
@@ -285,7 +333,7 @@ def build_manifest(
     top_k: int,
     encoded_catalog: EncodedCatalog,
 ) -> dict[str, Any]:
-    """Build metadata for the step 1 taxonomy export."""
+    """Build metadata for the neighbor-context export."""
     detected_total_memory_gb: float | None = None
     if encoded_catalog.detected_total_memory_bytes is not None:
         detected_total_memory_gb = round(
@@ -315,7 +363,7 @@ def build_manifest(
     }
 
 
-def build_taxonomy_step1(
+def build_neighbor_context(
     *,
     recipes_path: Path,
     out_dir: Path,
@@ -323,8 +371,8 @@ def build_taxonomy_step1(
     top_k: int = DEFAULT_TOP_K,
     batch_size: int | None = None,
     encoder: MLXEmbeddingEncoder | None = None,
-) -> TaxonomyStep1Summary:
-    """Run the full taxonomy step 1 pipeline."""
+) -> NeighborContextSummary:
+    """Run the full neighbor-context pipeline."""
     items = load_recipe_catalog(recipes_path)
     items = build_embedding_text(items)
     resolved_encoder = encoder or MLXEmbeddingEncoder(model_id=embed_model)
@@ -340,7 +388,7 @@ def build_taxonomy_step1(
         recipe_ids=encoded_catalog.items["recipe_id"].astype(int).tolist(),
         top_k=top_k,
     )
-    manifest = build_manifest(
+    manifest = build_neighbor_context_manifest(
         recipes_path=recipes_path,
         items=encoded_catalog.items,
         neighbor_context=neighbor_context,
@@ -348,7 +396,7 @@ def build_taxonomy_step1(
         top_k=top_k,
         encoded_catalog=encoded_catalog,
     )
-    return write_step1_outputs(
+    return write_neighbor_context_outputs(
         out_dir=out_dir,
         items=encoded_catalog.items,
         neighbor_context=neighbor_context,
@@ -470,3 +518,20 @@ def _as_normalized_float32_matrix(vectors: list[list[float]]) -> FloatMatrix:
     matrix = np.ascontiguousarray(matrix, dtype=np.float32)
     faiss.normalize_L2(matrix)
     return matrix
+
+
+def _is_batch_pressure_error(exc: MemoryError | RuntimeError) -> bool:
+    if isinstance(exc, MemoryError):
+        return True
+
+    message = str(exc).strip().lower()
+    return any(
+        token in message
+        for token in (
+            "oom",
+            "out of memory",
+            "insufficient memory",
+            "cuda out of memory",
+            "mps backend out of memory",
+        )
+    )

@@ -72,7 +72,7 @@ src/sid_reco/
 └── taxonomy/
     ├── __init__.py
     ├── dictionary.py  # taxonomy dictionary 생성
-    └── step1.py       # taxonomy step 1 임베딩 및 이웃 검색
+    └── neighbor_context.py  # neighbor context 임베딩 및 이웃 검색
 ```
 
 ### 구현된 모듈
@@ -80,7 +80,7 @@ src/sid_reco/
 - **설정 레이어** (`config.py`): `.env` 로딩, 프로젝트 루트 기준 상대 경로 해석, 기본값 설정, 디렉터리 자동 생성
 - **로컬 LLM 래퍼** (`llm.py`): `MLXTextGenerator`, `mlx_lm.load()` 기반 지연 로딩, chat template 지원
 - **로컬 임베딩 래퍼** (`embedding.py`): `MLXEmbeddingEncoder`, 단일/배치 임베딩 생성, MLX 텐서 → `list[float]` 변환
-- **CLI** (`cli.py`): `doctor`, `smoke-mlx`, `smoke-llm`, `smoke-embed`, `prepare-foodcom`, `build-taxonomy-step1`, `build-taxonomy-dictionary` 명령
+- **CLI** (`cli.py`): `doctor`, `smoke-mlx`, `smoke-llm`, `smoke-embed`, `prepare-foodcom`, `build-neighbor-context`, `build-taxonomy-dictionary` 명령
 
 ## Consequences
 
@@ -111,6 +111,6 @@ src/sid_reco/
 - [dev-environment](../entities/dev-environment.md) — 개발 환경 세팅 상세
 - [ADR-002: Food.com 전처리 정책 결정](adr-002-foodcom-preprocessing-policy.md) — Food.com 전처리 규칙
 - [Food.com 데이터셋](../entities/food-com-dataset.md) — 현재 로컬 데이터셋 상태
-- [ADR-003: Taxonomy Step 1 이웃 검색 정책 결정](adr-003-taxonomy-step1-neighbor-index.md) — taxonomy step 1 검색 규칙
+- [ADR-003: Neighbor Context 정책 결정](adr-003-neighbor-context-retrieval.md) — neighbor context 검색 규칙
 - [Food Taxonomy Dictionary](../entities/food-taxonomy-dictionary.md) — LLM 기반 taxonomy dictionary 생성 산출물
 - [ADR-004: Taxonomy Dictionary 생성 방식 결정](adr-004-taxonomy-dictionary-generation.md) — taxonomy dictionary 생성 정책

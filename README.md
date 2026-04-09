@@ -75,11 +75,11 @@ For an end-to-end experiment, continue with:
 
 ```bash
 uv run sid-reco prepare-foodcom --raw-dir data/raw/foodcom --out-dir data/processed/foodcom
-uv run sid-reco build-taxonomy-step1
+uv run sid-reco build-neighbor-context
 uv run sid-reco build-taxonomy-dictionary
 uv run sid-reco structure-taxonomy-batch \
   --recipes-path data/processed/foodcom/recipes.csv \
-  --neighbor-context-path data/processed/foodcom/taxonomy_step1/neighbor_context.csv \
+  --neighbor-context-path data/processed/foodcom/neighbor_context/neighbor_context.csv \
   --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
   --out-path data/processed/foodcom/taxonomy_structured/items.jsonl
 ```
@@ -106,14 +106,14 @@ Main outputs:
 - `data/processed/foodcom/splits/{train,valid,test}.csv`
 - `data/processed/foodcom/manifest.json`
 
-### 2. Build the taxonomy step 1 neighbor index
+### 2. Build the neighbor context
 
 Generate item metadata embeddings and FAISS-based top-k neighbor context.
 
 ```bash
-uv run sid-reco build-taxonomy-step1 \
+uv run sid-reco build-neighbor-context \
   --recipes-path data/processed/foodcom/recipes.csv \
-  --out-dir data/processed/foodcom/taxonomy_step1 \
+  --out-dir data/processed/foodcom/neighbor_context \
   --top-k 5
 ```
 
@@ -142,7 +142,7 @@ Main outputs:
 
 ### 4. Structure items into taxonomy-aligned JSON
 
-Use the taxonomy dictionary together with step 1 neighbor context to produce structured outputs for each item. The item structuring stage now applies:
+Use the taxonomy dictionary together with neighbor context to produce structured outputs for each item. The item structuring stage now applies:
 
 - prompt-level duplicate/synonym suppression
 - a self-refine rewrite pass on draft JSON when labels drift outside the master vocabulary
@@ -155,7 +155,7 @@ Single item:
 uv run sid-reco structure-taxonomy-item \
   --recipe-id 101 \
   --recipes-path data/processed/foodcom/recipes.csv \
-  --neighbor-context-path data/processed/foodcom/taxonomy_step1/neighbor_context.csv \
+  --neighbor-context-path data/processed/foodcom/neighbor_context/neighbor_context.csv \
   --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json
 ```
 
@@ -164,7 +164,7 @@ Batch:
 ```bash
 uv run sid-reco structure-taxonomy-batch \
   --recipes-path data/processed/foodcom/recipes.csv \
-  --neighbor-context-path data/processed/foodcom/taxonomy_step1/neighbor_context.csv \
+  --neighbor-context-path data/processed/foodcom/neighbor_context/neighbor_context.csv \
   --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
   --out-path data/processed/foodcom/taxonomy_structured/items.jsonl
 ```
@@ -202,7 +202,7 @@ Run these only in a local Apple Silicon session when you want to confirm MLX/Met
 ```bash
 uv run sid-reco doctor
 uv run sid-reco smoke-mlx
-uv run sid-reco build-taxonomy-step1 --help
+uv run sid-reco build-neighbor-context --help
 uv run sid-reco build-taxonomy-dictionary --help
 uv run sid-reco structure-taxonomy-item --help
 uv run sid-reco structure-taxonomy-batch --help
@@ -231,10 +231,10 @@ Instead of duplicating long operational details in the README, this repository k
 - [docs/wiki/entities/food-com-dataset.md](docs/wiki/entities/food-com-dataset.md)
 - [docs/wiki/entities/food-taxonomy-dictionary.md](docs/wiki/entities/food-taxonomy-dictionary.md)
 - [docs/wiki/entities/taxonomy-item-structuring.md](docs/wiki/entities/taxonomy-item-structuring.md)
-- [docs/wiki/entities/taxonomy-step1-neighbor-index.md](docs/wiki/entities/taxonomy-step1-neighbor-index.md)
+- [docs/wiki/entities/neighbor-context-index.md](docs/wiki/entities/neighbor-context-index.md)
 - [docs/wiki/decisions/adr-001-dev-environment.md](docs/wiki/decisions/adr-001-dev-environment.md)
 - [docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md](docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md)
-- [docs/wiki/decisions/adr-003-taxonomy-step1-neighbor-index.md](docs/wiki/decisions/adr-003-taxonomy-step1-neighbor-index.md)
+- [docs/wiki/decisions/adr-003-neighbor-context-retrieval.md](docs/wiki/decisions/adr-003-neighbor-context-retrieval.md)
 - [docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md](docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md)
 - [docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md](docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md)
 - [docs/wiki/decisions/adr-006-strict-tid-hardening.md](docs/wiki/decisions/adr-006-strict-tid-hardening.md)
@@ -262,7 +262,7 @@ Main shortcuts:
 For taxonomy work, the default repository pipeline is:
 
 ```bash
-build-taxonomy-step1 -> build-taxonomy-dictionary -> structure-taxonomy-item|batch
+build-neighbor-context -> build-taxonomy-dictionary -> structure-taxonomy-item|batch
 ```
 
 For docs/wiki work, `docs-manager` and `AGENTS.md` rules take priority over generic workflows.

@@ -1,12 +1,12 @@
 ---
-title: "Taxonomy Step 1 이웃 검색 정책 결정"
+title: "Neighbor Context 정책 결정"
 date: 2026-04-07
 type: adr
 status: Accepted
 sources: []
 ---
 
-# ADR-003: Taxonomy Step 1 이웃 검색 정책 결정
+# ADR-003: Neighbor Context 정책 결정
 
 ## Context
 
@@ -22,7 +22,7 @@ Taxonomy 사전 구축의 첫 단계에서는 recipe item 간의 거친 semantic
 
 ## Decision
 
-Taxonomy Step 1 이웃 검색 정책을 아래와 같이 고정한다.
+Neighbor Context 정책을 아래와 같이 고정한다.
 
 ### item 단위와 입력
 
@@ -46,7 +46,7 @@ Taxonomy Step 1 이웃 검색 정책을 아래와 같이 고정한다.
 
 ### 산출물 정책
 
-- 출력 경로는 `data/processed/foodcom/taxonomy_step1/`로 고정한다
+- 출력 경로는 `data/processed/foodcom/neighbor_context/`로 고정한다
 - 저장 파일:
   - `items_with_embeddings.csv`
   - `neighbor_context.csv`
@@ -72,6 +72,6 @@ Taxonomy Step 1 이웃 검색 정책을 아래와 같이 고정한다.
 
 ## Related
 
-- [Taxonomy Step 1 이웃 인덱스](../entities/taxonomy-step1-neighbor-index.md) — 현재 산출물과 사용법
+- [Neighbor Context](../entities/neighbor-context-index.md) — 현재 산출물과 사용법
 - [Food.com 데이터셋](../entities/food-com-dataset.md) — 원천 recipe catalog
 - [ADR-001: 개발 환경 및 로컬 추론 스택 결정](adr-001-dev-environment.md) — MLX 기반 로컬 추론 스택

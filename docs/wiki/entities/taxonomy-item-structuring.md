@@ -25,7 +25,7 @@ sources: []
 
 - 입력:
   - `data/processed/foodcom/recipes.csv`
-  - `data/processed/foodcom/taxonomy_step1/neighbor_context.csv`
+  - `data/processed/foodcom/neighbor_context/neighbor_context.csv`
   - `data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json`
 - 출력:
   - 단일 item JSON
@@ -51,7 +51,7 @@ sources: []
 uv run sid-reco structure-taxonomy-item \
   --recipe-id 101 \
   --recipes-path data/processed/foodcom/recipes.csv \
-  --neighbor-context-path data/processed/foodcom/taxonomy_step1/neighbor_context.csv \
+  --neighbor-context-path data/processed/foodcom/neighbor_context/neighbor_context.csv \
   --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json
 ```
 
@@ -60,7 +60,7 @@ uv run sid-reco structure-taxonomy-item \
 ```bash
 uv run sid-reco structure-taxonomy-batch \
   --recipes-path data/processed/foodcom/recipes.csv \
-  --neighbor-context-path data/processed/foodcom/taxonomy_step1/neighbor_context.csv \
+  --neighbor-context-path data/processed/foodcom/neighbor_context/neighbor_context.csv \
   --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
   --out-path data/processed/foodcom/taxonomy_structured/items.jsonl
 ```
@@ -77,7 +77,7 @@ uv run sid-reco structure-taxonomy-batch \
 ## Related
 
 - [Food Taxonomy Dictionary](food-taxonomy-dictionary.md) — item structuring이 참조하는 master vocabulary
-- [Taxonomy Step 1 이웃 인덱스](taxonomy-step1-neighbor-index.md) — top-5 neighbor evidence 제공 단계
-- [ADR-003: Taxonomy Step 1 이웃 검색 정책 결정](../decisions/adr-003-taxonomy-step1-neighbor-index.md) — neighbor context 정책
+- [Neighbor Context](neighbor-context-index.md) — top-5 neighbor evidence 제공 단계
+- [ADR-003: Neighbor Context 정책 결정](../decisions/adr-003-neighbor-context-retrieval.md) — neighbor context 정책
 - [ADR-005: Taxonomy Dictionary 생성 hardening 결정](../decisions/adr-005-taxonomy-dictionary-hardening.md) — dictionary 생성과 입력 bounded 정책
 - [ADR-006: Strict TID hardening 결정](../decisions/adr-006-strict-tid-hardening.md) — self-refine, canonicalization, validator 정책
