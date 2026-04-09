@@ -103,9 +103,9 @@ uv run mypy src              # 타입체크
 
 ## 포함되지 않은 범위
 
-개발 환경 세팅은 완료되었지만, 아래는 아직 구현되지 않았다.
+개발 환경 세팅은 완료되었지만, 아래는 아직 완성되지 않았다.
 
-- SID 생성 로직
+- residual K-means 기반 SID compiler 및 public CLI
 - 아이템 카탈로그 로더
 - candidate retrieval
 - LLM reranking
@@ -118,6 +118,7 @@ uv run mypy src              # 타입체크
 - [Food.com 데이터셋](food-com-dataset.md) — 현재 로컬에 확보한 추천 실험용 데이터셋
 - [Food Taxonomy Dictionary](food-taxonomy-dictionary.md) — LLM 기반 domain taxonomy dictionary 생성 결과
 - [Neighbor Context](neighbor-context-index.md) — item 임베딩과 FAISS 이웃 검색 산출물
+- [SID 컴파일 및 인덱싱](sid-compilation-indexing.md) — Phase 1 마지막 단계의 serialization/embedding 중간 산출물과 이후 SID compiler 범위
 - [ADR-004: Taxonomy Dictionary 생성 방식 결정](../decisions/adr-004-taxonomy-dictionary-generation.md) — superseded된 초기 taxonomy dictionary 생성 정책
 - [ADR-005: Taxonomy Dictionary 생성 hardening 결정](../decisions/adr-005-taxonomy-dictionary-hardening.md) — 현재 bounded input과 validation 정책
 - [Taxonomy Dictionary 개발 이슈 개요](../overviews/taxonomy-dictionary-development-issues.md) — 개발 및 검증 중 실제 발생한 런타임 이슈

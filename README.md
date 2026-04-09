@@ -10,6 +10,8 @@
 
 `ZeroAlign-Rec` is a Python codebase for experimenting with `SID`-based training-free recommendation in a local environment. It uses `MLX` on Apple Silicon to run both generative and embedding models locally, and supports an end-to-end workflow from Food.com preprocessing to taxonomy dictionary generation and taxonomy-aligned item structuring.
 
+Current Phase 1 progress also includes an in-repository `sid` package plus a public `compile-sid-index` CLI for deterministic structured-item serialization, MLX embedding artifacts, CPU residual K-means codebook training, and FAISS indexing outputs under `data/processed/foodcom/sid_index/`.
+
 ## Table of Contents
 
 - [Why ZeroAlign-Rec](#why-zeroalign-rec)
@@ -83,6 +85,10 @@ uv run sid-reco structure-taxonomy-batch \
   --neighbor-context-path data/processed/foodcom/neighbor_context/neighbor_context.csv \
   --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
   --out-path data/processed/foodcom/taxonomy_structured/items.jsonl
+uv run sid-reco compile-sid-index \
+  --structured-items-path data/processed/foodcom/taxonomy_structured/items.jsonl \
+  --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
+  --out-dir data/processed/foodcom/sid_index
 ```
 
 ## Core Workflows
@@ -183,6 +189,29 @@ uv run sid-reco structure-taxonomy-batch \
   --out-path data/processed/foodcom/taxonomy_structured/items.jsonl
 ```
 
+### 5. Compile hierarchical SID and FAISS index
+
+Compile structured items into deterministic serialized text, dense embeddings, hierarchical SID paths, and a FAISS index.
+
+```bash
+uv run sid-reco compile-sid-index \
+  --structured-items-path data/processed/foodcom/taxonomy_structured/items.jsonl \
+  --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
+  --out-dir data/processed/foodcom/sid_index
+```
+
+Main outputs:
+
+- `serialized_items.jsonl`
+- `embeddings.npy`
+- `embedding_manifest.json`
+- `compiled_sid.jsonl`
+- `item_to_sid.json`
+- `sid_to_items.json`
+- `id_map.jsonl`
+- `item_index.faiss`
+- `manifest.json`
+
 ## Configuration
 
 Create `.env` from `.env.example` and adjust only the variables you need.
@@ -227,6 +256,7 @@ uv run sid-reco structure-taxonomy-batch --help
 | Path | Role |
 | --- | --- |
 | `src/sid_reco/` | application package |
+| `src/sid_reco/sid/` | Phase 1 SID serialization and embedding artifact helpers |
 | `tests/` | automated tests |
 | `data/` | local datasets and processed artifacts |
 | `artifacts/` | generated reports, branding, and outputs |
@@ -246,12 +276,15 @@ Instead of duplicating long operational details in the README, this repository k
 - [docs/wiki/entities/food-taxonomy-dictionary.md](docs/wiki/entities/food-taxonomy-dictionary.md)
 - [docs/wiki/entities/taxonomy-item-structuring.md](docs/wiki/entities/taxonomy-item-structuring.md)
 - [docs/wiki/entities/neighbor-context-index.md](docs/wiki/entities/neighbor-context-index.md)
+- [docs/wiki/entities/sid-compilation-indexing.md](docs/wiki/entities/sid-compilation-indexing.md)
+- [docs/wiki/overviews/sid-phase1-validation-run.md](docs/wiki/overviews/sid-phase1-validation-run.md)
 - [docs/wiki/decisions/adr-001-dev-environment.md](docs/wiki/decisions/adr-001-dev-environment.md)
 - [docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md](docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md)
 - [docs/wiki/decisions/adr-003-neighbor-context-retrieval.md](docs/wiki/decisions/adr-003-neighbor-context-retrieval.md)
 - [docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md](docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md)
 - [docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md](docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md)
 - [docs/wiki/decisions/adr-006-strict-tid-hardening.md](docs/wiki/decisions/adr-006-strict-tid-hardening.md)
+- [artifacts/reports/sid-phase1-validation.html](artifacts/reports/sid-phase1-validation.html)
 
 ## Research References
 
