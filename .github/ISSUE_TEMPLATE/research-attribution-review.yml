@@ -1,0 +1,230 @@
+name: 연구 레퍼런스/영감 표기 검토
+description: 논문/공개 구현 레퍼런스 문구가 현재 구현 범위를 정확히 반영하는지 검토합니다.
+title: "[레퍼런스 검토] "
+labels:
+  - documentation
+  - research-review
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 작성 안내
+
+        이 템플릿은 README, 위키, ADR 등에 들어가는 `논문/공개 구현 참고 문구`가 과장되지 않고,
+        실제 구현 범위와 정확히 맞는지 검토하기 위한 용도입니다.
+
+        아래 항목을 채울 때는 다음 원칙을 지켜주세요.
+
+        - `현재 문구`에는 실제 문서에 들어간 문장을 그대로 붙여넣기
+        - `실제로 구현한 범위`와 `구현하지 않은 범위`를 분리해 적기
+        - 논문/레포 전체가 아니라, **정확히 어느 아이디어를 참고했는지** 좁혀 적기
+        - 가능하면 관련 코드 경로와 논문 섹션/그림도 함께 남기기
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 1. 검토 범위
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: 검토 대상 컴포넌트
+      description: 어떤 컴포넌트의 문구를 검토하는지 선택해주세요.
+      options:
+        - Taxonomy Dictionary
+        - Taxonomy Item Structuring
+        - Neighbor Context
+        - Food.com preprocessing
+        - 기타
+    validations:
+      required: true
+
+  - type: input
+    id: component_detail
+    attributes:
+      label: 컴포넌트 상세명
+      description: "`기타`를 선택했거나 더 구체적으로 적고 싶다면 입력해주세요."
+      placeholder: 예) TID extraction prompt / taxonomy report / README citation block
+
+  - type: checkboxes
+    id: doc_targets
+    attributes:
+      label: 영향 받는 문서 위치
+      description: 이번 검토가 필요한 문서 위치를 체크해주세요.
+      options:
+        - label: README.md
+        - label: README.ko.md
+        - label: docs/wiki/entities
+        - label: docs/wiki/decisions (ADR)
+        - label: 기타 문서
+
+  - type: dropdown
+    id: reference_kind
+    attributes:
+      label: 참고 대상 유형
+      description: 어떤 종류의 레퍼런스를 표기하려는지 선택해주세요.
+      options:
+        - 논문만
+        - 공개 구현만
+        - 논문 + 공개 구현
+        - 기타
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_wording
+    attributes:
+      label: 현재 문구
+      description: README/위키/ADR에 들어간 문구를 그대로 붙여넣어 주세요.
+      placeholder: |
+        예)
+        이 단계는 XXX 논문과 YYY 공개 구현의 one-time taxonomy categorization 아이디어를 참고했다.
+        다만 이 저장소는 전체 recommendation/evaluation 파이프라인을 구현한 것은 아니다.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 2. 외부 레퍼런스와 구현 경계
+
+  - type: textarea
+    id: references
+    attributes:
+      label: 참고한 외부 레퍼런스
+      description: 논문, GitHub 저장소, 특히 참고한 섹션/그림/프롬프트를 적어주세요.
+      placeholder: |
+        - 논문:
+          - 제목:
+          - 링크:
+          - 특히 참고한 부분: Section 3.2 / Figure 2 / Prompt Table ...
+        - 공개 구현:
+          - 저장소:
+          - 링크:
+          - 특히 참고한 파일/흐름:
+    validations:
+      required: true
+
+  - type: textarea
+    id: implemented_scope
+    attributes:
+      label: 현재 저장소에서 실제로 구현한 범위
+      description: 레퍼런스 전체가 아니라, 현재 코드가 실제로 닿아 있는 부분만 적어주세요.
+      placeholder: |
+        예)
+        - item metadata를 바탕으로 1회성 taxonomy dictionary를 LLM으로 생성
+        - top-5 neighbor metadata를 LLM 입력의 contextual guidance로 사용
+        - taxonomy dictionary를 downstream structuring의 guidance vocabulary로 재사용
+    validations:
+      required: true
+
+  - type: textarea
+    id: excluded_scope
+    attributes:
+      label: 구현하지 않은 범위
+      description: 오해를 막기 위해 현재 저장소에 없는 범위를 분명히 적어주세요.
+      placeholder: |
+        예)
+        - fine-tuning 없음
+        - recommendation ranking 없음
+        - evaluation loop 없음
+        - Elastic Identifier Grounding 없음
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 구현 근거
+      description: 관련 코드 경로와 문서 경로를 적어주세요. 가능하면 줄 번호도 포함해주세요.
+      placeholder: |
+        예)
+        - src/sid_reco/taxonomy/dictionary.py
+        - src/sid_reco/taxonomy/item_projection.py
+        - README.md
+        - docs/wiki/entities/...
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 3. 검토 포인트
+
+  - type: textarea
+    id: overstatement_risk
+    attributes:
+      label: 표현이 과할 수 있는 이유
+      description: 왜 현재 문구가 과장되거나 오해를 낳을 수 있는지 적어주세요.
+      placeholder: |
+        예)
+        - 전체 논문 방법론을 구현한 것처럼 읽힐 수 있음
+        - 특정 단계만 참고했는데 full pipeline처럼 보일 수 있음
+        - paper idea와 repo implementation을 구분하지 못할 수 있음
+
+  - type: checkboxes
+    id: wording_options
+    attributes:
+      label: 검토하고 싶은 표현 수위
+      description: 현재 고민 중인 표현 수위를 모두 체크해주세요.
+      options:
+        - label: inspired by
+        - label: partially inspired by
+        - label: references the idea of
+        - label: borrows the prompting pattern from
+        - label: 구현 유사성보다 문제 설정만 닿아 있음
+
+  - type: textarea
+    id: candidate_wording
+    attributes:
+      label: 대체 문구 초안
+      description: 이미 생각해둔 더 안전한 문장이 있으면 적어주세요. 없으면 비워도 됩니다.
+      placeholder: |
+        예)
+        이 단계는 XXX의 one-time taxonomy categorization 아이디어를 참고했다.
+        다만 본 저장소는 해당 논문의 전체 추천 파이프라인은 구현하지 않는다.
+
+  - type: textarea
+    id: requested_decision
+    attributes:
+      label: 검토 요청 사항
+      description: 리뷰어가 최종적으로 무엇을 결정해주면 되는지 적어주세요.
+      placeholder: |
+        예)
+        1. `inspired by`가 적절한지 판단
+        2. README에는 paper만 남기고 repo 링크는 wiki/ADR로 내릴지 판단
+        3. 문구를 더 좁혀야 한다면 대체 문장 제안
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 4. 종료 조건
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: 완료 기준
+      description: 이 이슈가 닫히기 위한 조건을 적어주세요.
+      placeholder: |
+        예)
+        - 문구 수위가 확정됨
+        - paper-only vs paper+repo 표기 정책이 정리됨
+        - README / wiki / ADR 반영 범위가 결정됨
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 작성 체크리스트
+      options:
+        - label: 현재 문구를 실제 문서에서 그대로 가져왔다.
+          required: true
+        - label: 실제로 구현한 범위와 구현하지 않은 범위를 분리해서 적었다.
+          required: true
+        - label: 외부 레퍼런스 링크를 포함했다.
+          required: true
+        - label: 관련 코드/문서 경로를 포함했다.
+          required: true

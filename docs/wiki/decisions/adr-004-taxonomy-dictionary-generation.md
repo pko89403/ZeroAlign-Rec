@@ -15,7 +15,9 @@ sources: []
 domain taxonomy dictionary가 먼저 필요하다.
 
 이 사전은 Food.com metadata 전체를 바탕으로 1회성으로 구축하되, Python 코드로 재현 가능해야 한다.
-또한 `TaxRec` 연구처럼 LLM을 taxonomy 생성의 핵심 단계에 사용하는 방향을 유지해야 한다.
+또한 [Taxonomy-Guided Zero-Shot Recommendations with LLMs](https://arxiv.org/abs/2406.14043)
+및 [TaxRec 공개 구현](https://github.com/yueqingliang1/TaxRec)처럼
+LLM을 taxonomy 생성의 핵심 단계에 사용하는 방향을 유지해야 한다.
 
 ## Decision
 
@@ -80,3 +82,4 @@ Taxonomy dictionary 생성 방식을 아래와 같이 고정한다.
 - [ADR-001: 개발 환경 및 로컬 추론 스택 결정](adr-001-dev-environment.md) — 전체 로컬 추론 스택 결정
 - [ADR-005: Taxonomy Dictionary 생성 hardening 결정](adr-005-taxonomy-dictionary-hardening.md) — 후속 hardening 정책
 - [Taxonomy Dictionary 개발 이슈 개요](../overviews/taxonomy-dictionary-development-issues.md) — 구현 및 검증 중 발생한 오류 기록
+- 외부 레퍼런스: [Taxonomy-Guided Zero-Shot Recommendations with LLMs](https://arxiv.org/abs/2406.14043), [TaxRec 공개 구현](https://github.com/yueqingliang1/TaxRec)

@@ -11,9 +11,15 @@ sources: []
 ## 개요
 
 `Food Taxonomy Dictionary`는 전처리된 Food.com recipe metadata를 로컬 LLM으로 분석해 생성하는
-도메인 taxonomy 사전이다. `TaxRec`의 domain taxonomy 생성 아이디어를 참고하며, 결과는
+도메인 taxonomy 사전이다. [Taxonomy-Guided Zero-Shot Recommendations with LLMs](https://arxiv.org/abs/2406.14043)
+및 [TaxRec 공개 구현](https://github.com/yueqingliang1/TaxRec)의 domain taxonomy generation 아이디어를 참고하며, 결과는
 `feature_name -> [possible_values]` 구조의 JSON으로 저장된다. 현재 구현은 direct one-shot 전체 입력 대신
 bounded sampling과 payload budget을 적용한 hardening 경로를 사용한다.
+
+## 영감 받은 레퍼런스
+
+- 논문: [Taxonomy-Guided Zero-Shot Recommendations with LLMs](https://arxiv.org/abs/2406.14043)
+- 구현 레퍼런스: [yueqingliang1/TaxRec](https://github.com/yueqingliang1/TaxRec)
 
 ## 현재 상태
 
@@ -36,6 +42,20 @@ taxonomy는 단순한 축 목록이 아니라 아래 두 요소를 포함한다.
 - 실제 MLX LLM으로 end-to-end 생성이 완료되었고 현재 snapshot 기준 입력 규모는 `192`개 recipe다
 - 현재 CLI summary는 전체 catalog 수와 실제 prompt 입력 수를 구분해 보여준다
 - downstream `Taxonomy Item Structuring` 단계에서 few-shot guidance 및 canonicalization 기준 vocabulary로 재사용된다
+
+### 현재 구현과 TaxRec 레퍼런스의 대응
+
+- 직접 반영한 부분:
+  - item metadata에서 domain taxonomy dictionary를 LLM으로 1회성 생성하는 흐름
+  - `feature_name -> [possible_values]` 형태의 명시적 taxonomy vocabulary 구축
+  - downstream item structuring 단계에서 taxonomy dictionary를 guidance vocabulary로 재사용하는 방향
+- 이 저장소에서 추가로 보강한 부분:
+  - prompt item cap, evenly spaced sampling, payload budget 기반 입력 bounded 처리
+  - JSON repair, empty taxonomy hard failure, prompt snapshot 저장, HTML report 생성
+- 아직 이 저장소에 포함되지 않은 TaxRec 범위:
+  - 논문 전체의 zero-shot recommendation 단계 자체
+  - user 선호를 포함한 LLM-based recommendation/ranking 실험
+  - 추천 성능 비교 평가 루프
 
 ## 사용법/설정
 

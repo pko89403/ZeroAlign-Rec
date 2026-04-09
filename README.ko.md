@@ -21,6 +21,7 @@
 - [검증](#검증)
 - [저장소 구조](#저장소-구조)
 - [문서와 지식 베이스](#문서와-지식-베이스)
+- [연구 레퍼런스](#연구-레퍼런스)
 - [Copilot 및 Agent 하네스](#copilot-및-agent-하네스)
 
 ## 왜 ZeroAlign-Rec인가
@@ -125,6 +126,13 @@ uv run sid-reco build-neighbor-context \
 ### 3. Taxonomy dictionary 생성
 
 로컬 LLM으로 domain taxonomy dictionary를 생성한다.
+이 단계는
+[Taxonomy-Guided Zero-Shot Recommendations with LLMs](https://aclanthology.org/2025.coling-main.102/)
+(Liang et al., COLING 2025)와
+[TaxRec 공개 구현](https://github.com/yueqingliang1/TaxRec)의
+one-time taxonomy categorization 아이디어를 참고했다.
+다만 이 저장소는 taxonomy dictionary 구축 아이디어만 가져온 것이며,
+TaxRec의 전체 recommendation/evaluation 파이프라인을 구현한 것은 아니다.
 
 ```bash
 uv run sid-reco build-taxonomy-dictionary \
@@ -141,6 +149,13 @@ uv run sid-reco build-taxonomy-dictionary \
 ### 4. Taxonomy-aligned JSON으로 item 구조화
 
 taxonomy dictionary와 neighbor context를 함께 사용해 item별 structured output을 만든다.
+이 단계는
+[Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers](https://arxiv.org/abs/2601.06798)
+와 [GRLM 공개 구현](https://github.com/ZY0025/GRLM)의
+Context-aware Term Generation 아이디어, 특히 similar-item neighborhood를
+LLM 입력의 contextual guidance로 함께 넣는 방식을 참고했다.
+다만 이 저장소는 top-5 neighbor prompting 아이디어만 차용한 것이며,
+GRLM의 전체 Term ID generation, instruction fine-tuning, grounding 파이프라인을 구현한 것은 아니다.
 
 단일 item:
 
@@ -214,6 +229,28 @@ uv run mypy src
 - [docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md](docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md)
 - [docs/wiki/decisions/adr-003-neighbor-context-retrieval.md](docs/wiki/decisions/adr-003-neighbor-context-retrieval.md)
 - [docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md](docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md)
+
+## 연구 레퍼런스
+
+이 저장소의 일부 컴포넌트는 선행 연구의 특정 아이디어를 부분적으로 참고한다.
+따라서 해당 아이디어를 설명하거나 재사용할 때는 이 저장소만이 아니라 원 논문도 함께 인용하는 것이 적절하다.
+
+### GRLM
+
+`Taxonomy Item Structuring` 단계는
+[Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers](https://arxiv.org/abs/2601.06798)
+및 [GRLM 공개 구현](https://github.com/ZY0025/GRLM)에서
+`similar-item neighborhood`를 LLM 입력의 문맥 가이드로 사용하는 발상을 참고한다.
+다만 이 저장소는 GRLM의 전체 학습, grounding, recommendation 파이프라인을 구현하지는 않는다.
+
+```bibtex
+@article{zhang2026unleashing,
+  title={Unleashing the Native Recommendation Potential: LLM-Based Generative Recommendation via Structured Term Identifiers},
+  author={Zhang, Zhiyang and She, Junda and Cai, Kuo and Chen, Bo and Wang, Shiyao and Luo, Xinchen and Luo, Qiang and Tang, Ruiming and Li, Han and Gai, Kun and others},
+  journal={arXiv preprint arXiv:2601.06798},
+  year={2026}
+}
+```
 
 ## Copilot 및 Agent 하네스
 
