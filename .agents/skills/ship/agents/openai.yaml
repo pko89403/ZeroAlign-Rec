@@ -1,0 +1,5 @@
+interface:
+  display_name: "Ship"
+  short_description: "Run release-readiness and rollback checks"
+  default_prompt: "Use $ship to run repository release checks, verify runtime commands, and capture rollback considerations."
+
