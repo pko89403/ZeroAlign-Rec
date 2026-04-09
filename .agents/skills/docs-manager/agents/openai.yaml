@@ -1,0 +1,5 @@
+interface:
+  display_name: "Docs Manager"
+  short_description: "Manage the 3-layer wiki and source knowledge base"
+  default_prompt: "Use $docs-manager to ingest sources, query the wiki, lint cross-references, or update ADR and index pages."
+

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Code Simplify"
+  short_description: "Reduce complexity without changing behavior"
+  default_prompt: "Use $code-simplify to simplify the target code while preserving behavior and rerunning relevant validations."
+
