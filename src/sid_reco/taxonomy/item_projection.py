@@ -273,7 +273,7 @@ def build_item_projection_prompt(context: ItemProjectionContext) -> ItemProjecti
         "- Prefer labels from the provided master vocabulary for each key when they fit.\n"
         "- If the vocabulary examples are insufficient, you may add a short snake_case label.\n"
         f"- If you truly cannot infer a value for a key, return "
-        f"[\"{UNKNOWN_TAXONOMY_VALUE}\"] for that key.\n"
+        f'["{UNKNOWN_TAXONOMY_VALUE}"] for that key.\n'
         "- Do not add extra keys, explanations, markdown, or code fences.\n\n"
         "Master taxonomy dictionary (few-shot guidance by key):\n"
         f"{taxonomy_dictionary_text}\n\n"
@@ -397,7 +397,7 @@ def repair_item_taxonomy_json(
         f"Schema: top-level object with exactly these keys: {', '.join(required_keys)}.\n"
         "Every key must map to a non-empty array of snake_case strings.\n"
         "Collapse duplicates and near-synonyms to one best label per key.\n"
-        f"Include missing or empty keys with [\"{UNKNOWN_TAXONOMY_VALUE}\"] "
+        f'Include missing or empty keys with ["{UNKNOWN_TAXONOMY_VALUE}"] '
         "and drop unsupported extra keys.\n"
         "Keep open-vocabulary labels when needed, but keep them short and snake_case.\n\n"
         f"Text to repair:\n{raw_output}"
@@ -563,7 +563,7 @@ def build_retry_prompt(
         f"Refill these keys with non-empty arrays: {', '.join(empty_features)}.\n"
         "Also remove duplicate or synonymous labels while retrying.\n"
         f"If you still cannot infer a value, return "
-        f"[\"{UNKNOWN_TAXONOMY_VALUE}\"] for those keys.\n"
+        f'["{UNKNOWN_TAXONOMY_VALUE}"] for those keys.\n'
     )
 
 
@@ -590,7 +590,7 @@ def build_self_refine_prompt(
         "clearly requires it.\n"
         "- Prefer master vocabulary labels when they clearly fit the evidence.\n"
         "- Keep open-vocabulary labels only when the master vocabulary does not fit.\n"
-        f"- If a key is still unknowable, return [\"{UNKNOWN_TAXONOMY_VALUE}\"] for that key.\n"
+        f'- If a key is still unknowable, return ["{UNKNOWN_TAXONOMY_VALUE}"] for that key.\n'
         "- Return JSON only.\n\n"
         "Master taxonomy dictionary:\n"
         f"{vocabulary_text}\n\n"
@@ -657,9 +657,7 @@ def _normalize_projected_taxonomy(
     missing_keys = [key for key in normalized_required_keys if key not in normalized]
     if missing_keys:
         raise ValueError(
-            "Projected taxonomy is missing required keys: "
-            + ", ".join(missing_keys)
-            + ".",
+            "Projected taxonomy is missing required keys: " + ", ".join(missing_keys) + ".",
         )
 
     return {key: normalized[key] for key in normalized_required_keys}
@@ -667,10 +665,7 @@ def _normalize_projected_taxonomy(
 
 def fill_empty_features(taxonomy: dict[str, list[str]]) -> dict[str, list[str]]:
     """Replace empty feature arrays with the sentinel value 'empty'."""
-    return {
-        key: values if values else [UNKNOWN_TAXONOMY_VALUE]
-        for key, values in taxonomy.items()
-    }
+    return {key: values if values else [UNKNOWN_TAXONOMY_VALUE] for key, values in taxonomy.items()}
 
 
 def _empty_feature_keys(taxonomy: dict[str, list[str]]) -> list[str]:

@@ -76,9 +76,8 @@ def test_build_item_projection_prompt_embeds_target_neighbors_and_vocab(tmp_path
     assert "few-shot guidance" in bundle.user_prompt
     assert "collapse duplicates and near-synonyms" in bundle.user_prompt
     assert "Do not repeat the same concept across multiple keys" in bundle.user_prompt
-    assert (
-        bundle.user_prompt.index("few-shot guidance")
-        < bundle.user_prompt.index('return ["empty"]')
+    assert bundle.user_prompt.index("few-shot guidance") < bundle.user_prompt.index(
+        'return ["empty"]'
     )
     assert bundle.required_keys == ("cuisine", "dish_type", "taste_mood")
 
@@ -107,7 +106,7 @@ def test_generate_item_taxonomy_allows_open_vocab_values_for_known_keys(tmp_path
                     "Dish Type": ["Soup"],
                     "Taste Mood": ["Cozy Dinner"],
                 }
-            )
+            ),
         ]
     )
 
@@ -435,7 +434,7 @@ def test_structure_taxonomy_item_optionally_includes_evidence(tmp_path: Path) ->
                     "Dish Type": ["Soup"],
                     "Taste Mood": ["Cozy Dinner"],
                 }
-            )
+            ),
         ]
     )
 
