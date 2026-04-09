@@ -148,7 +148,7 @@ def load_taxonomy_master_dictionary(taxonomy_dictionary_path: Path) -> dict[str,
 
 
 def load_neighbor_context(neighbor_context_path: Path) -> pd.DataFrame:
-    """Load the persisted top-k neighbor context table."""
+    """Load the persisted neighbor-context top-k table."""
     if not neighbor_context_path.exists():
         raise FileNotFoundError(f"Missing neighbor context file: {neighbor_context_path}")
 

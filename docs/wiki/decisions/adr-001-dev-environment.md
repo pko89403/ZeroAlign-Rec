@@ -111,6 +111,6 @@ src/sid_reco/
 - [dev-environment](../entities/dev-environment.md) — 개발 환경 세팅 상세
 - [ADR-002: Food.com 전처리 정책 결정](adr-002-foodcom-preprocessing-policy.md) — Food.com 전처리 규칙
 - [Food.com 데이터셋](../entities/food-com-dataset.md) — 현재 로컬 데이터셋 상태
-- [ADR-003: Neighbor Context 검색 정책 결정](adr-003-neighbor-context-retrieval.md) — neighbor context 검색 규칙
+- [ADR-003: Neighbor Context 정책 결정](adr-003-neighbor-context-retrieval.md) — neighbor context 검색 규칙
 - [Food Taxonomy Dictionary](../entities/food-taxonomy-dictionary.md) — LLM 기반 taxonomy dictionary 생성 산출물
 - [ADR-004: Taxonomy Dictionary 생성 방식 결정](adr-004-taxonomy-dictionary-generation.md) — taxonomy dictionary 생성 정책

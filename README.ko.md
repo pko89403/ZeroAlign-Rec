@@ -104,7 +104,7 @@ uv run sid-reco prepare-foodcom \
 - `data/processed/foodcom/splits/{train,valid,test}.csv`
 - `data/processed/foodcom/manifest.json`
 
-### 2. Neighbor context index 생성
+### 2. Neighbor context 생성
 
 item metadata embedding과 FAISS 기반 top-k neighbor context를 생성한다.
 
@@ -214,8 +214,6 @@ uv run mypy src
 - [docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md](docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md)
 - [docs/wiki/decisions/adr-003-neighbor-context-retrieval.md](docs/wiki/decisions/adr-003-neighbor-context-retrieval.md)
 - [docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md](docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md)
-- [docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md](docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md)
-- [docs/wiki/decisions/adr-006-strict-tid-hardening.md](docs/wiki/decisions/adr-006-strict-tid-hardening.md)
 
 ## Copilot 및 Agent 하네스
 
