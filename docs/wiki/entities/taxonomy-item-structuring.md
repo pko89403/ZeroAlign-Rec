@@ -31,6 +31,12 @@ sources: []
   - 단일 item JSON
   - batch JSONL (`data/processed/foodcom/taxonomy_structured/items.jsonl`)
 
+이 batch JSONL은 현재 진행 중인 Phase 1 마지막 단계에서
+`src/sid_reco/sid/` 모듈이 읽는 직접 입력이다.
+현재 구현된 downstream 중간 산출물은
+`data/processed/foodcom/sid_index/serialized_items.jsonl`,
+`embeddings.npy`, `embedding_manifest.json` 이다.
+
 현재 item structuring 경로의 주요 동작은 다음과 같다.
 
 - 모든 required key를 항상 포함한다
@@ -78,6 +84,7 @@ uv run sid-reco structure-taxonomy-batch \
 
 - [Food Taxonomy Dictionary](food-taxonomy-dictionary.md) — item structuring이 참조하는 master vocabulary
 - [Neighbor Context](neighbor-context-index.md) — top-5 neighbor evidence 제공 단계
+- [SID 컴파일 및 인덱싱](sid-compilation-indexing.md) — structured taxonomy JSONL을 serialization/embedding 산출물로 넘기는 다음 단계
 - [ADR-003: Neighbor Context 정책 결정](../decisions/adr-003-neighbor-context-retrieval.md) — neighbor context 정책
 - [ADR-005: Taxonomy Dictionary 생성 hardening 결정](../decisions/adr-005-taxonomy-dictionary-hardening.md) — dictionary 생성과 입력 bounded 정책
 - [ADR-006: Strict TID hardening 결정](../decisions/adr-006-strict-tid-hardening.md) — self-refine, canonicalization, validator 정책
