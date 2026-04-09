@@ -187,6 +187,10 @@ Create `.env` from `.env.example` and adjust only the variables you need.
 ```bash
 uv run sid-reco doctor
 uv run sid-reco smoke-mlx
+uv run sid-reco build-taxonomy-step1 --help
+uv run sid-reco build-taxonomy-dictionary --help
+uv run sid-reco structure-taxonomy-item --help
+uv run sid-reco structure-taxonomy-batch --help
 uv run pytest
 uv run ruff check .
 uv run mypy src
@@ -214,11 +218,14 @@ Instead of duplicating long operational details in the README, this repository k
 - [docs/wiki/entities/dev-environment.md](docs/wiki/entities/dev-environment.md)
 - [docs/wiki/entities/food-com-dataset.md](docs/wiki/entities/food-com-dataset.md)
 - [docs/wiki/entities/food-taxonomy-dictionary.md](docs/wiki/entities/food-taxonomy-dictionary.md)
+- [docs/wiki/entities/taxonomy-item-structuring.md](docs/wiki/entities/taxonomy-item-structuring.md)
 - [docs/wiki/entities/taxonomy-step1-neighbor-index.md](docs/wiki/entities/taxonomy-step1-neighbor-index.md)
 - [docs/wiki/decisions/adr-001-dev-environment.md](docs/wiki/decisions/adr-001-dev-environment.md)
 - [docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md](docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md)
 - [docs/wiki/decisions/adr-003-taxonomy-step1-neighbor-index.md](docs/wiki/decisions/adr-003-taxonomy-step1-neighbor-index.md)
 - [docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md](docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md)
+- [docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md](docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md)
+- [docs/wiki/decisions/adr-006-strict-tid-hardening.md](docs/wiki/decisions/adr-006-strict-tid-hardening.md)
 
 ## Copilot and Agent Harness
 
@@ -232,12 +239,18 @@ This repository also maintains a Copilot/Codex-friendly harness.
 
 Main shortcuts:
 
-- `/docs-manager` or `/doc-manager`
+- `/docs-manager` or `/doc-manager` — wiki/ADR/index plus README and harness sync
 - `/spec`
 - `/plan`
 - `/build`
 - `/test`
 - `/code-simplify`
 - `/ship`
+
+For taxonomy work, the default repository pipeline is:
+
+```bash
+build-taxonomy-step1 -> build-taxonomy-dictionary -> structure-taxonomy-item|batch
+```
 
 For docs/wiki work, `docs-manager` and `AGENTS.md` rules take priority over generic workflows.

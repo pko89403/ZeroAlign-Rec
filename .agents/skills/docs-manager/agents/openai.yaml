@@ -1,5 +1,4 @@
 interface:
   display_name: "Docs Manager"
-  short_description: "Manage the 3-layer wiki and source knowledge base"
-  default_prompt: "Use $docs-manager to ingest sources, query the wiki, lint cross-references, or update ADR and index pages."
-
+  short_description: "Sync wiki, README, and harness documentation"
+  default_prompt: "Use $docs-manager to ingest sources, query or lint the wiki, create ADR pages, or run the repository docs/harness sync routine across README.md, AGENTS.md, .github/copilot-instructions.md, .harness/reference/local-adaptation.md, and docs/wiki/."

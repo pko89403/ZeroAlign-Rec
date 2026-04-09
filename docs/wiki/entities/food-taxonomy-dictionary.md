@@ -35,6 +35,7 @@ taxonomy는 단순한 축 목록이 아니라 아래 두 요소를 포함한다.
 - `uv run pytest`, `uv run ruff check .`, `uv run mypy src` 검증이 통과했다
 - 실제 MLX LLM으로 end-to-end 생성이 완료되었고 현재 snapshot 기준 입력 규모는 `192`개 recipe다
 - 현재 CLI summary는 전체 catalog 수와 실제 prompt 입력 수를 구분해 보여준다
+- downstream `Taxonomy Item Structuring` 단계에서 few-shot guidance 및 canonicalization 기준 vocabulary로 재사용된다
 
 ## 사용법/설정
 
@@ -68,4 +69,6 @@ uv run sid-reco build-taxonomy-dictionary \
 - [ADR-001: 개발 환경 및 로컬 추론 스택 결정](../decisions/adr-001-dev-environment.md) — 생성 모델과 개발 스택 결정
 - [ADR-004: Taxonomy Dictionary 생성 방식 결정](../decisions/adr-004-taxonomy-dictionary-generation.md) — superseded된 초기 생성 정책
 - [ADR-005: Taxonomy Dictionary 생성 hardening 결정](../decisions/adr-005-taxonomy-dictionary-hardening.md) — 현재 bounded input/validation 정책
+- [Taxonomy Item Structuring](taxonomy-item-structuring.md) — dictionary를 참조해 item별 TID를 생성하는 downstream 단계
+- [ADR-006: Strict TID hardening 결정](../decisions/adr-006-strict-tid-hardening.md) — downstream canonicalization과 validator 정책
 - [Taxonomy Dictionary 개발 이슈 개요](../overviews/taxonomy-dictionary-development-issues.md) — 구현 및 검증 중 발생한 오류 기록

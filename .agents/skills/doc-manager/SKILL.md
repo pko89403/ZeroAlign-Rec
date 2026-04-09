@@ -6,6 +6,7 @@ description: Alias wrapper for docs-manager. Use when the user explicitly types 
 # Doc Manager
 
 This is an alias for `docs-manager`.
+`docs-manager` now includes the repository's docs/harness sync routine as well as wiki maintenance.
 
 ## Procedure
 
@@ -16,4 +17,3 @@ This is an alias for `docs-manager`.
 ## Related
 
 - `docs-manager`
-
