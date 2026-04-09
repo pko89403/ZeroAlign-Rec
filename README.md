@@ -140,7 +140,12 @@ Main outputs:
 
 ### 4. Structure items into taxonomy-aligned JSON
 
-Use the taxonomy dictionary together with step 1 neighbor context to produce structured outputs for each item.
+Use the taxonomy dictionary together with step 1 neighbor context to produce structured outputs for each item. The item structuring stage now applies:
+
+- prompt-level duplicate/synonym suppression
+- a self-refine rewrite pass on draft JSON when labels drift outside the master vocabulary
+- conservative post-processing canonicalization toward the taxonomy dictionary
+- lightweight validators for obviously weak `cuisine` and contradictory `dietary_style` labels
 
 Single item:
 
