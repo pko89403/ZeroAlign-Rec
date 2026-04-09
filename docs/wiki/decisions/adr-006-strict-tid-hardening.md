@@ -72,6 +72,6 @@ item structuring 경로를 아래 단계로 분리해 strict TID hardening을 �
 
 - [Taxonomy Item Structuring](../entities/taxonomy-item-structuring.md) — 현재 적용 대상 파이프라인
 - [Food Taxonomy Dictionary](../entities/food-taxonomy-dictionary.md) — canonicalization 기준 vocabulary
-- [Taxonomy Step 1 이웃 인덱스](../entities/taxonomy-step1-neighbor-index.md) — item evidence를 제공하는 이웃 검색 단계
-- [ADR-003: Taxonomy Step 1 이웃 검색 정책 결정](adr-003-taxonomy-step1-neighbor-index.md) — top-5 neighbor context 정책
+- [Neighbor Context](../entities/neighbor-context-index.md) — item evidence를 제공하는 이웃 검색 단계
+- [ADR-003: Neighbor Context 정책 결정](adr-003-neighbor-context-retrieval.md) — top-5 neighbor context 정책
 - [ADR-005: Taxonomy Dictionary 생성 hardening 결정](adr-005-taxonomy-dictionary-hardening.md) — upstream taxonomy dictionary hardening

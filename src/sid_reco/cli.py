@@ -28,15 +28,15 @@ from sid_reco.taxonomy.item_projection import (
     structure_taxonomy_item,
     write_structured_taxonomy_item,
 )
-from sid_reco.taxonomy.step1 import DEFAULT_TOP_K, build_taxonomy_step1
+from sid_reco.taxonomy.neighbor_context import DEFAULT_TOP_K, build_neighbor_context
 
 console = Console()
 DEFAULT_FOODCOM_RAW_DIR = Path("data/raw/foodcom")
 DEFAULT_FOODCOM_OUT_DIR = Path("data/processed/foodcom")
 DEFAULT_TAXONOMY_RECIPES_PATH = DEFAULT_FOODCOM_OUT_DIR / "recipes.csv"
-DEFAULT_TAXONOMY_OUT_DIR = DEFAULT_FOODCOM_OUT_DIR / "taxonomy_step1"
+DEFAULT_NEIGHBOR_CONTEXT_OUT_DIR = DEFAULT_FOODCOM_OUT_DIR / "neighbor_context"
 DEFAULT_TAXONOMY_DICTIONARY_OUT_DIR = DEFAULT_FOODCOM_OUT_DIR / "taxonomy_dictionary"
-DEFAULT_TAXONOMY_NEIGHBOR_CONTEXT_PATH = DEFAULT_TAXONOMY_OUT_DIR / "neighbor_context.csv"
+DEFAULT_NEIGHBOR_CONTEXT_PATH = DEFAULT_NEIGHBOR_CONTEXT_OUT_DIR / "neighbor_context.csv"
 DEFAULT_TAXONOMY_DICTIONARY_PATH = (
     DEFAULT_TAXONOMY_DICTIONARY_OUT_DIR / "food_taxonomy_dictionary.json"
 )
@@ -239,8 +239,8 @@ def prepare_foodcom(
     console.print(table)
 
 
-@app.command("build-taxonomy-step1")
-def build_taxonomy_step1_command(
+@app.command("build-neighbor-context")
+def build_neighbor_context_command(
     recipes_path: Annotated[
         Path,
         typer.Option(
@@ -258,9 +258,9 @@ def build_taxonomy_step1_command(
             file_okay=False,
             dir_okay=True,
             writable=True,
-            help="Directory where taxonomy step 1 outputs will be written.",
+            help="Directory where neighbor-context outputs will be written.",
         ),
-    ] = DEFAULT_TAXONOMY_OUT_DIR,
+    ] = DEFAULT_NEIGHBOR_CONTEXT_OUT_DIR,
     top_k: Annotated[
         int,
         typer.Option(
@@ -278,11 +278,11 @@ def build_taxonomy_step1_command(
         ),
     ] = None,
 ) -> None:
-    """Build item embeddings and a FAISS top-k neighbor index for taxonomy step 1."""
+    """Build item embeddings and a FAISS top-k neighbor context."""
     ensure_project_directories()
     settings = Settings.from_env()
     try:
-        summary = build_taxonomy_step1(
+        summary = build_neighbor_context(
             recipes_path=recipes_path,
             out_dir=out_dir,
             embed_model=settings.embed_model,
@@ -293,7 +293,7 @@ def build_taxonomy_step1_command(
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(code=1) from exc
 
-    table = Table(title="Taxonomy Step 1")
+    table = Table(title="Neighbor Context")
     table.add_column("Metric", style="cyan", no_wrap=True)
     table.add_column("Value", overflow="fold")
     table.add_row("Output dir", str(out_dir))
@@ -399,9 +399,9 @@ def structure_taxonomy_item_command(
             file_okay=True,
             dir_okay=False,
             readable=True,
-            help="Taxonomy step 1 neighbor_context.csv path.",
+            help="Neighbor-context CSV path.",
         ),
-    ] = DEFAULT_TAXONOMY_NEIGHBOR_CONTEXT_PATH,
+    ] = DEFAULT_NEIGHBOR_CONTEXT_PATH,
     taxonomy_dictionary_path: Annotated[
         Path,
         typer.Option(
@@ -493,9 +493,9 @@ def structure_taxonomy_batch_command(
             file_okay=True,
             dir_okay=False,
             readable=True,
-            help="Taxonomy step 1 neighbor_context.csv path.",
+            help="Neighbor-context CSV path.",
         ),
-    ] = DEFAULT_TAXONOMY_NEIGHBOR_CONTEXT_PATH,
+    ] = DEFAULT_NEIGHBOR_CONTEXT_PATH,
     taxonomy_dictionary_path: Annotated[
         Path,
         typer.Option(

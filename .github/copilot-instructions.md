@@ -37,7 +37,7 @@ Use domain-specific commands when relevant:
 - `uv run sid-reco smoke-mlx`
 - `uv run sid-reco smoke-llm "..." `
 - `uv run sid-reco smoke-embed "..."`
-- `uv run sid-reco build-taxonomy-step1 --help`
+- `uv run sid-reco build-neighbor-context --help`
 - `uv run sid-reco build-taxonomy-dictionary --help`
 - `uv run sid-reco structure-taxonomy-item --help`
 - `uv run sid-reco structure-taxonomy-batch --help`
