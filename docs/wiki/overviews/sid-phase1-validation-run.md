@@ -82,3 +82,5 @@ structured taxonomy + dense embedding + residual quantization 흐름이 충분�
 - [SID 컴파일 및 인덱싱](../entities/sid-compilation-indexing.md) — 현재 구현 범위와 내부 모듈 설명
 - [Taxonomy Item Structuring](../entities/taxonomy-item-structuring.md) — Phase 1 마지막 단계의 직접 입력 생성 단계
 - [Neighbor Context](../entities/neighbor-context-index.md) — upstream embedding/FAISS evidence 단계
+- [Phase 2 추천 런타임](../entities/phase2-recommendation-runtime.md) — Phase 1 산출물을 실제 추천 실행에 연결하는 downstream 단계
+- [Phase 2 추천 런타임 실행 검증 개요](phase2-recommendation-runtime-validation.md) — 실제 추천 경로에서 확인된 후속 검증 결과
