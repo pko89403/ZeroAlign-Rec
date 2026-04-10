@@ -53,6 +53,7 @@ Use domain-specific commands when relevant:
 - Avoid new dependencies unless the task clearly requires them.
 - Preserve the current Apple Silicon + MLX local-first assumptions unless the task explicitly changes support scope.
 - The current recommendation runtime uses a higher default LLM generation budget (`SID_RECO_LLM_MAX_TOKENS=1024`) to keep structured JSON outputs stable.
+- `compile-sid-index` now also writes `recommendation_stats.json`, and the Phase 2 recommendation runtime expects that artifact alongside the rest of `sid_index/`.
 
 ## Useful Paths
 

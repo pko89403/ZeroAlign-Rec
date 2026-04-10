@@ -8,3 +8,4 @@
 |------|------|------|---------|
 | [taxonomy-dictionary-development-issues.md](taxonomy-dictionary-development-issues.md) | Taxonomy Dictionary 개발 이슈 개요 | 2026-04-08 | 0 |
 | [sid-phase1-validation-run.md](sid-phase1-validation-run.md) | SID Phase 1 실행 검증 개요 | 2026-04-09 | 0 |
+| [phase2-recommendation-runtime-validation.md](phase2-recommendation-runtime-validation.md) | Phase 2 추천 런타임 실행 검증 개요 | 2026-04-10 | 0 |
