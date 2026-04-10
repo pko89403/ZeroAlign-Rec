@@ -28,7 +28,7 @@ class _FakeEncoder:
 
 
 def test_compile_sid_index_cli_writes_all_outputs(tmp_path: Path, monkeypatch) -> None:
-    structured_items_path, taxonomy_dictionary_path = _write_sid_inputs(tmp_path)
+    structured_items_path, taxonomy_dictionary_path, interactions_path = _write_sid_inputs(tmp_path)
     out_dir = tmp_path / "sid_index"
     settings = Settings(
         project_root=tmp_path,
@@ -56,6 +56,8 @@ def test_compile_sid_index_cli_writes_all_outputs(tmp_path: Path, monkeypatch) -
             str(structured_items_path),
             "--taxonomy-dictionary-path",
             str(taxonomy_dictionary_path),
+            "--interactions-path",
+            str(interactions_path),
             "--out-dir",
             str(out_dir),
             "--branching-factor",
@@ -77,6 +79,7 @@ def test_compile_sid_index_cli_writes_all_outputs(tmp_path: Path, monkeypatch) -
     assert (out_dir / "id_map.jsonl").exists()
     assert (out_dir / "item_index.faiss").exists()
     assert (out_dir / "manifest.json").exists()
+    assert (out_dir / "recommendation_stats.json").exists()
 
     serialized_payloads = [
         json.loads(line)
@@ -109,13 +112,18 @@ def test_compile_sid_index_cli_writes_all_outputs(tmp_path: Path, monkeypatch) -
 
     item_to_sid = json.loads((out_dir / "item_to_sid.json").read_text(encoding="utf-8"))
     assert sorted(item_to_sid) == ["101", "102", "103"]
+    recommendation_stats = json.loads(
+        (out_dir / "recommendation_stats.json").read_text(encoding="utf-8")
+    )
+    assert recommendation_stats["popularity"] == {"101": 2, "102": 2, "103": 2}
+    assert recommendation_stats["cooccurrence"]["101"] == {"102": 1, "103": 1}
 
 
 def test_compile_sid_index_cli_reports_missing_taxonomy_dictionary(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
-    structured_items_path, _ = _write_sid_inputs(tmp_path)
+    structured_items_path, _, _ = _write_sid_inputs(tmp_path)
     settings = Settings(
         project_root=tmp_path,
         llm_backend="mlx",
@@ -147,9 +155,10 @@ def test_compile_sid_index_cli_reports_missing_taxonomy_dictionary(
     assert "Missing taxonomy dictionary file" in result.stdout
 
 
-def _write_sid_inputs(tmp_path: Path) -> tuple[Path, Path]:
+def _write_sid_inputs(tmp_path: Path) -> tuple[Path, Path, Path]:
     structured_items_path = tmp_path / "items.jsonl"
     taxonomy_dictionary_path = tmp_path / "food_taxonomy_dictionary.json"
+    interactions_path = tmp_path / "interactions.csv"
 
     structured_items_path.write_text(
         "\n".join(
@@ -205,5 +214,20 @@ def _write_sid_inputs(tmp_path: Path) -> tuple[Path, Path]:
         + "\n",
         encoding="utf-8",
     )
+    interactions_path.write_text(
+        "\n".join(
+            [
+                "user_id,recipe_id,date,rating,review",
+                "1,101,2024-01-01,1.0,good",
+                "1,102,2024-01-02,1.0,nice",
+                "2,101,2024-01-03,1.0,ok",
+                "2,103,2024-01-04,1.0,ok",
+                "3,102,2024-01-05,1.0,ok",
+                "3,103,2024-01-06,1.0,ok",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
 
-    return structured_items_path, taxonomy_dictionary_path
+    return structured_items_path, taxonomy_dictionary_path, interactions_path

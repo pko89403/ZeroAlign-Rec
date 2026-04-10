@@ -24,6 +24,12 @@ from sid_reco.sid.serialization import (
     serialize_taxonomy_text,
     write_serialized_items,
 )
+from sid_reco.sid.stats import (
+    RecommendationStats,
+    RecommendationStatsWriteSummary,
+    build_recommendation_stats,
+    write_recommendation_stats,
+)
 
 __all__ = [
     "CompiledSIDItem",
@@ -31,17 +37,21 @@ __all__ = [
     "EmbeddedSIDItems",
     "EmbeddedSIDWriteSummary",
     "ResidualKMeansLevel",
+    "RecommendationStats",
+    "RecommendationStatsWriteSummary",
     "SIDIndexWriteSummary",
     "SerializedSIDItem",
     "SerializedSIDWriteSummary",
     "TrainedResidualCodebooks",
     "assign_trained_residual_kmeans",
+    "build_recommendation_stats",
     "compile_residual_kmeans",
     "encode_serialized_items",
     "encode_serialized_items_with_mlx",
     "serialize_structured_items",
     "serialize_taxonomy_text",
     "train_residual_codebooks",
+    "write_recommendation_stats",
     "write_embedded_items",
     "write_sid_index_outputs",
     "write_serialized_items",
