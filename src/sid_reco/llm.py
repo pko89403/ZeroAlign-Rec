@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from importlib import import_module
 from typing import Any
 
-from sid_reco.config import Settings
+from sid_reco.config import DEFAULT_LLM_MAX_TOKENS, Settings
 from sid_reco.mlx_runtime import ensure_mlx_runtime_available
 
 
@@ -29,7 +29,7 @@ class MLXTextGenerator:
         prompt: str,
         *,
         system_prompt: str | None = None,
-        max_tokens: int = 256,
+        max_tokens: int = DEFAULT_LLM_MAX_TOKENS,
         temperature: float = 0.0,
         top_p: float = 1.0,
         verbose: bool = False,
