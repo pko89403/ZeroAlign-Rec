@@ -89,6 +89,7 @@ uv run sid-reco compile-sid-index \
   --structured-items-path data/processed/foodcom/taxonomy_structured/items.jsonl \
   --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
   --out-dir data/processed/foodcom/sid_index
+uv run sid-reco recommend --help
 ```
 
 ## Core Workflows
@@ -228,6 +229,24 @@ Main outputs:
 - `item_index.faiss`
 - `manifest.json`
 
+### 6. Run the training-free recommendation pipeline
+
+After Phase 1 artifacts are ready, the runtime recommendation entrypoint is:
+
+```bash
+uv run sid-reco recommend --help
+```
+
+The recommendation CLI consumes:
+
+- `sid_index/` artifacts produced by `compile-sid-index`
+- a taxonomy dictionary
+- a catalog CSV
+- a recommendation few-shot casebank JSONL
+
+The current runtime defaults also use a larger generation budget to keep
+structured JSON outputs stable during interest sketching and bootstrap reranking.
+
 ## Configuration
 
 Create `.env` from `.env.example` and adjust only the variables you need.
@@ -239,7 +258,7 @@ Create `.env` from `.env.example` and adjust only the variables you need.
 | `SID_RECO_EMBED_MODEL` | embedding model name |
 | `SID_RECO_CATALOG_PATH` | path to the item metadata catalog |
 | `SID_RECO_CACHE_DIR` | path for intermediate artifacts and cache |
-| `SID_RECO_LLM_MAX_TOKENS` | default generation token count |
+| `SID_RECO_LLM_MAX_TOKENS` | default generation token count (default: `1024`) |
 | `SID_RECO_LLM_TEMPERATURE` | default temperature |
 | `SID_RECO_LLM_TOP_P` | default nucleus sampling value |
 
@@ -261,6 +280,7 @@ Run these only in a local Apple Silicon session when you want to confirm MLX/Met
 ```bash
 uv run sid-reco doctor
 uv run sid-reco smoke-mlx
+uv run sid-reco recommend --help
 uv run sid-reco build-neighbor-context --help
 uv run sid-reco build-taxonomy-dictionary --help
 uv run sid-reco structure-taxonomy-item --help

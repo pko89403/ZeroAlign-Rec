@@ -21,12 +21,15 @@ from sid_reco.datasets.foodcom import (
 from sid_reco.embedding import MLXEmbeddingEncoder
 from sid_reco.llm import MLXTextGenerator
 from sid_reco.mlx_runtime import get_runtime_environment_summary, probe_mlx_runtime
+from sid_reco.recommendation import recommend
 from sid_reco.sid import (
     assign_trained_residual_kmeans,
+    build_recommendation_stats,
     encode_serialized_items_with_mlx,
     serialize_structured_items,
     train_residual_codebooks,
     write_embedded_items,
+    write_recommendation_stats,
     write_serialized_items,
     write_sid_index_outputs,
 )
@@ -50,10 +53,13 @@ DEFAULT_NEIGHBOR_CONTEXT_PATH = DEFAULT_NEIGHBOR_CONTEXT_OUT_DIR / "neighbor_con
 DEFAULT_TAXONOMY_DICTIONARY_PATH = (
     DEFAULT_TAXONOMY_DICTIONARY_OUT_DIR / "food_taxonomy_dictionary.json"
 )
+DEFAULT_INTERACTIONS_PATH = DEFAULT_FOODCOM_OUT_DIR / "interactions.csv"
 DEFAULT_TAXONOMY_STRUCTURED_OUT_PATH = (
     DEFAULT_FOODCOM_OUT_DIR / "taxonomy_structured" / "items.jsonl"
 )
 DEFAULT_SID_INDEX_OUT_DIR = DEFAULT_FOODCOM_OUT_DIR / "sid_index"
+DEFAULT_RECOMMENDATION_STATS_PATH = DEFAULT_SID_INDEX_OUT_DIR / "recommendation_stats.json"
+DEFAULT_FEWSHOT_STORE_PATH = DEFAULT_FOODCOM_OUT_DIR / "recommendation_casebank.jsonl"
 app = typer.Typer(
     help="Utilities for the SID-based training-free recommender.",
     no_args_is_help=True,
@@ -606,6 +612,18 @@ def compile_sid_index_command(
             help="Taxonomy dictionary JSON path used to preserve feature order.",
         ),
     ] = DEFAULT_TAXONOMY_DICTIONARY_PATH,
+    interactions_path: Annotated[
+        Path,
+        typer.Option(
+            "--interactions-path",
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help=(
+                "Processed interactions CSV used to derive popularity and co-occurrence statistics."
+            ),
+        ),
+    ] = DEFAULT_INTERACTIONS_PATH,
     out_dir: Annotated[
         Path,
         typer.Option(
@@ -689,6 +707,11 @@ def compile_sid_index_command(
             compiled=compiled,
             out_dir=out_dir,
         )
+        recommendation_stats = build_recommendation_stats(interactions_path)
+        stats_summary = write_recommendation_stats(
+            recommendation_stats,
+            out_path=out_dir / "recommendation_stats.json",
+        )
     except (FileNotFoundError, ValueError, RuntimeError) as exc:
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(code=1) from exc
@@ -706,7 +729,164 @@ def compile_sid_index_command(
     table.add_row("Compiled items", str(index_summary.item_count))
     table.add_row("Serialized path", str(serialized_summary.output_path))
     table.add_row("Index path", str(index_summary.index_path))
+    table.add_row("Stats path", str(stats_summary.output_path))
+    table.add_row("Stats users", str(stats_summary.user_count))
     console.print(table)
+
+
+@app.command("recommend")
+def recommend_command(
+    query: Annotated[
+        str | None,
+        typer.Option(
+            "--query",
+            help="Natural-language recommendation query.",
+        ),
+    ] = None,
+    liked_item_id: Annotated[
+        list[int] | None,
+        typer.Option(
+            "--liked-item-id",
+            help="Repeatable liked recipe_id for pseudo-CF cooccurrence lookup.",
+        ),
+    ] = None,
+    disliked_item_id: Annotated[
+        list[int] | None,
+        typer.Option(
+            "--disliked-item-id",
+            help="Repeatable disliked recipe_id.",
+        ),
+    ] = None,
+    hard_filter: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--hard-filter",
+            help="Repeatable taxonomy filter in key=value1,value2 form.",
+        ),
+    ] = None,
+    sid_index_dir: Annotated[
+        Path,
+        typer.Option(
+            "--sid-index-dir",
+            file_okay=False,
+            dir_okay=True,
+            readable=True,
+            help="Directory containing Phase 1 SID index artifacts.",
+        ),
+    ] = DEFAULT_SID_INDEX_OUT_DIR,
+    taxonomy_dictionary_path: Annotated[
+        Path,
+        typer.Option(
+            "--taxonomy-dictionary-path",
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Master taxonomy dictionary JSON path.",
+        ),
+    ] = DEFAULT_TAXONOMY_DICTIONARY_PATH,
+    stats_store_path: Annotated[
+        Path,
+        typer.Option(
+            "--stats-store-path",
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Phase 1 recommendation statistics JSON path.",
+        ),
+    ] = DEFAULT_RECOMMENDATION_STATS_PATH,
+    fewshot_store_path: Annotated[
+        Path,
+        typer.Option(
+            "--fewshot-store-path",
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Few-shot casebank JSONL path for Module 2.3.",
+        ),
+    ] = DEFAULT_FEWSHOT_STORE_PATH,
+    catalog_path: Annotated[
+        Path,
+        typer.Option(
+            "--catalog-path",
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="Catalog CSV used to render final recommendation metadata.",
+        ),
+    ] = DEFAULT_TAXONOMY_RECIPES_PATH,
+    top_k: Annotated[
+        int,
+        typer.Option("--top-k", min=1, help="Number of final recommendations to return."),
+    ] = 3,
+    rerank_passes: Annotated[
+        int,
+        typer.Option(
+            "--rerank-passes",
+            min=1,
+            help="Number of bootstrap rerank passes to run.",
+        ),
+    ] = 3,
+) -> None:
+    """Run the full training-free recommendation pipeline."""
+    ensure_project_directories()
+    settings = Settings.from_env()
+    generator = MLXTextGenerator.from_settings(settings)
+    encoder = MLXEmbeddingEncoder.from_settings(settings)
+    try:
+        response = recommend(
+            sid_index_dir=sid_index_dir,
+            taxonomy_dictionary_path=taxonomy_dictionary_path,
+            stats_store_path=stats_store_path,
+            fewshot_store_path=fewshot_store_path,
+            catalog_path=catalog_path,
+            generator=generator,
+            encoder=encoder,
+            query=query,
+            liked_item_ids=liked_item_id or [],
+            disliked_item_ids=disliked_item_id or [],
+            hard_filters=_parse_hard_filters(hard_filter or []),
+            top_k=top_k,
+            rerank_passes=rerank_passes,
+            max_tokens=settings.llm_max_tokens,
+        )
+    except (FileNotFoundError, ValueError, RuntimeError) as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=1) from exc
+
+    table = Table(title="Recommendation Results")
+    table.add_column("Rank", style="cyan", no_wrap=True)
+    table.add_column("Recipe ID", no_wrap=True)
+    table.add_column("Title", overflow="fold")
+    table.add_column("MSCP", no_wrap=True)
+    table.add_column("Band", no_wrap=True)
+    table.add_column("Rationale", overflow="fold")
+    for item in response.items:
+        table.add_row(
+            str(item.rank),
+            str(item.recipe_id),
+            item.title,
+            "-" if item.mscp is None else f"{item.mscp:.2f}",
+            item.confidence_band,
+            item.rationale,
+        )
+    console.print(table)
+    console.print(response.rerank_summary)
+    console.print(response.confidence_summary)
+
+
+def _parse_hard_filters(raw_filters: list[str]) -> dict[str, list[str]]:
+    parsed: dict[str, list[str]] = {}
+    for raw_filter in raw_filters:
+        if "=" not in raw_filter:
+            raise ValueError("Each --hard-filter entry must use key=value1,value2 format.")
+        key, raw_values = raw_filter.split("=", maxsplit=1)
+        values = [value.strip() for value in raw_values.split(",") if value.strip()]
+        if not key.strip() or not values:
+            raise ValueError(
+                "Each --hard-filter entry must include a non-empty key and at least one value."
+            )
+        parsed[key.strip()] = values
+    return parsed
 
 
 if __name__ == "__main__":

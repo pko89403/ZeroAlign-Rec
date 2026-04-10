@@ -35,6 +35,7 @@
 Use domain-specific commands when relevant:
 
 - `uv run sid-reco smoke-mlx`
+- `uv run sid-reco recommend --help`
 - `uv run sid-reco smoke-llm "..." `
 - `uv run sid-reco smoke-embed "..."`
 - `uv run sid-reco build-neighbor-context --help`
@@ -51,6 +52,7 @@ Use domain-specific commands when relevant:
 - Reuse existing patterns in `src/sid_reco/` and `tests/` before introducing new ones.
 - Avoid new dependencies unless the task clearly requires them.
 - Preserve the current Apple Silicon + MLX local-first assumptions unless the task explicitly changes support scope.
+- The current recommendation runtime uses a higher default LLM generation budget (`SID_RECO_LLM_MAX_TOKENS=1024`) to keep structured JSON outputs stable.
 
 ## Useful Paths
 
