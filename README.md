@@ -10,7 +10,7 @@
 
 `ZeroAlign-Rec` is a Python codebase for experimenting with `SID`-based training-free recommendation in a local environment. It uses `MLX` on Apple Silicon to run both generative and embedding models locally, and supports an end-to-end workflow from Food.com preprocessing to taxonomy dictionary generation and taxonomy-aligned item structuring.
 
-Current Phase 1 progress also includes an in-repository `sid` package plus a public `compile-sid-index` CLI for deterministic structured-item serialization, MLX embedding artifacts, CPU residual K-means codebook training, and FAISS indexing outputs under `data/processed/foodcom/sid_index/`.
+Current Phase 1 progress also includes an in-repository `sid` package plus a public `compile-sid-index` CLI for deterministic structured-item serialization, MLX embedding artifacts, CPU residual K-means codebook training, FAISS indexing, and offline recommendation statistics under `data/processed/foodcom/sid_index/`.
 
 ## Table of Contents
 
@@ -211,6 +211,7 @@ Main outputs:
 - `sid_to_items.json`
 - `id_map.jsonl`
 - `item_index.faiss`
+- `recommendation_stats.json`
 - `manifest.json`
 
 ### 6. Run the training-free recommendation pipeline
@@ -226,6 +227,7 @@ The recommendation CLI consumes:
 - `sid_index/` artifacts produced by `compile-sid-index`
 - a taxonomy dictionary
 - a catalog CSV
+- `recommendation_stats.json` produced by `compile-sid-index`
 - a recommendation few-shot casebank JSONL
 
 The current runtime defaults also use a larger generation budget to keep
