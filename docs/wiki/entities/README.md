@@ -12,3 +12,4 @@
 | [taxonomy-item-structuring.md](taxonomy-item-structuring.md) | Taxonomy Item Structuring | 2026-04-09 | taxonomy, llm, json, tid, recommendation |
 | [neighbor-context-index.md](neighbor-context-index.md) | Neighbor Context | 2026-04-07 | taxonomy, faiss, embedding, recommendation |
 | [sid-compilation-indexing.md](sid-compilation-indexing.md) | SID 컴파일 및 인덱싱 | 2026-04-09 | sid, embedding, kmeans, faiss, indexing |
+| [phase2-recommendation-runtime.md](phase2-recommendation-runtime.md) | Phase 2 추천 런타임 | 2026-04-10 | recommendation, phase2, sid, mlx, runtime |
