@@ -12,6 +12,31 @@
 
 Current Phase 1 progress also includes an in-repository `sid` package plus a public `compile-sid-index` CLI for deterministic structured-item serialization, MLX embedding artifacts, CPU residual K-means codebook training, FAISS indexing, and offline recommendation statistics under `data/processed/foodcom/sid_index/`.
 
+## Live Demo
+
+A static HTML/JS bundle visualizes the four-module online pipeline (Interest Sketch → Semantic Search → Zero-Shot Rerank → MSCP Confidence) on a 26-recipe Food.com seed. The bundle is bilingual via the `?lang=` URL parameter and runs entirely client-side, so no build step or server is required.
+
+<p align="center">
+  <a href="docs/demo/index.html">
+    <img src="docs/demo/screenshots/desktop-en.png" alt="ZeroAlign-Rec recommendation demo (desktop, EN)" width="800">
+  </a>
+</p>
+
+<details>
+<summary>More views — Korean variant and mobile responsive</summary>
+
+<p align="center">
+  <img src="docs/demo/screenshots/desktop-kr.png" alt="Korean (KR) variant" width="800">
+</p>
+
+<p align="center">
+  <img src="docs/demo/screenshots/mobile-en.png" alt="Mobile responsive layout" width="280">
+</p>
+
+</details>
+
+Source lives under [`docs/demo/`](docs/demo/). Open `index.html` over any local HTTP server (for example `python3 -m http.server --directory docs/demo`), or publish the folder via GitHub Pages for shareable access. Unit tests for the simulated pipeline live in `docs/demo/tests/` and run with `node --test`.
+
 ## Table of Contents
 
 - [Why ZeroAlign-Rec](#why-zeroalign-rec)
