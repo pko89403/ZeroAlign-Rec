@@ -12,6 +12,31 @@
 
 현재 Phase 1 진행 상태에는 `src/sid_reco/sid/` 패키지와 public `compile-sid-index` CLI도 포함된다. 이 흐름은 `data/processed/foodcom/sid_index/` 아래에 deterministic structured-item serialization 산출물, MLX embedding 산출물, CPU residual K-means codebook 결과, FAISS indexing 산출물을 저장한다.
 
+## 라이브 데모
+
+4-모듈 온라인 파이프라인(관심 스케치 → 시맨틱 검색 → 제로샷 리랭킹 → MSCP 신뢰도)을 26개 Food.com 시드 레시피 위에서 시각화하는 정적 HTML/JS 번들이다. `?lang=` URL 파라미터로 한국어/영어를 전환하며, 빌드 단계 없이 클라이언트에서 모두 실행된다.
+
+<p align="center">
+  <a href="docs/demo/index.html">
+    <img src="docs/demo/screenshots/desktop-kr.png" alt="ZeroAlign-Rec 추천 데모 (데스크톱, KR)" width="800">
+  </a>
+</p>
+
+<details>
+<summary>다른 뷰 — 영문 버전과 모바일 반응형</summary>
+
+<p align="center">
+  <img src="docs/demo/screenshots/desktop-en.png" alt="영문(EN) 버전" width="800">
+</p>
+
+<p align="center">
+  <img src="docs/demo/screenshots/mobile-en.png" alt="모바일 반응형 레이아웃" width="280">
+</p>
+
+</details>
+
+소스는 [`docs/demo/`](docs/demo/) 아래에 있다. 로컬 HTTP 서버로 `index.html`을 열거나(예: `python3 -m http.server --directory docs/demo`), 폴더를 GitHub Pages로 배포하면 공유 가능한 링크가 된다. 시뮬레이션 파이프라인 단위 테스트는 `docs/demo/tests/`에 있고 `node --test`로 실행한다.
+
 ## 목차
 
 - [왜 ZeroAlign-Rec인가](#왜-zeroalign-rec인가)
