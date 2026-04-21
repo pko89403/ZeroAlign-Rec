@@ -26,7 +26,7 @@ sources: []
 
 ### 세팅 범위
 
-1. **프로젝트 초기화**: `pyproject.toml`, `src/`, `tests/`, `data/`, `artifacts/`, `docs/` 구성
+1. **프로젝트 초기화**: `pyproject.toml`, `src/`, `tests/`, `data/` 구성
 2. **패키지 및 가상환경**: `uv sync --all-groups` → `.venv`, `uv.lock` 생성
 3. **로컬 모델 백엔드**: MLX 기반 LLM (`Qwen3.5-9B`) + 임베딩 (`Qwen3-Embedding-4B`)
 4. **런타임 코드**: `config.py`, `llm.py`, `embedding.py`, `cli.py`
@@ -39,7 +39,7 @@ SID_RECO_LLM_BACKEND=mlx
 SID_RECO_LLM_MODEL=mlx-community/Qwen3.5-9B-OptiQ-4bit
 SID_RECO_EMBED_MODEL=mlx-community/Qwen3-Embedding-4B-4bit-DWQ
 SID_RECO_CATALOG_PATH=data/catalog.csv
-SID_RECO_CACHE_DIR=artifacts/sid_cache
+SID_RECO_CACHE_DIR=data/sid_cache
 SID_RECO_LLM_MAX_TOKENS=256
 SID_RECO_LLM_TEMPERATURE=0.0
 SID_RECO_LLM_TOP_P=1.0

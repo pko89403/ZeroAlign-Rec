@@ -23,9 +23,13 @@ build/
 .graphify-work/
 graphify-out/cache/
 graphify-out/memory/
-artifacts/*
-!artifacts/.gitkeep
+artifacts/
+tasks/
+ideas/
+phases/
 data/raw/*
 !data/raw/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
+data/sid_cache/*
+!data/sid_cache/.gitkeep

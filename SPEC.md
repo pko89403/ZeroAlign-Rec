@@ -551,7 +551,7 @@ tests/test_cli_recommend.py                      -> CLI integration tests
 If persistent traces are later approved, a natural default location would be:
 
 ```text
-artifacts/recommendation_runs/
+data/recommendation_runs/
 ```
 
 This is intentionally not a mandatory V1 output yet.

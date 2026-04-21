@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="artifacts/branding/zeroalign-rec-logo.svg" alt="ZeroAlign-Rec logo" width="760">
+  <img src="assets/branding/zeroalign-rec-logo.svg" alt="ZeroAlign-Rec logo" width="760">
 </p>
 
 <h1 align="center">ZeroAlign-Rec</h1>
@@ -56,7 +56,7 @@ Source lives under [`apps/demo/`](apps/demo/). Open `index.html` over any local 
 - **Training-free recommendation experiments**: validate SID-based recommendation flows without separate model training.
 - **Local-first inference**: run `mlx-lm` and `mlx-embeddings` locally on Apple Silicon.
 - **Taxonomy-aware pipeline**: separate dataset preparation, neighbor index construction, taxonomy dictionary generation, and item structuring into reproducible steps.
-- **Agent-friendly repository**: keep `.github/`, `.agents/skills/`, `.harness/`, and `AGENTS.md` organized for Copilot/Codex workflows.
+- **Agent-friendly repository**: keep `.github/`, `.agents/skills/`, `references/`, and `AGENTS.md` organized for Copilot/Codex workflows.
 
 ## Requirements
 
@@ -323,12 +323,12 @@ uv run sid-reco structure-taxonomy-batch --help
 | `tests/` | automated tests |
 | `apps/demo/` | static frontend demo for the recommendation pipeline |
 | `data/` | local datasets and processed artifacts |
-| `artifacts/` | generated reports, branding, and outputs |
-| `docs/` | legacy docs-first knowledge archive |
+| `assets/` | authored static assets (branding, media) |
 | `graphify-out/` | primary committed knowledge graph artifacts |
 | `.github/` | Copilot-facing instructions and agent personas |
 | `.agents/skills/` | repo-local agent skills |
-| `.harness/` | internal harness support and reference assets |
+| `references/` | shared checklists and upstream snapshots |
+| `scripts/hooks/` | Claude Code / Codex CLI hook entrypoints |
 | `AGENTS.md` | top-level repository rules and schema |
 
 ## Docs and Knowledge Base
@@ -395,10 +395,9 @@ This repository also maintains a Copilot/Codex-friendly harness.
 - Copilot project instructions: `.github/copilot-instructions.md`
 - specialized personas: `.github/agents/`
 - repo-local skills: `.agents/skills/`
-- harness support assets: `.harness/`
-- local adaptation rules: `.harness/reference/local-adaptation.md`
+- hook scripts: `scripts/hooks/`
+- local adaptation rules: `references/local-adaptation.md`
 - optional phase executor: `scripts/execute.py`
-- optional phase bundle schema: `phases/README.md`
 
 Main shortcuts:
 
@@ -420,8 +419,6 @@ For codebase or architecture questions, read `graphify-out/GRAPH_REPORT.md` firs
 `graphify-out/graph.json` as the primary machine-readable graph. Check `graphify-out/BUILD_INFO.json`:
 - `mode=code_update` means the graph reflects code-only refresh
 - `mode=full_refresh` with `verified=true` means the graph reflects the current `raw/` source corpus
-For reproducible implementation runs, `tasks/` remains the human-readable planning area and
-`phases/` is the optional Claude-driven execution area.
 
 ## Research References
 

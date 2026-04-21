@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .harness/hooks/graphify-pretool.sh"
+            "command": "bash scripts/hooks/graphify-pretool.sh"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .harness/hooks/graphify-auto-refresh.sh"
+            "command": "bash scripts/hooks/graphify-auto-refresh.sh"
           }
         ]
       }

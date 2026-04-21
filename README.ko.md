@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="artifacts/branding/zeroalign-rec-logo.svg" alt="ZeroAlign-Rec logo" width="760">
+  <img src="assets/branding/zeroalign-rec-logo.svg" alt="ZeroAlign-Rec logo" width="760">
 </p>
 
 <h1 align="center">ZeroAlign-Rec</h1>
@@ -56,7 +56,7 @@
 - **Training-free recommendation experiments**: SID 기반 추천 흐름을 별도 model training 없이 빠르게 검증할 수 있다.
 - **Local-first inference**: `mlx-lm`과 `mlx-embeddings`를 사용해 Apple Silicon에서 로컬 추론을 수행한다.
 - **Taxonomy-aware pipeline**: dataset preparation, neighbor index, taxonomy dictionary, item structuring을 단계별로 분리해 재현 가능하게 다룬다.
-- **Agent-friendly repository**: Copilot/Codex용 `.github/`, `.agents/skills/`, `.harness/`, `AGENTS.md`가 함께 정리되어 있다.
+- **Agent-friendly repository**: Copilot/Codex용 `.github/`, `.agents/skills/`, `references/`, `AGENTS.md`가 함께 정리되어 있다.
 
 ## 요구 사항
 
@@ -281,12 +281,12 @@ uv run mypy src
 | `tests/` | automated tests |
 | `apps/demo/` | 추천 파이프라인을 보여주는 정적 frontend demo |
 | `data/` | local datasets and processed artifacts |
-| `artifacts/` | generated reports, branding, and outputs |
-| `docs/` | legacy docs-first knowledge archive |
+| `assets/` | authored static assets (branding, media) |
 | `graphify-out/` | primary committed knowledge graph artifacts |
 | `.github/` | Copilot-facing instructions and agent personas |
 | `.agents/skills/` | repo-local agent skills |
-| `.harness/` | internal harness support and reference assets |
+| `references/` | shared checklists and upstream snapshots |
+| `scripts/hooks/` | Claude Code / Codex CLI hook entrypoints |
 | `AGENTS.md` | top-level repository rules and schema |
 
 ## 문서와 지식 베이스
@@ -353,10 +353,9 @@ Graphify 입력에는 `references/`, `README*`, `SPEC.md`, `CLAUDE.md`/`AGENTS.m
 - Copilot 프로젝트 지침: `.github/copilot-instructions.md`
 - specialized personas: `.github/agents/`
 - repo-local skills: `.agents/skills/`
-- harness support assets: `.harness/`
-- local adaptation rules: `.harness/reference/local-adaptation.md`
+- hook scripts: `scripts/hooks/`
+- local adaptation rules: `references/local-adaptation.md`
 - optional phase executor: `scripts/execute.py`
-- optional phase bundle schema: `phases/README.md`
 
 주요 shortcut:
 
@@ -373,8 +372,6 @@ Graphify 입력에는 `references/`, `README*`, `SPEC.md`, `CLAUDE.md`/`AGENTS.m
 또 `graphify-out/BUILD_INFO.json`을 읽어:
 - `mode=code_update`이면 그래프가 코드 중심 refresh 상태이고
 - `mode=full_refresh`이며 `verified=true`이면 그래프가 현재 `raw/` source corpus를 반영한다고 본다.
-재현 가능한 구현 실행이 필요할 때는 `tasks/`를 사람용 계획 영역으로 유지하고,
-`phases/`를 선택적 Claude-driven 실행 영역으로 사용한다.
 
 ## 연구 레퍼런스
 
