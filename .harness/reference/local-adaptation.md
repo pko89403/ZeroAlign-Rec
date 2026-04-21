@@ -51,7 +51,6 @@ uv run sid-reco structure-taxonomy-batch --help
 
 - 아이디어 정리 산출물: `ideas/`
 - 스펙: `SPEC.md`
-- 작업 계획: `tasks/plan.md`, `tasks/todo.md`
 - step 실행 번들: `phases/`
 - primary graph artifact: `graphify-out/`
 - source corpus: `raw/`
@@ -66,7 +65,7 @@ uv run sid-reco structure-taxonomy-batch --help
 - 브라우저/웹 접근성/Core Web Vitals 항목은 HTML 리포트나 UI 작업이 실제로 있을 때만 적용한다.
 - `npm audit`, `npm run build` 같은 문구는 일반 예시로 읽고, 실제 실행은 이 저장소의 `uv` 명령으로 치환한다.
 - Codex App에서 repo-local slash-like entrypoint가 필요하면 command 파일이 아니라 skill 이름으로 노출되도록 wrapper skill을 만든다.
-- `scripts/execute.py`는 선택적 Claude-driven phase executor다. `tasks/` 문서를 자동 변환하지 않으며, 필요할 때 `phases/`에 별도 step bundle을 만든다.
+- `scripts/execute.py`는 선택적 Claude-driven phase executor다. 필요할 때 `phases/`에 step bundle을 만든다.
 - Claude Code active safety hooks는 `.claude/settings.json`과 `.harness/hooks/claude-stop-checks.sh`를 기준으로 읽는다.
 - Graphify bootstrap/regeneration은 `scripts/graphify_code_refresh.sh`를 우선 사용한다.
 - `graphify update .`는 AST-only refresh이므로 committed graph bootstrap과 code drift 반영에 사용한다.
