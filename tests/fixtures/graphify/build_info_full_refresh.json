@@ -1,0 +1,7 @@
+{
+  "graphify_version": "0.4.23",
+  "mode": "full_refresh",
+  "command": "assistant-orchestrated graphify full refresh",
+  "corpus_path": ".graphify-work/corpus",
+  "generated_at": "2026-04-20T00:00:00+00:00"
+}

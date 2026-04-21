@@ -256,7 +256,8 @@ uv run mypy src
 | `tests/` | automated tests |
 | `data/` | local datasets and processed artifacts |
 | `artifacts/` | generated reports, branding, and outputs |
-| `docs/` | user-facing knowledge base and wiki |
+| `docs/` | source materials plus legacy wiki archive |
+| `graphify-out/` | primary committed knowledge graph artifacts |
 | `.github/` | Copilot-facing instructions and agent personas |
 | `.agents/skills/` | repo-local agent skills |
 | `.harness/` | internal harness support and reference assets |
@@ -264,35 +265,76 @@ uv run mypy src
 
 ## 문서와 지식 베이스
 
-상세 설명은 README에 길게 중복하기보다 `docs/`와 위키 문서에 정리한다.
+상세 설명은 README에 길게 중복하기보다 `graphify-out/`와 `raw/` source corpus에 정리한다.
 
-- [docs/README.md](docs/README.md)
-- [docs/wiki/entities/dev-environment.md](docs/wiki/entities/dev-environment.md)
-- [docs/wiki/entities/food-com-dataset.md](docs/wiki/entities/food-com-dataset.md)
-- [docs/wiki/entities/food-taxonomy-dictionary.md](docs/wiki/entities/food-taxonomy-dictionary.md)
-- [docs/wiki/entities/neighbor-context-index.md](docs/wiki/entities/neighbor-context-index.md)
-- [docs/wiki/entities/taxonomy-item-structuring.md](docs/wiki/entities/taxonomy-item-structuring.md)
-- [docs/wiki/entities/sid-compilation-indexing.md](docs/wiki/entities/sid-compilation-indexing.md)
-- [docs/wiki/overviews/sid-phase1-validation-run.md](docs/wiki/overviews/sid-phase1-validation-run.md)
-- [docs/wiki/decisions/adr-001-dev-environment.md](docs/wiki/decisions/adr-001-dev-environment.md)
-- [docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md](docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md)
-- [docs/wiki/decisions/adr-003-neighbor-context-retrieval.md](docs/wiki/decisions/adr-003-neighbor-context-retrieval.md)
-- [docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md](docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md)
-- [artifacts/reports/sid-phase1-validation.html](artifacts/reports/sid-phase1-validation.html)
+주요 그래프 산출물:
+
+- [graphify-out/GRAPH_REPORT.md](graphify-out/GRAPH_REPORT.md)
+- [graphify-out/graph.json](graphify-out/graph.json)
+- [graphify-out/graph.html](graphify-out/graph.html)
+
+갱신 명령:
+
+```bash
+scripts/graphify_code_refresh.sh
+```
+
+현재 wrapper는 `graphify update .` 기반 AST-only refresh다.
+즉 committed code graph bootstrap과 code drift 반영에는 충분하다.
+문서/설계 semantic refresh는 staged producer 경로로 실제 실행할 수 있고,
+full refresh 입력은 `src/`, `tests/`, `raw/`만 사용한다.
+이제 PostToolUse hook이 relevant한 로컬 변경 뒤 그래프 갱신을 자동으로 시도한다.
+코드 변경만 있으면 `code_update`로 끝날 수 있고, `raw/` 변경이 있으면
+staged full refresh -> verify -> sync까지 자동으로 수행한다.
+
+full refresh 준비:
+
+```bash
+scripts/graphify_prepare_corpus.sh
+```
+
+full refresh orchestration은 repo-local `graphify-manager` / `graphify-full` skill이 담당하며,
+실제 producer는 아래 명령으로 staged corpus에 대해 실행된다.
+
+```bash
+uv run --with graphifyy==0.4.23 python scripts/graphify_full_refresh.py .graphify-work/corpus
+```
+
+staged full refresh 뒤에는 아래 순서로 검증/동기화한다.
+
+```bash
+python3 scripts/graphify_verify_full_refresh.py .graphify-work/corpus/graphify-out
+bash scripts/graphify_sync_staged.sh
+```
+
+CI는 relevant 변경이 있으면 candidate note만 남긴다.
+full refresh producer 실행, staged verify, root `graphify-out/` 승격은 여전히 자동으로 하지 않는다.
+
+source corpus:
+
+- [raw/README.md](raw/README.md)
+- `raw/design/`
+- `raw/external/`
+
+Graphify 입력에는 `references/`, `README*`, `SPEC.md`, `CLAUDE.md`/`AGENTS.md`가 포함되지 않는다.
 
 ## Copilot 및 Agent 하네스
 
 이 저장소는 Copilot/Codex 친화적인 harness를 함께 유지한다.
 
+- primary knowledge graph: `graphify-out/`
+- Claude Code active safety hooks: `.claude/settings.json`
 - Copilot 프로젝트 지침: `.github/copilot-instructions.md`
 - specialized personas: `.github/agents/`
 - repo-local skills: `.agents/skills/`
 - harness support assets: `.harness/`
 - local adaptation rules: `.harness/reference/local-adaptation.md`
+- optional phase executor: `scripts/execute.py`
+- optional phase bundle schema: `phases/README.md`
 
 주요 shortcut:
 
-- `/docs-manager` or `/doc-manager`
+- `/docs-manager` or `/doc-manager` — Graphify sync/review plus `raw/` source corpus and harness sync
 - `/spec`
 - `/plan`
 - `/build`
@@ -300,7 +342,13 @@ uv run mypy src
 - `/code-simplify`
 - `/ship`
 
-문서/위키 작업에서는 일반 workflow보다 `docs-manager`와 `AGENTS.md` 규칙이 우선한다.
+코드베이스/아키텍처 질문은 먼저 `graphify-out/GRAPH_REPORT.md`를 읽고,
+`graphify-out/graph.json`을 primary machine-readable graph로 사용한다.
+또 `graphify-out/BUILD_INFO.json`을 읽어:
+- `mode=code_update`이면 그래프가 코드 중심 refresh 상태이고
+- `mode=full_refresh`이며 `verified=true`이면 그래프가 현재 `raw/` source corpus를 반영한다고 본다.
+재현 가능한 구현 실행이 필요할 때는 `tasks/`를 사람용 계획 영역으로 유지하고,
+`phases/`를 선택적 Claude-driven 실행 영역으로 사용한다.
 
 ## 연구 레퍼런스
 

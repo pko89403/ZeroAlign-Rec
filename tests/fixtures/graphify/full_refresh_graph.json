@@ -1,0 +1,98 @@
+{
+  "nodes": [
+    {
+      "id": "adr_one",
+      "label": "ADR 001",
+      "source_file": "raw/design/adr/adr-001-dev-environment.md"
+    },
+    {
+      "id": "note_runtime",
+      "label": "Runtime Note",
+      "source_file": "raw/design/notes/phase2-recommendation-runtime.md"
+    },
+    {
+      "id": "spec_design",
+      "label": "Design Spec",
+      "source_file": "raw/design/specs/recommendation-v2.md"
+    },
+    {
+      "id": "diagram_flow",
+      "label": "Flow Diagram",
+      "source_file": "raw/design/diagrams/flow.png"
+    },
+    {
+      "id": "paper_main",
+      "label": "Paper",
+      "source_file": "raw/external/papers/sid-paper.pdf"
+    },
+    {
+      "id": "dataset_main",
+      "label": "Dataset",
+      "source_file": "raw/external/datasets/foodcom.md"
+    },
+    {
+      "id": "core_alpha",
+      "label": "Alpha",
+      "source_file": "src/pkg/core.py"
+    }
+  ],
+  "links": [
+    {
+      "source": "adr_one",
+      "target": "core_alpha",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8
+    },
+    {
+      "source": "note_runtime",
+      "target": "core_alpha",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8
+    },
+    {
+      "source": "spec_design",
+      "target": "core_alpha",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8
+    },
+    {
+      "source": "adr_one",
+      "target": "note_runtime",
+      "relation": "links_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "note_runtime",
+      "target": "core_alpha",
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8
+    },
+    {
+      "source": "adr_one",
+      "target": "spec_design",
+      "relation": "semantically_related",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8
+    },
+    {
+      "source": "spec_design",
+      "target": "note_runtime",
+      "relation": "links_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "spec_design",
+      "target": "core_alpha",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8
+    }
+  ],
+  "hyperedges": []
+}
