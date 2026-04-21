@@ -74,8 +74,7 @@ uv run sid-reco compile-sid-index --help
 - repo hook 스크립트: `.harness/hooks/`
 - archived command prompt 초안: `.harness/reference/command-drafts/`
 - archived persona markdown: `.harness/reference/agent-personas/`
-- phase executor: `scripts/execute.py`
-- phase 산출물: `phases/`
+- optional phase executor: `scripts/execute.py`
 
 운영 원칙:
 
@@ -83,13 +82,12 @@ uv run sid-reco compile-sid-index --help
 2. 코드 구현, 테스트, 리뷰, 릴리스 흐름은 imported agent skills를 사용할 수 있다.
 3. imported skill의 일반 예시가 이 저장소 구조와 충돌하면 `.harness/reference/local-adaptation.md` 규칙을 우선한다.
 4. `raw/design/**` 문서는 계속 한국어로 유지한다.
-5. `phases/`는 `scripts/execute.py`가 실행하는 선택적 step bundle이다.
-6. Claude Code safety hooks는 `.claude/settings.json`과 `.harness/hooks/` 스크립트로 활성화된다.
-7. primary machine-readable knowledge layer는 `graphify-out/`다.
-8. Graphify의 유일한 source corpus는 `raw/`다.
-9. `scripts/graphify_code_refresh.sh`는 code-only bootstrap이고, full refresh는 `graphify-manager` skill이 orchestration 한다.
-10. 사용자가 자연어로 PR 생성을 요청해도 `.github/pull_request_template.md`를 반드시 기준으로 사용한다.
-11. `gh pr create --body` 또는 `--body-file`로 템플릿을 우회하지 않는다. `gh`를 쓸 때는 `--template .github/pull_request_template.md` 또는 동등한 템플릿 기반 경로를 사용한다.
+5. Claude Code safety hooks는 `.claude/settings.json`과 `.harness/hooks/` 스크립트로 활성화된다.
+6. primary machine-readable knowledge layer는 `graphify-out/`다.
+7. Graphify의 유일한 source corpus는 `raw/`다.
+8. `scripts/graphify_code_refresh.sh`는 code-only bootstrap이고, full refresh는 `graphify-manager` skill이 orchestration 한다.
+9. 사용자가 자연어로 PR 생성을 요청해도 `.github/pull_request_template.md`를 반드시 기준으로 사용한다.
+10. `gh pr create --body` 또는 `--body-file`로 템플릿을 우회하지 않는다. `gh`를 쓸 때는 `--template .github/pull_request_template.md` 또는 동등한 템플릿 기반 경로를 사용한다.
 
 ---
 

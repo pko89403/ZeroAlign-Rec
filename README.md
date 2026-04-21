@@ -397,7 +397,6 @@ This repository also maintains a Copilot/Codex-friendly harness.
 - harness support assets: `.harness/`
 - local adaptation rules: `.harness/reference/local-adaptation.md`
 - optional phase executor: `scripts/execute.py`
-- optional phase bundle schema: `phases/README.md`
 
 Main shortcuts:
 
@@ -419,7 +418,6 @@ For codebase or architecture questions, read `graphify-out/GRAPH_REPORT.md` firs
 `graphify-out/graph.json` as the primary machine-readable graph. Check `graphify-out/BUILD_INFO.json`:
 - `mode=code_update` means the graph reflects code-only refresh
 - `mode=full_refresh` with `verified=true` means the graph reflects the current `raw/` source corpus
-For reproducible implementation runs, `phases/` is the optional Claude-driven execution area.
 
 ## Research References
 

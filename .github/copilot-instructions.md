@@ -35,7 +35,6 @@
 - `uv run ruff check .`
 - `uv run mypy src`
 - `uv run sid-reco doctor`
-- `python3 scripts/execute.py <phase-name>`
 
 Use domain-specific commands when relevant:
 
@@ -76,8 +75,6 @@ Use domain-specific commands when relevant:
 - `.harness/reference/local-adaptation.md`
 - `.agents/skills/`
 - `references/`
-- `ideas/`
-- `phases/README.md`
 - `scripts/execute.py`
 - `scripts/graphify_code_refresh.sh`
 - `scripts/graphify_prepare_corpus.sh`
