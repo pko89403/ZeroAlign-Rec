@@ -323,7 +323,8 @@ uv run sid-reco structure-taxonomy-batch --help
 | `tests/` | automated tests |
 | `data/` | local datasets and processed artifacts |
 | `artifacts/` | generated reports, branding, and outputs |
-| `docs/` | user-facing knowledge base and wiki |
+| `docs/` | source materials plus legacy wiki archive |
+| `graphify-out/` | primary committed knowledge graph artifacts |
 | `.github/` | Copilot-facing instructions and agent personas |
 | `.agents/skills/` | repo-local agent skills |
 | `.harness/` | internal harness support and reference assets |
@@ -331,37 +332,76 @@ uv run sid-reco structure-taxonomy-batch --help
 
 ## Docs and Knowledge Base
 
-Instead of duplicating long operational details in the README, this repository keeps deeper material in `docs/` and the wiki.
+Instead of duplicating long operational details in the README, this repository keeps
+machine-readable structure in `graphify-out/` and keeps the human-owned source corpus in `raw/`.
 
-- [docs/README.md](docs/README.md)
-- [docs/wiki/entities/dev-environment.md](docs/wiki/entities/dev-environment.md)
-- [docs/wiki/entities/food-com-dataset.md](docs/wiki/entities/food-com-dataset.md)
-- [docs/wiki/entities/food-taxonomy-dictionary.md](docs/wiki/entities/food-taxonomy-dictionary.md)
-- [docs/wiki/entities/taxonomy-item-structuring.md](docs/wiki/entities/taxonomy-item-structuring.md)
-- [docs/wiki/entities/neighbor-context-index.md](docs/wiki/entities/neighbor-context-index.md)
-- [docs/wiki/entities/sid-compilation-indexing.md](docs/wiki/entities/sid-compilation-indexing.md)
-- [docs/wiki/overviews/sid-phase1-validation-run.md](docs/wiki/overviews/sid-phase1-validation-run.md)
-- [docs/wiki/decisions/adr-001-dev-environment.md](docs/wiki/decisions/adr-001-dev-environment.md)
-- [docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md](docs/wiki/decisions/adr-002-foodcom-preprocessing-policy.md)
-- [docs/wiki/decisions/adr-003-neighbor-context-retrieval.md](docs/wiki/decisions/adr-003-neighbor-context-retrieval.md)
-- [docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md](docs/wiki/decisions/adr-004-taxonomy-dictionary-generation.md)
-- [docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md](docs/wiki/decisions/adr-005-taxonomy-dictionary-hardening.md)
-- [docs/wiki/decisions/adr-006-strict-tid-hardening.md](docs/wiki/decisions/adr-006-strict-tid-hardening.md)
-- [artifacts/reports/sid-phase1-validation.html](artifacts/reports/sid-phase1-validation.html)
+Primary graph artifacts:
+
+- [graphify-out/GRAPH_REPORT.md](graphify-out/GRAPH_REPORT.md)
+- [graphify-out/graph.json](graphify-out/graph.json)
+- [graphify-out/graph.html](graphify-out/graph.html)
+
+Refresh command:
+
+```bash
+scripts/graphify_code_refresh.sh
+```
+
+The current wrapper uses `graphify update .`, which gives an AST-only refresh for committed code graph bootstrap.
+Full semantic refresh is available through the staged producer flow, using `src/`, `tests/`, and `raw/`
+as the full-refresh source boundary.
+PostToolUse hooks now try to refresh the graph automatically after relevant local edits.
+Code-only changes can land as `code_update`, while `raw/` changes run the staged
+full-refresh flow and promote verified results into root `graphify-out/`.
+
+For full-refresh staging:
+
+```bash
+scripts/graphify_prepare_corpus.sh
+```
+
+Full refresh orchestration lives in the repo-local `graphify-manager` / `graphify-full` skill
+and runs the staged producer command below:
+
+```bash
+uv run --with graphifyy==0.4.23 python scripts/graphify_full_refresh.py .graphify-work/corpus
+```
+
+After a staged full refresh, run:
+
+```bash
+python3 scripts/graphify_verify_full_refresh.py .graphify-work/corpus/graphify-out
+bash scripts/graphify_sync_staged.sh
+```
+
+CI only prepares a reminder/candidate note when relevant files change.
+It does not run the full refresh producer, verify staged output, or promote root `graphify-out/`.
+
+Source corpus:
+
+- [raw/README.md](raw/README.md)
+- `raw/design/`
+- `raw/external/`
+
+Graphify does not treat `references/`, `README*`, `SPEC.md`, or `CLAUDE.md`/`AGENTS.md` as source input.
 
 ## Copilot and Agent Harness
 
 This repository also maintains a Copilot/Codex-friendly harness.
 
+- primary knowledge graph: `graphify-out/`
+- Claude Code active safety hooks: `.claude/settings.json`
 - Copilot project instructions: `.github/copilot-instructions.md`
 - specialized personas: `.github/agents/`
 - repo-local skills: `.agents/skills/`
 - harness support assets: `.harness/`
 - local adaptation rules: `.harness/reference/local-adaptation.md`
+- optional phase executor: `scripts/execute.py`
+- optional phase bundle schema: `phases/README.md`
 
 Main shortcuts:
 
-- `/docs-manager` or `/doc-manager` — wiki/ADR/index plus README and harness sync
+- `/docs-manager` or `/doc-manager` — Graphify sync/review plus `raw/` source corpus and harness sync
 - `/spec`
 - `/plan`
 - `/build`
@@ -375,7 +415,12 @@ For taxonomy work, the default repository pipeline is:
 build-neighbor-context -> build-taxonomy-dictionary -> structure-taxonomy-item|batch
 ```
 
-For docs/wiki work, `docs-manager` and `AGENTS.md` rules take priority over generic workflows.
+For codebase or architecture questions, read `graphify-out/GRAPH_REPORT.md` first and use
+`graphify-out/graph.json` as the primary machine-readable graph. Check `graphify-out/BUILD_INFO.json`:
+- `mode=code_update` means the graph reflects code-only refresh
+- `mode=full_refresh` with `verified=true` means the graph reflects the current `raw/` source corpus
+For reproducible implementation runs, `tasks/` remains the human-readable planning area and
+`phases/` is the optional Claude-driven execution area.
 
 ## Research References
 

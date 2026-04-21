@@ -19,6 +19,9 @@ build/
 .vscode/
 .idea/
 *.log
+.graphify-work/
+graphify-out/cache/
+graphify-out/memory/
 artifacts/*
 !artifacts/.gitkeep
 data/raw/*
