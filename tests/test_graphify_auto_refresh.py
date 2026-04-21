@@ -62,6 +62,8 @@ def _commit_all(repo: Path, message: str = "seed") -> None:
 def _copy_graphify_runtime(repo: Path) -> None:
     for relative in (
         ".harness/hooks/graphify-auto-refresh.sh",
+        "scripts/hooks/common.sh",
+        "scripts/hooks/graphify-auto-refresh.sh",
         "scripts/graphify_code_refresh.sh",
         "scripts/graphify_prepare_corpus.sh",
         "scripts/graphify_full_refresh.py",
