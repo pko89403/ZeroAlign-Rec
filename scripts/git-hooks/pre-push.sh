@@ -8,16 +8,4 @@ if [ -z "$repo_root" ]; then
   repo_root="$(cd "$script_dir/../.." && pwd)"
 fi
 
-cd "$repo_root"
-
-echo "pre-push: uv run ruff check ."
-uv run ruff check .
-
-echo "pre-push: uv run ruff format --check ."
-uv run ruff format --check .
-
-echo "pre-push: uv run mypy src"
-uv run mypy src
-
-echo "pre-push: uv run pytest --ignore=tests/test_mlx_runtime.py --ignore=tests/test_cli_smoke_mlx.py"
-uv run pytest --ignore=tests/test_mlx_runtime.py --ignore=tests/test_cli_smoke_mlx.py
+bash "$repo_root/scripts/hooks/pre-push.sh"
