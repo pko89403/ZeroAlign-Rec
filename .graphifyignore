@@ -1,0 +1,35 @@
+# Primary runtime and cache noise
+.git/
+.venv/
+.uv_cache/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+__pycache__/
+*.pyc
+
+# Existing generated outputs
+artifacts/
+data/
+dist/
+build/
+htmlcov/
+.coverage
+.coverage.*
+graphify-out/cache/
+graphify-out/memory/
+
+# Harness/support paths excluded from the initial curated corpus
+.agents/
+.claude/
+.github/
+.githooks/
+.harness/
+ideas/
+phases/
+references/
+scripts/
+tasks/
+
+# Legacy and source-material exclusions
+docs/
