@@ -2,7 +2,13 @@
 
 set -euo pipefail
 
-cd "$(git rev-parse --show-toplevel)"
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$repo_root" ]; then
+  script_dir="$(cd "$(dirname "$0")" && pwd)"
+  repo_root="$(cd "$script_dir/../.." && pwd)"
+fi
+
+cd "$repo_root"
 
 mkdir -p .graphify-work
 
