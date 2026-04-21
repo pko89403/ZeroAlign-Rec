@@ -1,0 +1,11 @@
+{
+  "nodes": [
+    {
+      "id": "config_settings",
+      "label": "Settings",
+      "source_file": "src/sid_reco/config.py"
+    }
+  ],
+  "links": [],
+  "hyperedges": []
+}

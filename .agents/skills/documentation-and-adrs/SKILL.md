@@ -11,9 +11,10 @@ Document decisions, not just code. The most valuable documentation captures the 
 
 ## Repository Notes
 
-- Wiki-owned documentation in this repository lives under `docs/wiki/` and follows `AGENTS.md`.
-- ADRs for this project belong in `docs/wiki/decisions/`, not `docs/decisions/`.
-- If the change is primarily a wiki/source/index maintenance task, use `docs-manager` first and apply this skill only as supporting guidance.
+- Source documentation in this repository lives under `raw/` and follows `AGENTS.md`.
+- ADRs for this project belong in `raw/design/adr/`.
+- Design notes belong in `raw/design/notes/`.
+- If the change is primarily a Graphify source-corpus or harness sync task, use `docs-manager` first and apply this skill only as supporting guidance.
 
 ## When to Use
 
@@ -41,7 +42,7 @@ ADRs capture the reasoning behind significant technical decisions. They're the h
 
 ### ADR Template
 
-Store ADRs in `docs/wiki/decisions/` with sequential numbering and keep `docs/wiki/INDEX.md` plus `docs/wiki/decisions/README.md` in sync:
+Store ADRs in `raw/design/adr/` with sequential numbering:
 
 ```markdown
 # ADR-001: Use PostgreSQL for primary database

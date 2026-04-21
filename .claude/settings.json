@@ -1,0 +1,95 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .harness/hooks/session-start.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .harness/hooks/claude-stop-checks.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Glob|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .harness/hooks/graphify-pretool.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'rm\\s+-rf|git\\s+push\\s+--force|git\\s+reset\\s+--hard|git\\s+checkout\\s+--|git\\s+clean\\s+-fd|git\\s+branch\\s+-D|find\\s+.+\\s+-delete'; then echo 'BLOCKED: 위험한 destructive 명령이 감지되었습니다.' >&2; exit 1; fi"
+          },
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'pip\\s+uninstall|uv\\s+pip\\s+uninstall|npm\\s+uninstall|npm\\s+cache\\s+clean|yarn\\s+remove|pnpm\\s+remove'; then echo 'WARN: 패키지 제거 또는 캐시 삭제 명령입니다. 의도한 것인지 확인하세요.' >&2; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo \"$CLAUDE_TOOL_INPUT\" | grep -oE '\"file_path\"\\s*:\\s*\"[^\"]+\"' | head -1 | sed 's/.*\"\\([^\"]*\\)\"$/\\1/'); if echo \"$FILE\" | grep -qE '(^|/)graphify-out/'; then echo 'BLOCKED: graphify-out/ 는 generated output 입니다. refresh path를 사용하세요.' >&2; exit 1; fi"
+          },
+          {
+            "type": "command",
+            "command": "FILE=$(echo \"$CLAUDE_TOOL_INPUT\" | grep -oE '\"file_path\"\\s*:\\s*\"[^\"]+\"' | head -1 | sed 's/.*\"\\([^\"]*\\)\"$/\\1/'); BASENAME=$(basename \"$FILE\"); if echo \"$BASENAME\" | grep -qiE '^\\.env$|^\\.env\\.|^credentials\\.json$|^secrets?\\.(json|yaml|yml|toml)$|\\.pem$|\\.key$|\\.p12$|\\.pfx$'; then if ! echo \"$BASENAME\" | grep -qE '\\.example$'; then echo \"WARN: 시크릿 파일 쓰기 감지: $FILE\" >&2; fi; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo \"$CLAUDE_TOOL_INPUT\" | grep -oE '\"file_path\"\\s*:\\s*\"[^\"]+\"' | head -1 | sed 's/.*\"\\([^\"]*\\)\"$/\\1/'); if echo \"$FILE\" | grep -qE '(^|/)graphify-out/'; then echo 'BLOCKED: graphify-out/ 는 generated output 입니다. refresh path를 사용하세요.' >&2; exit 1; fi"
+          },
+          {
+            "type": "command",
+            "command": "FILE=$(echo \"$CLAUDE_TOOL_INPUT\" | grep -oE '\"file_path\"\\s*:\\s*\"[^\"]+\"' | head -1 | sed 's/.*\"\\([^\"]*\\)\"$/\\1/'); BASENAME=$(basename \"$FILE\"); if echo \"$BASENAME\" | grep -qiE '^\\.env$|^\\.env\\.|^credentials\\.json$|^secrets?\\.(json|yaml|yml|toml)$|\\.pem$|\\.key$|\\.p12$|\\.pfx$'; then if ! echo \"$BASENAME\" | grep -qE '\\.example$'; then echo \"WARN: 시크릿 파일 수정 감지: $FILE\" >&2; fi; fi"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .harness/hooks/graphify-auto-refresh.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'git\\s+add|git\\s+commit'; then bash .harness/hooks/check-secrets.sh; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
