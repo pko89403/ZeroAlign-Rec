@@ -211,11 +211,11 @@ def test_claude_settings_enable_repo_specific_safety_hooks() -> None:
 
 
 def test_claude_stop_script_uses_repo_validation_chain() -> None:
-    script_path = (
-        Path(__file__).resolve().parents[1] / ".harness" / "hooks" / "claude-stop-checks.sh"
-    )
-    content = script_path.read_text(encoding="utf-8")
+    root = Path(__file__).resolve().parents[1]
+    wrapper = (root / ".harness" / "hooks" / "claude-stop-checks.sh").read_text(encoding="utf-8")
+    content = (root / "scripts" / "hooks" / "claude-stop-checks.sh").read_text(encoding="utf-8")
 
+    assert "scripts/hooks/claude-stop-checks.sh" in wrapper
     assert "uv run ruff check ." in content
     assert "uv run ruff format --check ." in content
     assert "uv run mypy src" in content
