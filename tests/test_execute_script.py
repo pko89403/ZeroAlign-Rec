@@ -50,9 +50,9 @@ def test_load_guardrails_uses_repo_specific_documents(tmp_path: Path) -> None:
         "# Copilot\nCopilot content\n",
         encoding="utf-8",
     )
-    harness_reference = tmp_path / ".harness" / "reference"
-    harness_reference.mkdir(parents=True)
-    (harness_reference / "local-adaptation.md").write_text(
+    references_dir = tmp_path / "references"
+    references_dir.mkdir()
+    (references_dir / "local-adaptation.md").write_text(
         "# Local Adaptation\nAdaptation content\n",
         encoding="utf-8",
     )
@@ -198,7 +198,7 @@ def test_claude_settings_enable_repo_specific_safety_hooks() -> None:
     settings = json.loads(settings_path.read_text(encoding="utf-8"))
 
     stop_hooks = settings["hooks"]["Stop"][0]["hooks"]
-    assert stop_hooks[0]["command"] == "bash .harness/hooks/claude-stop-checks.sh"
+    assert stop_hooks[0]["command"] == "bash scripts/hooks/claude-stop-checks.sh"
 
     pretool_hooks = settings["hooks"]["PreToolUse"]
     write_commands = [
@@ -212,10 +212,8 @@ def test_claude_settings_enable_repo_specific_safety_hooks() -> None:
 
 def test_claude_stop_script_uses_repo_validation_chain() -> None:
     root = Path(__file__).resolve().parents[1]
-    wrapper = (root / ".harness" / "hooks" / "claude-stop-checks.sh").read_text(encoding="utf-8")
     content = (root / "scripts" / "hooks" / "claude-stop-checks.sh").read_text(encoding="utf-8")
 
-    assert "scripts/hooks/claude-stop-checks.sh" in wrapper
     assert "uv run ruff check ." in content
     assert "uv run ruff format --check ." in content
     assert "uv run mypy src" in content

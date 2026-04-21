@@ -13,7 +13,7 @@ Use the `planning-and-task-breakdown` workflow for this repository.
 2. Stay in read-only planning mode.
 3. Write `tasks/plan.md` for the execution flow and checkpoints.
 4. Write `tasks/todo.md` for the ordered task list with acceptance criteria.
-5. Use repository validations from `.harness/reference/local-adaptation.md`.
+5. Use repository validations from `references/local-adaptation.md`.
 
 ## Related
 

@@ -15,7 +15,7 @@ In this repository, the imported skill pack runs with these local rules:
 
 - `AGENTS.md` is the top-level rules file and schema document.
 - Work on `raw/`, ADR pages, design notes, or Graphify source-corpus sync must use `docs-manager` first.
-- Repository-specific command substitutions live in `.harness/reference/local-adaptation.md`.
+- Repository-specific command substitutions live in `references/local-adaptation.md`.
 - Primary verification commands are `uv run pytest`, `uv run ruff check .`, `uv run mypy src`, and `uv run sid-reco doctor`.
 - Shared checklists live in `references/`.
 - Idea artifacts belong in `ideas/`; spec/task artifacts belong in `SPEC.md` and `tasks/`.

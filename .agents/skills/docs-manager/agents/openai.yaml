@@ -1,4 +1,4 @@
 interface:
   display_name: "Docs Manager"
   short_description: "Sync wiki, README, and harness documentation"
-  default_prompt: "Use $docs-manager to maintain the `raw/` Graphify source corpus, create ADR pages under `raw/design/adr/`, maintain design notes under `raw/design/notes/`, and run the repository docs/harness sync routine across README.md, AGENTS.md, .github/copilot-instructions.md, and .harness/reference/local-adaptation.md."
+  default_prompt: "Use $docs-manager to maintain the `raw/` Graphify source corpus, create ADR pages under `raw/design/adr/`, maintain design notes under `raw/design/notes/`, and run the repository docs/harness sync routine across README.md, AGENTS.md, .github/copilot-instructions.md, and references/local-adaptation.md."
