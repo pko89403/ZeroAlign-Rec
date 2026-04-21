@@ -55,7 +55,6 @@ uv run sid-reco structure-taxonomy-batch --help
 - step 실행 번들: `phases/`
 - primary graph artifact: `graphify-out/`
 - source corpus: `raw/`
-- 리포트 HTML 등 생성물: `artifacts/reports/`
 
 ## Notes
 

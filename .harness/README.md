@@ -25,7 +25,6 @@ Copilot과 skill discovery는 `.github/`, `.agents/skills/`, `AGENTS.md` 같은
 ## 루트에 남겨두는 관련 경로
 
 - `references/` — imported skill이 직접 참조하는 체크리스트
-- `artifacts/reports/` — HTML 보고서 등 생성 산출물
 - `.graphify-work/` — ignored staged corpus/work graph for full refresh automation
 
 ## 운영 원칙

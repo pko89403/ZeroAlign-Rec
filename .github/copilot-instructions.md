@@ -86,7 +86,6 @@ Use domain-specific commands when relevant:
 - `scripts/graphify_full_refresh.py`
 - `scripts/graphify_verify_full_refresh.py`
 - `scripts/graphify_sync_staged.sh`
-- `artifacts/reports/`
 
 ## Graphify Trigger Model
 
