@@ -324,7 +324,6 @@ uv run sid-reco structure-taxonomy-batch --help
 | `apps/demo/` | static frontend demo for the recommendation pipeline |
 | `data/` | local datasets and processed artifacts |
 | `assets/` | authored static assets (branding, media) |
-| `docs/` | legacy docs-first knowledge archive |
 | `graphify-out/` | primary committed knowledge graph artifacts |
 | `.github/` | Copilot-facing instructions and agent personas |
 | `.agents/skills/` | repo-local agent skills |

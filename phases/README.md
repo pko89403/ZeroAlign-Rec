@@ -29,7 +29,6 @@ phases/
 - step 프롬프트는 `AGENTS.md`, `README.md`, `SPEC.md`,
   `.github/copilot-instructions.md`,
   `.harness/reference/local-adaptation.md`를 기본 guardrail로 읽는다
-- `docs/sources/`는 immutable source material이므로 step에서 수정하면 안 된다
 - 현재 executor는 unrelated local changes를 phase commit에 섞지 않기 위해 clean worktree를 요구한다
 - 기본 branch prefix는 `codex/`다
 

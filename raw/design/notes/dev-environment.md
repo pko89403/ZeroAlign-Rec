@@ -26,7 +26,7 @@ sources: []
 
 ### 세팅 범위
 
-1. **프로젝트 초기화**: `pyproject.toml`, `src/`, `tests/`, `data/`, `docs/` 구성
+1. **프로젝트 초기화**: `pyproject.toml`, `src/`, `tests/`, `data/` 구성
 2. **패키지 및 가상환경**: `uv sync --all-groups` → `.venv`, `uv.lock` 생성
 3. **로컬 모델 백엔드**: MLX 기반 LLM (`Qwen3.5-9B`) + 임베딩 (`Qwen3-Embedding-4B`)
 4. **런타임 코드**: `config.py`, `llm.py`, `embedding.py`, `cli.py`

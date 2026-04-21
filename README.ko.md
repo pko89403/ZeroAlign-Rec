@@ -282,7 +282,6 @@ uv run mypy src
 | `apps/demo/` | 추천 파이프라인을 보여주는 정적 frontend demo |
 | `data/` | local datasets and processed artifacts |
 | `assets/` | authored static assets (branding, media) |
-| `docs/` | legacy docs-first knowledge archive |
 | `graphify-out/` | primary committed knowledge graph artifacts |
 | `.github/` | Copilot-facing instructions and agent personas |
 | `.agents/skills/` | repo-local agent skills |
