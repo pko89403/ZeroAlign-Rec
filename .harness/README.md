@@ -10,10 +10,11 @@
   - `.github/` — Copilot CLI / Chat 진입 규칙과 agent persona
   - `.agents/skills/` — repo-local skill 본체
   - `AGENTS.md` — 최상위 규칙 / 스키마 정본
+  - `scripts/hooks/` — canonical hook implementation
 
 - **harness support assets**
   - `.harness/reference/` — imported agent-skills 문서 스냅샷, 로컬 적응 규칙, command draft, persona 스냅샷
-  - `.harness/hooks/` — Claude Code safety hook 스크립트 및 support hook 자산
+  - `.harness/hooks/` — Claude/Codex hook entrypoint wrapper와 support hook 자산
 
 ## 왜 루트 진입점은 그대로 두는가
 
@@ -31,4 +32,4 @@ Copilot과 skill discovery는 `.github/`, `.agents/skills/`, `AGENTS.md` 같은
 
 1. 새 support 문서나 스냅샷을 추가할 때는 우선 `.harness/` 아래에 둔다.
 2. 외부 툴이 직접 읽는 파일은 `.claude/settings.json`, `.github/`, `.agents/skills/`, `AGENTS.md`에 유지한다.
-3. `.harness/hooks/`는 Claude Code active safety hooks의 실제 스크립트 위치로 사용하며, 그 외 hook 참고 자산도 함께 둔다.
+3. 실제 hook 구현은 `scripts/hooks/`에 두고, `.harness/hooks/`는 Claude/Codex가 직접 참조하는 wrapper와 support hook 자산을 유지한다.
