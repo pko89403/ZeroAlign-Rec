@@ -1,5 +1,4 @@
 from sid_reco.config import (
-    ARTIFACTS_DIR,
     DATA_DIR,
     DEFAULT_EMBED_MODEL,
     DEFAULT_LLM_BACKEND,
@@ -33,15 +32,14 @@ def test_directories_exist_after_bootstrap() -> None:
     ensure_project_directories()
 
     assert DATA_DIR.exists()
-    assert ARTIFACTS_DIR.exists()
     assert SID_CACHE_DIR.exists()
 
 
 def test_relative_env_paths_resolve_from_project_root(monkeypatch) -> None:
     monkeypatch.setenv("SID_RECO_CATALOG_PATH", "data/custom.csv")
-    monkeypatch.setenv("SID_RECO_CACHE_DIR", "artifacts/custom_cache")
+    monkeypatch.setenv("SID_RECO_CACHE_DIR", "data/custom_cache")
 
     settings = Settings.from_env()
 
     assert settings.sid_catalog_path == DATA_DIR / "custom.csv"
-    assert settings.sid_cache_dir == ARTIFACTS_DIR / "custom_cache"
+    assert settings.sid_cache_dir == DATA_DIR / "custom_cache"

@@ -95,7 +95,7 @@ def test_encode_serialized_items_with_mlx_reuses_encoder_from_settings(monkeypat
         llm_model="test-llm",
         embed_model="test-embed-model",
         sid_catalog_path=Path("/tmp/project/data/catalog.csv"),
-        sid_cache_dir=Path("/tmp/project/artifacts/sid_cache"),
+        sid_cache_dir=Path("/tmp/project/data/sid_cache"),
         llm_max_tokens=256,
         llm_temperature=0.0,
         llm_top_p=1.0,
