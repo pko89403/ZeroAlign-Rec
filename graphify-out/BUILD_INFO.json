@@ -1,9 +1,9 @@
 {
   "graphify_version": "0.4.23",
   "mode": "full_refresh",
-  "command": "python3 scripts/graphify_full_refresh.py /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.graphify-work/corpus",
-  "generated_at": "2026-04-20T09:06:08.466995+00:00",
-  "corpus_path": "/Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.graphify-work/corpus",
+  "command": "python3 scripts/graphify_full_refresh.py /Users/skiiwoo/PERSONAL/worktree/zeroalign-rec/fix-harness/.graphify-work/corpus",
+  "generated_at": "2026-04-21T07:27:24.089865+00:00",
+  "corpus_path": "/Users/skiiwoo/PERSONAL/worktree/zeroalign-rec/fix-harness/.graphify-work/corpus",
   "verified": true,
   "semantic_backend": "heuristic",
   "verification_profile": "raw-source-coverage-v3",
