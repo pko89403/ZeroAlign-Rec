@@ -26,7 +26,6 @@ GUARDRAIL_FILES = (
     "AGENTS.md",
     "README.md",
     "SPEC.md",
-    ".github/copilot-instructions.md",
     "references/local-adaptation.md",
 )
 SubprocessRunner = Callable[..., subprocess.CompletedProcess[str] | Any]
