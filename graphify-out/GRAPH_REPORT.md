@@ -1,10 +1,10 @@
-# Graph Report - /Users/skiiwoo/.codex/worktrees/c911/Training-Free-SID-Reco/.graphify-work/corpus  (2026-04-20)
+# Graph Report - /Users/skiiwoo/PERSONAL/worktree/zeroalign-rec/fix-harness/.graphify-work/corpus  (2026-04-21)
 
 ## Corpus Check
-- Corpus is ~38,126 words - fits in a single context window. You may not need a graph.
+- Corpus is ~38,871 words - fits in a single context window. You may not need a graph.
 
 ## Summary
-- 936 nodes · 4167 edges · 20 communities detected
+- 950 nodes · 4207 edges · 21 communities detected
 - Extraction: 29% EXTRACTED · 71% INFERRED · 0% AMBIGUOUS · INFERRED: 2975 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
@@ -29,6 +29,7 @@
 - [[_COMMUNITY_Community 17|Community 17]]
 - [[_COMMUNITY_Community 18|Community 18]]
 - [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 20|Community 20]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `MLXTextGenerator` - 100 edges
@@ -57,98 +58,104 @@
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.03
-Nodes (155): compute_bootstrap_confidence(), _confidence_band(), ConfidenceCandidate, _MutableConfidenceAggregate, Module 2.4 CPU confidence aggregation for bootstrap rerank outputs., Create a compact confidence summary for final delivery., Aggregated confidence evidence for one candidate across rerank passes., Compute per-candidate MSCP and aggregate rationale evidence on CPU. (+147 more)
+Cohesion: 0.06
+Nodes (153): build_neighbor_context_command(), build_taxonomy_dictionary_command(), doctor(), main(), _parse_hard_filters(), prepare_foodcom(), CLI entry points for local development., Run a single prompt against the configured local MLX LLM. (+145 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.03
-Nodes (165): build_neighbor_context_command(), build_taxonomy_dictionary_command(), compile_sid_index_command(), doctor(), main(), _parse_hard_filters(), prepare_foodcom(), CLI entry points for local development. (+157 more)
+Cohesion: 0.04
+Nodes (125): compute_bootstrap_confidence(), _confidence_band(), ConfidenceCandidate, _MutableConfidenceAggregate, Module 2.4 CPU confidence aggregation for bootstrap rerank outputs., Create a compact confidence summary for final delivery., Aggregated confidence evidence for one candidate across rerank passes., Compute per-candidate MSCP and aggregate rationale evidence on CPU. (+117 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.06
-Nodes (137): build_bounded_taxonomy_payload(), build_taxonomy_dictionary(), build_taxonomy_dictionary_prompt(), _evenly_spaced_indices(), generate_taxonomy_dictionary(), load_taxonomy_items(), normalize_taxonomy_dictionary(), _parse_string_list() (+129 more)
+Cohesion: 0.05
+Nodes (105): compile_sid_index_command(), Compile structured taxonomy items into hierarchical SIDs and a FAISS index., CompiledSIDItem, CompiledSIDItems, ResidualKMeansLevel, Settings, EmbeddedSIDItems, EmbeddedSIDWriteSummary (+97 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.06
-Nodes (94): Related, Taxonomy Item Structuring, 개요, 동작 규칙, 사용법/설정, 실행 명령, 현재 구현과 GRLM 레퍼런스의 대응, 현재 상태 (+86 more)
+Cohesion: 0.07
+Nodes (101): from_settings(), Local MLX embedding utilities., Build an encoder from application settings., Encode a batch of texts into normalized embedding vectors., Encode a single text and return one embedding vector., Load the embedding model only once., apply_k_core_filter(), build_manifest() (+93 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.09
-Nodes (93): apply_k_core_filter(), build_manifest(), build_recipe_stats(), build_temporal_splits(), DatasetSummary, _ensure_columns(), filter_positive_interactions(), load_raw_interactions() (+85 more)
+Cohesion: 0.04
+Nodes (81): Project-level configuration helpers., Resolve relative paths against the project root., _resolve_project_path(), ADR-001: 개발 환경 및 로컬 추론 스택 결정, Consequences, Context, Decision, Related (+73 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.07
-Nodes (53): CompiledSIDItem, CompiledSIDItems, ResidualKMeansLevel, EmbeddedSIDItems, _normalize_embedding_matrix(), FAISS indexing and mapping artifact writers for compiled SID outputs., Summary for persisted SID index artifacts., Persist compiled SID outputs, mapping files, and a CPU FAISS index. (+45 more)
+Cohesion: 0.06
+Nodes (90): Related, Taxonomy Item Structuring, 개요, 동작 규칙, 사용법/설정, 실행 명령, 현재 구현과 GRLM 레퍼런스의 대응, 현재 상태 (+82 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.1
-Nodes (0): 
+Cohesion: 0.06
+Nodes (62): _assign_to_centroids(), assign_trained_residual_kmeans(), _canonicalize_clusters(), _centroids_close(), compile_residual_kmeans(), _fit_deterministic_kmeans(), _format_sid(), _initialize_centroids() (+54 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.16
-Nodes (16): ensure_mlx_runtime_available(), get_runtime_environment_summary(), MLXRuntimeProbeResult, probe_mlx_runtime(), Helpers for probing MLX runtime availability safely., Probe MLX imports in a child process to avoid crashing the main process., High-level summary of the local execution environment., Result of a child-process MLX runtime probe. (+8 more)
+Cohesion: 0.09
+Nodes (0): 
 
 ### Community 8 - "Community 8"
-Cohesion: 0.16
-Nodes (12): _ordered_neighbor_candidates(), Search exact top-k item neighbors with deterministic tie-breaking., _search_neighbor_candidates_for_source(), search_topk_neighbors(), _FlakyEncoder, _StaticSearchIndex, test_encode_catalog_with_adaptive_batches_halves_after_runtime_error(), test_encode_catalog_with_adaptive_batches_reraises_non_oom_runtime_error() (+4 more)
+Cohesion: 0.21
+Nodes (12): _FakeEncoder, _FakeGenerator, _make_candidate(), _make_sketch(), test_parse_rerank_response_rejects_long_reasoning(), test_parse_rerank_response_rejects_wrong_selection_size(), test_run_bootstrap_rerank_injects_one_dynamic_example_and_runs_multiple_passes(), test_run_bootstrap_rerank_limits_structured_output_to_selection_size() (+4 more)
 
 ### Community 9 - "Community 9"
+Cohesion: 0.39
+Nodes (11): _clean_env(), _init_repo(), _seed_raw_corpus(), test_graphify_ci_candidate_is_candidate_only_even_when_staged_output_exists(), test_graphify_ci_candidate_writes_manual_note_when_no_staged_output(), test_graphify_prepare_corpus_script_copies_only_curated_inputs(), test_graphify_sync_staged_copies_verified_outputs(), test_graphify_sync_staged_requires_verify_marker() (+3 more)
+
+### Community 10 - "Community 10"
+Cohesion: 0.69
+Nodes (10): _clean_env(), _commit_all(), _copy_graphify_runtime(), _init_repo(), _seed_repo(), test_graphify_auto_refresh_bootstrap_does_not_skip_first_doc_change(), test_graphify_auto_refresh_bootstrap_runs_code_refresh_for_first_code_change(), test_graphify_auto_refresh_runs_code_refresh_after_code_only_change() (+2 more)
+
+### Community 11 - "Community 11"
 Cohesion: 0.4
 Nodes (8): _load_execute_module(), test_build_preamble_keeps_git_ownership_in_executor(), test_check_blockers_exits_for_blocked_steps(), test_ensure_clean_worktree_exits_when_repo_is_dirty(), test_ensure_created_at_records_task_timestamp(), test_invoke_claude_writes_output_and_uses_expected_command(), test_load_guardrails_uses_repo_specific_documents(), _write_phase_index()
 
-### Community 10 - "Community 10"
-Cohesion: 0.35
-Nodes (10): _init_repo(), _seed_raw_corpus(), test_graphify_ci_candidate_is_candidate_only_even_when_staged_output_exists(), test_graphify_ci_candidate_writes_manual_note_when_no_staged_output(), test_graphify_prepare_corpus_script_copies_only_curated_inputs(), test_graphify_sync_staged_copies_verified_outputs(), test_graphify_sync_staged_requires_verify_marker(), test_graphify_verify_full_refresh_accepts_doc_context_graph() (+2 more)
-
-### Community 11 - "Community 11"
+### Community 12 - "Community 12"
 Cohesion: 0.2
 Nodes (2): _EmptyTaxonomyGenerator, _FakeGenerator
 
-### Community 12 - "Community 12"
+### Community 13 - "Community 13"
 Cohesion: 0.29
 Nodes (7): load_recommendation_stats_store(), _parse_double_nested_int_mapping(), _parse_nested_int_mapping(), Load and query offline recommendation statistics., Lookup-friendly popularity and co-occurrence statistics., Load recommendation statistics persisted by compile-sid-index., RecommendationStatsStore
 
-### Community 13 - "Community 13"
+### Community 14 - "Community 14"
 Cohesion: 0.33
 Nodes (6): _ProjectionGenerator, test_structure_taxonomy_batch_cli_can_include_evidence(), test_structure_taxonomy_batch_cli_writes_jsonl(), test_structure_taxonomy_item_cli_can_include_evidence(), test_structure_taxonomy_item_cli_prints_json(), _write_projection_inputs()
 
-### Community 14 - "Community 14"
-Cohesion: 0.43
-Nodes (4): _FakeEncoder, test_compile_sid_index_cli_reports_missing_taxonomy_dictionary(), test_compile_sid_index_cli_writes_all_outputs(), _write_sid_inputs()
-
 ### Community 15 - "Community 15"
 Cohesion: 0.71
-Nodes (6): _copy_graphify_runtime(), _init_repo(), _seed_repo(), test_graphify_auto_refresh_runs_code_refresh_after_code_only_change(), test_graphify_auto_refresh_runs_full_refresh_after_doc_change(), _write_file()
+Nodes (6): _clean_env(), _copy_script(), _init_repo(), test_graphify_full_refresh_produces_staged_outputs_with_doc_context(), test_graphify_full_refresh_reports_partial_state_on_semantic_failure(), _write_file()
 
 ### Community 16 - "Community 16"
-Cohesion: 0.73
-Nodes (5): _copy_script(), _init_repo(), test_graphify_full_refresh_produces_staged_outputs_with_doc_context(), test_graphify_full_refresh_reports_partial_state_on_semantic_failure(), _write_file()
-
-### Community 17 - "Community 17"
 Cohesion: 0.4
 Nodes (5): GroundingDecision, Module 2.4 SID-aware fallback mapping helpers., Resolved canonical identity for a recommendation candidate., Resolve a candidate through direct id_map lookup, then SID fallback., resolve_grounding()
 
-### Community 18 - "Community 18"
+### Community 17 - "Community 17"
 Cohesion: 0.4
 Nodes (1): _FakeEncoder
+
+### Community 18 - "Community 18"
+Cohesion: 0.5
+Nodes (0): 
 
 ### Community 19 - "Community 19"
 Cohesion: 1.0
 Nodes (2): _recipe_row(), test_prepare_foodcom_cli_writes_processed_outputs()
 
+### Community 20 - "Community 20"
+Cohesion: 1.0
+Nodes (0): 
+
 ## Knowledge Gaps
 - **194 isolated node(s):** `Shared recommendation contracts.`, `Normalized request contract for recommendation entrypoints.`, `Taxonomy-constrained representation of user intent.`, `Final recommendation payload for one catalog item.`, `Public response contract for recommendation entrypoints.` (+189 more)
   These have ≤1 connection - possible missing edges or undocumented components.
+- **Thin community `Community 20`** (2 nodes): `test_git_hooks_delegate_to_shared_scripts_with_repo_root_fallback()`, `test_git_hook_scripts.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `SID recommender package.` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 5`, `Community 12`, `Community 17`?**
-  _High betweenness centrality (0.045) - this node is a cross-community bridge._
-- **Why does `MLXTextGenerator` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 4`?**
-  _High betweenness centrality (0.039) - this node is a cross-community bridge._
-- **Why does `Settings` connect `Community 1` to `Community 0`, `Community 2`, `Community 3`, `Community 5`, `Community 14`?**
-  _High betweenness centrality (0.034) - this node is a cross-community bridge._
+- **Why does `SID recommender package.` connect `Community 2` to `Community 0`, `Community 1`, `Community 4`, `Community 5`, `Community 6`, `Community 13`, `Community 16`?**
+  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Why does `MLXTextGenerator` connect `Community 5` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 6`?**
+  _High betweenness centrality (0.038) - this node is a cross-community bridge._
+- **Why does `Settings` connect `Community 2` to `Community 0`, `Community 1`, `Community 3`, `Community 4`, `Community 5`, `Community 6`?**
+  _High betweenness centrality (0.033) - this node is a cross-community bridge._
 - **Are the 96 inferred relationships involving `MLXTextGenerator` (e.g. with `_FakeTokenizer` and `_FakeTokenListTokenizer`) actually correct?**
   _`MLXTextGenerator` has 96 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 95 inferred relationships involving `Context` (e.g. with `build_taxonomy_dictionary()` and `foodcom.py`) actually correct?**
