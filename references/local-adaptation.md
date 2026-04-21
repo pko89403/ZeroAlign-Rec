@@ -62,7 +62,10 @@ uv run sid-reco structure-taxonomy-batch --help
 - 브라우저/웹 접근성/Core Web Vitals 항목은 HTML 리포트나 UI 작업이 실제로 있을 때만 적용한다.
 - `npm audit`, `npm run build` 같은 문구는 일반 예시로 읽고, 실제 실행은 이 저장소의 `uv` 명령으로 치환한다.
 - Codex App에서 repo-local slash-like entrypoint가 필요하면 command 파일이 아니라 skill 이름으로 노출되도록 wrapper skill을 만든다.
-- `scripts/execute.py`는 선택적 Claude-driven phase executor다. 호출 시 `phases/`가 로컬에 생성되며, `.gitignore`로 커밋되지 않는다.
+- `scripts/execute.py`는 선택적 Claude-driven phase executor다. 동작 계약:
+  - 사용자가 `phases/<phase-name>/index.json`을 먼저 수동 작성해야 한다 (executor는 자동 생성하지 않고, 없으면 `SystemExit(1)`).
+  - `phases/`는 `.gitignore`에 등록된 로컬 스크래치 디렉터리 — phase 메타데이터는 커밋 대상이 아니고 사용자 개인 worktree 안에서만 유지된다.
+  - executor를 실제로 쓸 때는 `mkdir -p phases/<phase>` 후 `index.json`을 생성해서 bootstrap한다.
 - Claude Code active safety hooks는 `.claude/settings.json`과 `scripts/hooks/claude-stop-checks.sh`를 기준으로 읽는다.
 - Graphify bootstrap/regeneration은 `scripts/graphify_code_refresh.sh`를 우선 사용한다.
 - `graphify update .`는 AST-only refresh이므로 committed graph bootstrap과 code drift 반영에 사용한다.
