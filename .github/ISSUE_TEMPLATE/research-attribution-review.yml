@@ -54,8 +54,8 @@ body:
       options:
         - label: README.md
         - label: README.ko.md
-        - label: docs/wiki/entities
-        - label: docs/wiki/decisions (ADR)
+        - label: raw/design/notes
+        - label: raw/design/adr
         - label: 기타 문서
 
   - type: dropdown
@@ -75,7 +75,7 @@ body:
     id: current_wording
     attributes:
       label: 현재 문구
-      description: README/위키/ADR에 들어간 문구를 그대로 붙여넣어 주세요.
+      description: README/raw/ADR에 들어간 문구를 그대로 붙여넣어 주세요.
       placeholder: |
         예)
         이 단계는 XXX 논문과 YYY 공개 구현의 one-time taxonomy categorization 아이디어를 참고했다.
@@ -142,7 +142,7 @@ body:
         - src/sid_reco/taxonomy/dictionary.py
         - src/sid_reco/taxonomy/item_projection.py
         - README.md
-        - docs/wiki/entities/...
+        - raw/design/notes/...
     validations:
       required: true
 
