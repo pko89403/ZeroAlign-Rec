@@ -30,6 +30,3 @@ phases/
 references/
 scripts/
 tasks/
-
-# Legacy and source-material exclusions
-docs/

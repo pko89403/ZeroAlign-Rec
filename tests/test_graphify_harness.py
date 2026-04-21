@@ -20,7 +20,6 @@ def test_graphifyignore_excludes_non_curated_paths() -> None:
 
     assert ".agents/" in content
     assert ".harness/" in content
-    assert "docs/" in content
     assert "scripts/" in content
     assert "tasks/" in content
 
