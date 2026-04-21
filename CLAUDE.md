@@ -88,6 +88,8 @@ uv run sid-reco compile-sid-index --help
 7. primary machine-readable knowledge layer는 `graphify-out/`다.
 8. Graphify의 유일한 source corpus는 `raw/`다.
 9. `scripts/graphify_code_refresh.sh`는 code-only bootstrap이고, full refresh는 `graphify-manager` skill이 orchestration 한다.
+10. 사용자가 자연어로 PR 생성을 요청해도 `.github/pull_request_template.md`를 반드시 기준으로 사용한다.
+11. `gh pr create --body` 또는 `--body-file`로 템플릿을 우회하지 않는다. `gh`를 쓸 때는 `--template .github/pull_request_template.md` 또는 동등한 템플릿 기반 경로를 사용한다.
 
 ---
 

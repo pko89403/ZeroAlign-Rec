@@ -75,3 +75,5 @@ uv run sid-reco structure-taxonomy-batch --help
 - curated full refresh가 필요하면 `scripts/graphify_prepare_corpus.sh`로 `.graphify-work/corpus/`를 준비하고, `scripts/graphify_full_refresh.py` -> `scripts/graphify_verify_full_refresh.py` -> `scripts/graphify_sync_staged.sh` 순서를 따른다.
 - repo-local full refresh orchestration entrypoint는 `.agents/skills/graphify-manager/SKILL.md`다.
 - `graphify-out/BUILD_INFO.json`의 `mode`가 `full_refresh`이고 `verified=true`이면 현재 `raw/` source corpus가 그래프에 반영된 상태로 본다.
+- 사용자가 자연어로 PR 생성을 요청해도 `.github/pull_request_template.md`를 반드시 기준으로 사용한다.
+- `gh pr create --body` 또는 `--body-file`는 템플릿을 우회할 수 있으므로, 템플릿 기반 본문을 먼저 만들지 않은 상태에서는 사용하지 않는다.
