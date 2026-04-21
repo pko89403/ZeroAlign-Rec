@@ -1,8 +1,7 @@
 # phases
 
 `phases/`는 선택적 실행 하네스 산출물 위치다.
-`tasks/plan.md`, `tasks/todo.md`가 사람이 읽는 계획 문서라면,
-`phases/`는 `scripts/execute.py`가 순차 실행하는 step bundle을 담는다.
+`scripts/execute.py`가 순차 실행하는 step bundle을 담는다.
 
 ## 용도
 

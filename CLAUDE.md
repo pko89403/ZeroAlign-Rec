@@ -53,7 +53,7 @@ uv run sid-reco compile-sid-index --help
 
 - `/docs-manager` 또는 `/doc-manager` — `raw/` source corpus 관리와 `README.md`, `AGENTS.md`, `.github/copilot-instructions.md`, `.harness/reference/local-adaptation.md` 동기화를 포함한 문서 반영 루틴
 - `/spec` — 구현 전에 `SPEC.md`를 정리하는 spec-driven workflow
-- `/plan` — `tasks/plan.md`, `tasks/todo.md` 기반 작업 분해
+- `/plan` — spec-driven workflow 후속 작업 분해
 - `/build` — incremental-implementation + TDD 기반 구현 흐름
 - `/test` — TDD / Prove-It 기반 검증 흐름
 - built-in `/review` 또는 `$code-review-and-quality` — 5축 코드 리뷰
@@ -83,7 +83,7 @@ uv run sid-reco compile-sid-index --help
 2. 코드 구현, 테스트, 리뷰, 릴리스 흐름은 imported agent skills를 사용할 수 있다.
 3. imported skill의 일반 예시가 이 저장소 구조와 충돌하면 `.harness/reference/local-adaptation.md` 규칙을 우선한다.
 4. `raw/design/**` 문서는 계속 한국어로 유지한다.
-5. `tasks/`는 사람이 읽는 계획 산출물, `phases/`는 `scripts/execute.py`가 실행하는 선택적 step bundle로 구분한다.
+5. `phases/`는 `scripts/execute.py`가 실행하는 선택적 step bundle이다.
 6. Claude Code safety hooks는 `.claude/settings.json`과 `.harness/hooks/` 스크립트로 활성화된다.
 7. primary machine-readable knowledge layer는 `graphify-out/`다.
 8. Graphify의 유일한 source corpus는 `raw/`다.

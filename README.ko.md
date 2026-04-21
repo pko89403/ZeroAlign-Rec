@@ -372,8 +372,7 @@ Graphify 입력에는 `references/`, `README*`, `SPEC.md`, `CLAUDE.md`/`AGENTS.m
 또 `graphify-out/BUILD_INFO.json`을 읽어:
 - `mode=code_update`이면 그래프가 코드 중심 refresh 상태이고
 - `mode=full_refresh`이며 `verified=true`이면 그래프가 현재 `raw/` source corpus를 반영한다고 본다.
-재현 가능한 구현 실행이 필요할 때는 `tasks/`를 사람용 계획 영역으로 유지하고,
-`phases/`를 선택적 Claude-driven 실행 영역으로 사용한다.
+재현 가능한 구현 실행이 필요할 때는 `phases/`를 선택적 Claude-driven 실행 영역으로 사용한다.
 
 ## 연구 레퍼런스
 

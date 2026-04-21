@@ -77,8 +77,6 @@ Use domain-specific commands when relevant:
 - `.agents/skills/`
 - `references/`
 - `ideas/`
-- `tasks/plan.md`
-- `tasks/todo.md`
 - `phases/README.md`
 - `scripts/execute.py`
 - `scripts/graphify_code_refresh.sh`

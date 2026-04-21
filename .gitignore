@@ -24,6 +24,7 @@ build/
 graphify-out/cache/
 graphify-out/memory/
 artifacts/
+tasks/
 data/raw/*
 !data/raw/.gitkeep
 data/processed/*

@@ -11,6 +11,4 @@ Read the existing spec (SPEC.md or equivalent) and the relevant codebase section
 3. Slice work vertically (one complete path per task, not horizontal layers)
 4. Write tasks with acceptance criteria and verification steps
 5. Add checkpoints between phases
-6. Present the plan for human review
-
-Save the plan to tasks/plan.md and task list to tasks/todo.md.
+6. Present the plan for human review in the conversation.
