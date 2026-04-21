@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="artifacts/branding/zeroalign-rec-logo.svg" alt="ZeroAlign-Rec logo" width="760">
+  <img src="assets/branding/zeroalign-rec-logo.svg" alt="ZeroAlign-Rec logo" width="760">
 </p>
 
 <h1 align="center">ZeroAlign-Rec</h1>
@@ -281,7 +281,8 @@ uv run mypy src
 | `tests/` | automated tests |
 | `apps/demo/` | 추천 파이프라인을 보여주는 정적 frontend demo |
 | `data/` | local datasets and processed artifacts |
-| `artifacts/` | generated reports, branding, and outputs |
+| `assets/` | authored static assets (branding, media) |
+| `artifacts/` | generated reports and outputs |
 | `docs/` | legacy docs-first knowledge archive |
 | `graphify-out/` | primary committed knowledge graph artifacts |
 | `.github/` | Copilot-facing instructions and agent personas |

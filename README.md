@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="artifacts/branding/zeroalign-rec-logo.svg" alt="ZeroAlign-Rec logo" width="760">
+  <img src="assets/branding/zeroalign-rec-logo.svg" alt="ZeroAlign-Rec logo" width="760">
 </p>
 
 <h1 align="center">ZeroAlign-Rec</h1>
@@ -323,7 +323,8 @@ uv run sid-reco structure-taxonomy-batch --help
 | `tests/` | automated tests |
 | `apps/demo/` | static frontend demo for the recommendation pipeline |
 | `data/` | local datasets and processed artifacts |
-| `artifacts/` | generated reports, branding, and outputs |
+| `assets/` | authored static assets (branding, media) |
+| `artifacts/` | generated reports and outputs |
 | `docs/` | legacy docs-first knowledge archive |
 | `graphify-out/` | primary committed knowledge graph artifacts |
 | `.github/` | Copilot-facing instructions and agent personas |
