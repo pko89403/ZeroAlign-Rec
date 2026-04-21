@@ -24,7 +24,6 @@ graphify-out/memory/
 .claude/
 .github/
 .githooks/
-.harness/
 ideas/
 phases/
 references/

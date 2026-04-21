@@ -14,7 +14,7 @@
 2. If present, use `graphify-out/graph.json` as the primary machine-readable codebase graph.
 3. Check `graphify-out/BUILD_INFO.json` to see whether the graph is `code_update` or `full_refresh`.
 3. Read `AGENTS.md` for the project schema and workflow rules.
-4. If an imported skill example conflicts with this repository, follow `.harness/reference/local-adaptation.md`.
+4. If an imported skill example conflicts with this repository, follow `references/local-adaptation.md`.
 5. Repo-local skills live in `.agents/skills/`.
 
 ## Preferred Workflows
@@ -71,8 +71,7 @@ Use domain-specific commands when relevant:
 - `.agents/skills/graphify-manager/SKILL.md`
 - `AGENTS.md`
 - `.claude/settings.json`
-- `.harness/README.md`
-- `.harness/reference/local-adaptation.md`
+- `references/local-adaptation.md`
 - `.agents/skills/`
 - `references/`
 - `scripts/execute.py`

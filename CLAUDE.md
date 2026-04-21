@@ -51,7 +51,7 @@ uv run sid-reco compile-sid-index --help
 이 저장소의 repo-local Codex 확장점은 `.agents/skills/`다.
 공식 Codex App built-in slash command와는 별개로, enabled skill은 slash 목록에 나타날 수 있다.
 
-- `/docs-manager` 또는 `/doc-manager` — `raw/` source corpus 관리와 `README.md`, `AGENTS.md`, `.github/copilot-instructions.md`, `.harness/reference/local-adaptation.md` 동기화를 포함한 문서 반영 루틴
+- `/docs-manager` 또는 `/doc-manager` — `raw/` source corpus 관리와 `README.md`, `AGENTS.md`, `.github/copilot-instructions.md`, `references/local-adaptation.md` 동기화를 포함한 문서 반영 루틴
 - `/spec` — 구현 전에 `SPEC.md`를 정리하는 spec-driven workflow
 - `/plan` — spec-driven workflow 후속 작업 분해
 - `/build` — incremental-implementation + TDD 기반 구현 흐름
@@ -68,21 +68,18 @@ uv run sid-reco compile-sid-index --help
 
 - 활성 스킬 위치: `.agents/skills/`
 - Claude runtime 설정: `.claude/settings.json`
-- 하네스 support 자산 루트: `.harness/`
-- 체크리스트 참조: `references/`
-- upstream 문서 스냅샷: `.harness/reference/`
-- repo hook 스크립트: `.harness/hooks/`
-- archived command prompt 초안: `.harness/reference/command-drafts/`
-- archived persona markdown: `.harness/reference/agent-personas/`
+- Codex hook 설정: `.codex/hooks.json`
+- 체크리스트 및 upstream 참조: `references/`
+- hook 스크립트: `scripts/hooks/`
 - optional phase executor: `scripts/execute.py`
 
 운영 원칙:
 
 1. `raw/`, `graphify-out/`, ADR/설계 노트 작업은 항상 `docs-manager`와 이 `AGENTS.md` 스키마가 우선한다.
 2. 코드 구현, 테스트, 리뷰, 릴리스 흐름은 imported agent skills를 사용할 수 있다.
-3. imported skill의 일반 예시가 이 저장소 구조와 충돌하면 `.harness/reference/local-adaptation.md` 규칙을 우선한다.
+3. imported skill의 일반 예시가 이 저장소 구조와 충돌하면 `references/local-adaptation.md` 규칙을 우선한다.
 4. `raw/design/**` 문서는 계속 한국어로 유지한다.
-5. Claude Code safety hooks는 `.claude/settings.json`과 `.harness/hooks/` 스크립트로 활성화된다.
+5. Claude Code safety hooks는 `.claude/settings.json`과 `scripts/hooks/` 스크립트로 활성화된다.
 6. primary machine-readable knowledge layer는 `graphify-out/`다.
 7. Graphify의 유일한 source corpus는 `raw/`다.
 8. `scripts/graphify_code_refresh.sh`는 code-only bootstrap이고, full refresh는 `graphify-manager` skill이 orchestration 한다.

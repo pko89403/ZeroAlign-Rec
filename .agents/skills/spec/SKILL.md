@@ -9,7 +9,7 @@ Use the `spec-driven-development` workflow for this repository.
 
 ## Procedure
 
-1. Read `AGENTS.md`, `README.md`, and `.harness/reference/local-adaptation.md`.
+1. Read `AGENTS.md`, `README.md`, and `references/local-adaptation.md`.
 2. Clarify the objective, acceptance criteria, constraints, and boundaries.
 3. Produce a structured `SPEC.md` in the repository root.
 4. Include repository-specific commands such as:

@@ -56,7 +56,7 @@ Source lives under [`apps/demo/`](apps/demo/). Open `index.html` over any local 
 - **Training-free recommendation experiments**: validate SID-based recommendation flows without separate model training.
 - **Local-first inference**: run `mlx-lm` and `mlx-embeddings` locally on Apple Silicon.
 - **Taxonomy-aware pipeline**: separate dataset preparation, neighbor index construction, taxonomy dictionary generation, and item structuring into reproducible steps.
-- **Agent-friendly repository**: keep `.github/`, `.agents/skills/`, `.harness/`, and `AGENTS.md` organized for Copilot/Codex workflows.
+- **Agent-friendly repository**: keep `.github/`, `.agents/skills/`, `references/`, and `AGENTS.md` organized for Copilot/Codex workflows.
 
 ## Requirements
 
@@ -327,7 +327,8 @@ uv run sid-reco structure-taxonomy-batch --help
 | `graphify-out/` | primary committed knowledge graph artifacts |
 | `.github/` | Copilot-facing instructions and agent personas |
 | `.agents/skills/` | repo-local agent skills |
-| `.harness/` | internal harness support and reference assets |
+| `references/` | shared checklists and upstream snapshots |
+| `scripts/hooks/` | Claude Code / Codex CLI hook entrypoints |
 | `AGENTS.md` | top-level repository rules and schema |
 
 ## Docs and Knowledge Base
@@ -394,8 +395,8 @@ This repository also maintains a Copilot/Codex-friendly harness.
 - Copilot project instructions: `.github/copilot-instructions.md`
 - specialized personas: `.github/agents/`
 - repo-local skills: `.agents/skills/`
-- harness support assets: `.harness/`
-- local adaptation rules: `.harness/reference/local-adaptation.md`
+- hook scripts: `scripts/hooks/`
+- local adaptation rules: `references/local-adaptation.md`
 - optional phase executor: `scripts/execute.py`
 
 Main shortcuts:
