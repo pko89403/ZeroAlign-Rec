@@ -18,6 +18,7 @@ build/
 .ipynb_checkpoints/
 .vscode/
 .idea/
+.claude/settings.local.json
 *.log
 .graphify-work/
 graphify-out/cache/
