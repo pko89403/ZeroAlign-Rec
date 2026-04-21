@@ -52,8 +52,10 @@ def test_claude_settings_prefer_graphify_before_raw_search() -> None:
 
 
 def test_session_start_mentions_graphify_priority() -> None:
-    content = (ROOT / ".harness" / "hooks" / "session-start.sh").read_text(encoding="utf-8")
+    wrapper = (ROOT / ".harness" / "hooks" / "session-start.sh").read_text(encoding="utf-8")
+    content = (ROOT / "scripts" / "hooks" / "session-start.sh").read_text(encoding="utf-8")
 
+    assert "scripts/hooks/session-start.sh" in wrapper
     assert "graphify-mode-note.sh" in content
     assert "BUILD_INFO.json" in content
 
@@ -162,8 +164,10 @@ def test_graphify_full_wrapper_skill_exists() -> None:
 
 
 def test_graphify_mode_helper_mentions_full_refresh_policy() -> None:
-    content = (ROOT / ".harness" / "hooks" / "graphify-mode-note.sh").read_text(encoding="utf-8")
+    wrapper = (ROOT / ".harness" / "hooks" / "graphify-mode-note.sh").read_text(encoding="utf-8")
+    content = (ROOT / "scripts" / "hooks" / "graphify-mode-note.sh").read_text(encoding="utf-8")
 
+    assert "scripts/hooks/graphify-mode-note.sh" in wrapper
     assert "BUILD_INFO.json" in content
     assert "full_refresh" in content
     assert "raw/" in content

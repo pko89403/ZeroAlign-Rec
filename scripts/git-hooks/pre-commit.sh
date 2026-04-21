@@ -8,4 +8,4 @@ if [ -z "$repo_root" ]; then
   repo_root="$(cd "$script_dir/../.." && pwd)"
 fi
 
-bash "$repo_root/scripts/hooks/graphify-auto-refresh.sh"
+bash "$repo_root/scripts/hooks/pre-commit.sh"
