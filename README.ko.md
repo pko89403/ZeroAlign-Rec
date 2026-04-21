@@ -17,8 +17,8 @@
 4-모듈 온라인 파이프라인(관심 스케치 → 시맨틱 검색 → 제로샷 리랭킹 → MSCP 신뢰도)을 26개 Food.com 시드 레시피 위에서 시각화하는 정적 HTML/JS 번들이다. `?lang=` URL 파라미터로 한국어/영어를 전환하며, 빌드 단계 없이 클라이언트에서 모두 실행된다.
 
 <p align="center">
-  <a href="docs/demo/index.html">
-    <img src="docs/demo/screenshots/desktop-kr.png" alt="ZeroAlign-Rec 추천 데모 (데스크톱, KR)" width="800">
+  <a href="apps/demo/index.html">
+    <img src="apps/demo/screenshots/desktop-kr.png" alt="ZeroAlign-Rec 추천 데모 (데스크톱, KR)" width="800">
   </a>
 </p>
 
@@ -26,16 +26,16 @@
 <summary>다른 뷰 — 영문 버전과 모바일 반응형</summary>
 
 <p align="center">
-  <img src="docs/demo/screenshots/desktop-en.png" alt="영문(EN) 버전" width="800">
+  <img src="apps/demo/screenshots/desktop-en.png" alt="영문(EN) 버전" width="800">
 </p>
 
 <p align="center">
-  <img src="docs/demo/screenshots/mobile-en.png" alt="모바일 반응형 레이아웃" width="280">
+  <img src="apps/demo/screenshots/mobile-en.png" alt="모바일 반응형 레이아웃" width="280">
 </p>
 
 </details>
 
-소스는 [`docs/demo/`](docs/demo/) 아래에 있다. 로컬 HTTP 서버로 `index.html`을 열거나(예: `python3 -m http.server --directory docs/demo`), 폴더를 GitHub Pages로 배포하면 공유 가능한 링크가 된다. 시뮬레이션 파이프라인 단위 테스트는 `docs/demo/tests/`에 있고 `node --test`로 실행한다.
+소스는 [`apps/demo/`](apps/demo/) 아래에 있다. 로컬 HTTP 서버로 `index.html`을 열거나(예: `python3 -m http.server --directory apps/demo`), 폴더를 GitHub Pages로 배포하면 공유 가능한 링크가 된다. 시뮬레이션 파이프라인 단위 테스트는 `apps/demo/tests/`에 있고 `node --test`로 실행한다.
 
 ## 목차
 
@@ -279,9 +279,10 @@ uv run mypy src
 | `src/sid_reco/` | application package |
 | `src/sid_reco/sid/` | Phase 1 SID serialization 및 embedding artifact helper |
 | `tests/` | automated tests |
+| `apps/demo/` | 추천 파이프라인을 보여주는 정적 frontend demo |
 | `data/` | local datasets and processed artifacts |
 | `artifacts/` | generated reports, branding, and outputs |
-| `docs/` | source materials plus legacy wiki archive |
+| `docs/` | legacy docs-first knowledge archive |
 | `graphify-out/` | primary committed knowledge graph artifacts |
 | `.github/` | Copilot-facing instructions and agent personas |
 | `.agents/skills/` | repo-local agent skills |
