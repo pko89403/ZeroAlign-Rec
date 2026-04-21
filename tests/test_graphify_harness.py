@@ -225,3 +225,18 @@ def test_docs_manager_marks_full_refresh_as_explicit_only() -> None:
 
     assert "raw/" in content
     assert "legacy wiki" not in content
+
+
+def test_pr_creation_rules_require_template_based_flow() -> None:
+    claude = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+    copilot = (ROOT / ".github" / "copilot-instructions.md").read_text(encoding="utf-8")
+    local_adaptation = (ROOT / ".harness" / "reference" / "local-adaptation.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert ".github/pull_request_template.md" in claude
+    assert "gh pr create --body" in claude
+    assert ".github/pull_request_template.md" in copilot
+    assert "--template .github/pull_request_template.md" in copilot
+    assert ".github/pull_request_template.md" in local_adaptation
+    assert "--body-file" in local_adaptation

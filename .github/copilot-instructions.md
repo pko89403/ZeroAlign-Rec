@@ -93,3 +93,9 @@ Use domain-specific commands when relevant:
 - Hooks and session-start rules use the current graph and `BUILD_INFO.json` as trust signals.
 - PostToolUse hooks may auto-refresh the graph after relevant local edits.
 - CI may leave a candidate/reminder note, but it does not run the full refresh producer, verify staged output, or promote root `graphify-out/`.
+
+## Pull Request Rule
+
+- If a user asks to create a PR in natural language, still use `.github/pull_request_template.md` as the starting structure.
+- Do not bypass the template with raw `gh pr create --body` or `--body-file` unless the body was first built from the repository template.
+- When using `gh`, prefer `gh pr create --template .github/pull_request_template.md` or an equivalent template-filled flow.
