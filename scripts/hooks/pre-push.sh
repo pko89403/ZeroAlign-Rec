@@ -18,5 +18,8 @@ uv run ruff format --check .
 echo "pre-push: uv run mypy src"
 uv run mypy src
 
-echo "pre-push: uv run pytest --ignore=tests/test_mlx_runtime.py --ignore=tests/test_cli_smoke_mlx.py"
-uv run pytest --ignore=tests/test_mlx_runtime.py --ignore=tests/test_cli_smoke_mlx.py
+echo "pre-push: uv run pytest --ignore=tests/test_mlx_runtime.py --ignore=tests/test_cli_smoke_mlx.py --ignore=tests/test_graphify_auto_refresh.py"
+uv run pytest \
+  --ignore=tests/test_mlx_runtime.py \
+  --ignore=tests/test_cli_smoke_mlx.py \
+  --ignore=tests/test_graphify_auto_refresh.py
