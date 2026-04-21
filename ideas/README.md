@@ -4,4 +4,4 @@
 
 - 형식: 자유로운 Markdown
 - 생성 시점: 사용자 확인 후에만 저장
-- 주의: 위키 지식 저장소와 다르므로 `docs/wiki/` 대신 여기 둔다
+- 주의: Graphify source corpus와 다르므로 `raw/design/` 대신 여기 둔다

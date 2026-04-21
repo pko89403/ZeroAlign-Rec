@@ -17,8 +17,8 @@ Current Phase 1 progress also includes an in-repository `sid` package plus a pub
 A static HTML/JS bundle visualizes the four-module online pipeline (Interest Sketch → Semantic Search → Zero-Shot Rerank → MSCP Confidence) on a 26-recipe Food.com seed. The bundle is bilingual via the `?lang=` URL parameter and runs entirely client-side, so no build step or server is required.
 
 <p align="center">
-  <a href="docs/demo/index.html">
-    <img src="docs/demo/screenshots/desktop-en.png" alt="ZeroAlign-Rec recommendation demo (desktop, EN)" width="800">
+  <a href="apps/demo/index.html">
+    <img src="apps/demo/screenshots/desktop-en.png" alt="ZeroAlign-Rec recommendation demo (desktop, EN)" width="800">
   </a>
 </p>
 
@@ -26,16 +26,16 @@ A static HTML/JS bundle visualizes the four-module online pipeline (Interest Ske
 <summary>More views — Korean variant and mobile responsive</summary>
 
 <p align="center">
-  <img src="docs/demo/screenshots/desktop-kr.png" alt="Korean (KR) variant" width="800">
+  <img src="apps/demo/screenshots/desktop-kr.png" alt="Korean (KR) variant" width="800">
 </p>
 
 <p align="center">
-  <img src="docs/demo/screenshots/mobile-en.png" alt="Mobile responsive layout" width="280">
+  <img src="apps/demo/screenshots/mobile-en.png" alt="Mobile responsive layout" width="280">
 </p>
 
 </details>
 
-Source lives under [`docs/demo/`](docs/demo/). Open `index.html` over any local HTTP server (for example `python3 -m http.server --directory docs/demo`), or publish the folder via GitHub Pages for shareable access. Unit tests for the simulated pipeline live in `docs/demo/tests/` and run with `node --test`.
+Source lives under [`apps/demo/`](apps/demo/). Open `index.html` over any local HTTP server (for example `python3 -m http.server --directory apps/demo`), or publish the folder via GitHub Pages for shareable access. Unit tests for the simulated pipeline live in `apps/demo/tests/` and run with `node --test`.
 
 ## Table of Contents
 
@@ -321,9 +321,10 @@ uv run sid-reco structure-taxonomy-batch --help
 | `src/sid_reco/` | application package |
 | `src/sid_reco/sid/` | Phase 1 SID serialization and embedding artifact helpers |
 | `tests/` | automated tests |
+| `apps/demo/` | static frontend demo for the recommendation pipeline |
 | `data/` | local datasets and processed artifacts |
 | `artifacts/` | generated reports, branding, and outputs |
-| `docs/` | source materials plus legacy wiki archive |
+| `docs/` | legacy docs-first knowledge archive |
 | `graphify-out/` | primary committed knowledge graph artifacts |
 | `.github/` | Copilot-facing instructions and agent personas |
 | `.agents/skills/` | repo-local agent skills |
