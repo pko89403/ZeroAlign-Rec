@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -8,10 +9,21 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def _clean_env() -> dict[str, str]:
+    return {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+
+
 def _init_repo(tmp_path: Path) -> Path:
     repo = tmp_path / "repo"
     repo.mkdir()
-    subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["git", "init"],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
+        env=_clean_env(),
+    )
     return repo
 
 
@@ -21,15 +33,29 @@ def _write_file(path: Path, content: str) -> None:
 
 
 def _commit_all(repo: Path, message: str = "seed") -> None:
-    subprocess.run(["git", "config", "user.email", "codex@example.com"], cwd=repo, check=True)
-    subprocess.run(["git", "config", "user.name", "Codex"], cwd=repo, check=True)
-    subprocess.run(["git", "add", "."], cwd=repo, check=True, capture_output=True, text=True)
+    env = _clean_env()
+    subprocess.run(
+        ["git", "config", "user.email", "codex@example.com"],
+        cwd=repo,
+        check=True,
+        env=env,
+    )
+    subprocess.run(["git", "config", "user.name", "Codex"], cwd=repo, check=True, env=env)
+    subprocess.run(
+        ["git", "add", "."],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
+        env=env,
+    )
     subprocess.run(
         ["git", "commit", "-m", message],
         cwd=repo,
         check=True,
         capture_output=True,
         text=True,
+        env=env,
     )
 
 
@@ -53,6 +79,7 @@ def _copy_graphify_runtime(repo: Path) -> None:
         check=True,
         capture_output=True,
         text=True,
+        env=_clean_env(),
     )
 
     graph_dir = repo / "graphify-out"
@@ -81,6 +108,7 @@ def test_graphify_auto_refresh_runs_code_refresh_after_code_only_change(tmp_path
         check=True,
         capture_output=True,
         text=True,
+        env=_clean_env(),
     )
 
     _write_file(repo / "src" / "pkg" / "core.py", "class Alpha:\n    value = 1\n")
@@ -90,6 +118,7 @@ def test_graphify_auto_refresh_runs_code_refresh_after_code_only_change(tmp_path
         check=True,
         capture_output=True,
         text=True,
+        env=_clean_env(),
     )
 
     build_info = json.loads((repo / "graphify-out" / "BUILD_INFO.json").read_text(encoding="utf-8"))
@@ -109,6 +138,7 @@ def test_graphify_auto_refresh_runs_full_refresh_after_doc_change(tmp_path: Path
         check=True,
         capture_output=True,
         text=True,
+        env=_clean_env(),
     )
 
     _write_file(
@@ -121,6 +151,7 @@ def test_graphify_auto_refresh_runs_full_refresh_after_doc_change(tmp_path: Path
         check=True,
         capture_output=True,
         text=True,
+        env=_clean_env(),
     )
 
     build_info = json.loads((repo / "graphify-out" / "BUILD_INFO.json").read_text(encoding="utf-8"))
@@ -145,6 +176,7 @@ def test_graphify_auto_refresh_bootstrap_does_not_skip_first_doc_change(tmp_path
         check=True,
         capture_output=True,
         text=True,
+        env=_clean_env(),
     )
 
     build_info = json.loads((repo / "graphify-out" / "BUILD_INFO.json").read_text(encoding="utf-8"))
@@ -168,6 +200,7 @@ def test_graphify_auto_refresh_bootstrap_runs_code_refresh_for_first_code_change
         check=True,
         capture_output=True,
         text=True,
+        env=_clean_env(),
     )
 
     build_info = json.loads((repo / "graphify-out" / "BUILD_INFO.json").read_text(encoding="utf-8"))
