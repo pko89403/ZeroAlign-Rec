@@ -85,6 +85,7 @@ uv run sid-reco compile-sid-index --help
 8. `scripts/graphify_code_refresh.sh`는 code-only bootstrap이고, full refresh는 `graphify-manager` skill이 orchestration 한다.
 9. 사용자가 자연어로 PR 생성을 요청해도 `.github/pull_request_template.md`를 반드시 기준으로 사용한다.
 10. `gh pr create --body` 또는 `--body-file`로 템플릿을 우회하지 않는다. `gh`를 쓸 때는 `--template .github/pull_request_template.md` 또는 동등한 템플릿 기반 경로를 사용한다.
+11. 사용자에게 의사결정 옵션을 제시할 때는 공수가 크더라도 근본적으로 '제대로된 방향'을 권장안으로 먼저 제안한다. 공수 절충안이나 현상 유지 옵션은 권장안 뒤에 함께 병기한다.
 
 ---
 
