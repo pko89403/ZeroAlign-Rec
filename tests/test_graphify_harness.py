@@ -227,6 +227,47 @@ def test_docs_manager_marks_full_refresh_as_explicit_only() -> None:
     assert "legacy wiki" not in content
 
 
+def test_active_doc_surfaces_no_longer_point_to_legacy_wiki_paths() -> None:
+    documentation_skill = (
+        ROOT / ".agents" / "skills" / "documentation-and-adrs" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+    meta_skill = (ROOT / ".agents" / "skills" / "using-agent-skills" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    docs_manager_agent = (
+        ROOT / ".agents" / "skills" / "docs-manager" / "agents" / "openai.yaml"
+    ).read_text(encoding="utf-8")
+    doc_manager_agent = (
+        ROOT / ".agents" / "skills" / "doc-manager" / "agents" / "openai.yaml"
+    ).read_text(encoding="utf-8")
+    issue_template = (
+        ROOT / ".github" / "ISSUE_TEMPLATE" / "research-attribution-review.yml"
+    ).read_text(encoding="utf-8")
+    ideas_readme = (ROOT / "ideas" / "README.md").read_text(encoding="utf-8")
+    idea_refine_script = (
+        ROOT / ".agents" / "skills" / "idea-refine" / "scripts" / "idea-refine.sh"
+    ).read_text(encoding="utf-8")
+
+    for content in (
+        documentation_skill,
+        meta_skill,
+        docs_manager_agent,
+        doc_manager_agent,
+        issue_template,
+        ideas_readme,
+        idea_refine_script,
+    ):
+        assert "docs/wiki" not in content
+        assert "docs/sources" not in content
+
+    assert "raw/design/adr/" in documentation_skill
+    assert "raw/design/notes/" in documentation_skill
+    assert "raw/" in meta_skill
+    assert "raw/design/adr" in docs_manager_agent
+    assert "raw/design/notes" in issue_template
+    assert 'IDEAS_DIR="ideas"' in idea_refine_script
+
+
 def test_pr_creation_rules_require_template_based_flow() -> None:
     claude = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
     copilot = (ROOT / ".github" / "copilot-instructions.md").read_text(encoding="utf-8")
