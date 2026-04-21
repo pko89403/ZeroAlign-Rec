@@ -246,7 +246,6 @@ def test_active_doc_surfaces_no_longer_point_to_legacy_wiki_paths() -> None:
     issue_template = (
         ROOT / ".github" / "ISSUE_TEMPLATE" / "research-attribution-review.yml"
     ).read_text(encoding="utf-8")
-    ideas_readme = (ROOT / "ideas" / "README.md").read_text(encoding="utf-8")
     idea_refine_script = (
         ROOT / ".agents" / "skills" / "idea-refine" / "scripts" / "idea-refine.sh"
     ).read_text(encoding="utf-8")
@@ -257,7 +256,6 @@ def test_active_doc_surfaces_no_longer_point_to_legacy_wiki_paths() -> None:
         docs_manager_agent,
         doc_manager_agent,
         issue_template,
-        ideas_readme,
         idea_refine_script,
     ):
         assert "docs/wiki" not in content
