@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -9,10 +10,21 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / "tests" / "fixtures" / "graphify"
 
 
+def _clean_env() -> dict[str, str]:
+    return {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+
+
 def _init_repo(tmp_path: Path) -> Path:
     repo = tmp_path / "repo"
     repo.mkdir()
-    subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["git", "init"],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
+        env=_clean_env(),
+    )
     return repo
 
 
@@ -47,7 +59,14 @@ def test_graphify_prepare_corpus_script_copies_only_curated_inputs(tmp_path: Pat
     _write_file(repo / "data" / "processed" / "x.txt", "skip\n")
 
     script = ROOT / "scripts" / "graphify_prepare_corpus.sh"
-    subprocess.run(["bash", str(script)], cwd=repo, check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["bash", str(script)],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
+        env=_clean_env(),
+    )
 
     assert (repo / ".graphify-work" / "corpus" / "src" / "app.py").exists()
     assert (repo / ".graphify-work" / "corpus" / "tests" / "test_app.py").exists()
@@ -136,6 +155,7 @@ def test_graphify_sync_staged_requires_verify_marker(tmp_path: Path) -> None:
         check=False,
         capture_output=True,
         text=True,
+        env=_clean_env(),
     )
 
     assert result.returncode == 1
@@ -169,6 +189,7 @@ def test_graphify_sync_staged_copies_verified_outputs(tmp_path: Path) -> None:
         check=True,
         capture_output=True,
         text=True,
+        env=_clean_env(),
     )
 
     assert (repo / "graphify-out" / "graph.json").exists()
@@ -186,7 +207,14 @@ def test_graphify_ci_candidate_writes_manual_note_when_no_staged_output(tmp_path
     repo = _init_repo(tmp_path)
     script = ROOT / "scripts" / "graphify_ci_candidate.sh"
 
-    subprocess.run(["bash", str(script)], cwd=repo, check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["bash", str(script)],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
+        env=_clean_env(),
+    )
 
     note = (repo / ".graphify-work" / "FULL_REFRESH_CANDIDATE.md").read_text(encoding="utf-8")
     assert "did **not** run the full refresh producer" in note
@@ -215,7 +243,14 @@ def test_graphify_ci_candidate_is_candidate_only_even_when_staged_output_exists(
     scripts_dir.mkdir()
     shutil.copy2(candidate, scripts_dir / "graphify_ci_candidate.sh")
 
-    subprocess.run(["bash", str(candidate)], cwd=repo, check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["bash", str(candidate)],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
+        env=_clean_env(),
+    )
 
     note = (repo / ".graphify-work" / "FULL_REFRESH_CANDIDATE.md").read_text(encoding="utf-8")
     assert "did **not** run the full refresh producer" in note

@@ -9,10 +9,21 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def _clean_env() -> dict[str, str]:
+    return {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+
+
 def _init_repo(tmp_path: Path) -> Path:
     repo = tmp_path / "repo"
     repo.mkdir()
-    subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["git", "init"],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
+        env=_clean_env(),
+    )
     return repo
 
 
@@ -51,6 +62,7 @@ def test_graphify_full_refresh_produces_staged_outputs_with_doc_context(tmp_path
         check=True,
         capture_output=True,
         text=True,
+        env=_clean_env(),
     )
     subprocess.run(
         [
@@ -66,6 +78,7 @@ def test_graphify_full_refresh_produces_staged_outputs_with_doc_context(tmp_path
         check=True,
         capture_output=True,
         text=True,
+        env=_clean_env(),
     )
 
     out_dir = repo / ".graphify-work" / "corpus" / "graphify-out"
@@ -114,9 +127,11 @@ def test_graphify_full_refresh_reports_partial_state_on_semantic_failure(tmp_pat
         check=True,
         capture_output=True,
         text=True,
+        env=_clean_env(),
     )
     env = dict(os.environ)
     env["GRAPHIFY_SEMANTIC_ADAPTER_MODE"] = "fail"
+    env = {key: value for key, value in env.items() if not key.startswith("GIT_")}
     result = subprocess.run(
         [
             "uv",
