@@ -55,7 +55,6 @@ def test_graphify_prepare_corpus_script_copies_only_curated_inputs(tmp_path: Pat
     _write_file(repo / "raw" / "design" / "adr" / "adr-001-alpha.md", "# adr\n")
     _write_file(repo / "raw" / "design" / "notes" / "alpha.md", "# note\n")
     _write_file(repo / "raw" / "external" / "papers" / "paper.md", "external source\n")
-    _write_file(repo / "artifacts" / "report.txt", "skip\n")
     _write_file(repo / "data" / "processed" / "x.txt", "skip\n")
 
     script = ROOT / "scripts" / "graphify_prepare_corpus.sh"

@@ -19,8 +19,6 @@ def test_graphifyignore_excludes_non_curated_paths() -> None:
     content = (ROOT / ".graphifyignore").read_text(encoding="utf-8")
 
     assert ".agents/" in content
-    assert ".harness/" in content
-    assert "docs/" in content
     assert "scripts/" in content
     assert "tasks/" in content
 
@@ -37,7 +35,7 @@ def test_claude_settings_prefer_graphify_before_raw_search() -> None:
     ]
 
     assert graphify_hooks
-    assert graphify_hooks[0] == "bash .harness/hooks/graphify-pretool.sh"
+    assert graphify_hooks[0] == "bash scripts/hooks/graphify-pretool.sh"
 
     posttool = settings["hooks"]["PostToolUse"]
     auto_refresh_hooks = [
@@ -48,14 +46,12 @@ def test_claude_settings_prefer_graphify_before_raw_search() -> None:
     ]
 
     assert auto_refresh_hooks
-    assert auto_refresh_hooks[0] == "bash .harness/hooks/graphify-auto-refresh.sh"
+    assert auto_refresh_hooks[0] == "bash scripts/hooks/graphify-auto-refresh.sh"
 
 
 def test_session_start_mentions_graphify_priority() -> None:
-    wrapper = (ROOT / ".harness" / "hooks" / "session-start.sh").read_text(encoding="utf-8")
     content = (ROOT / "scripts" / "hooks" / "session-start.sh").read_text(encoding="utf-8")
 
-    assert "scripts/hooks/session-start.sh" in wrapper
     assert "graphify-mode-note.sh" in content
     assert "BUILD_INFO.json" in content
 
@@ -164,10 +160,8 @@ def test_graphify_full_wrapper_skill_exists() -> None:
 
 
 def test_graphify_mode_helper_mentions_full_refresh_policy() -> None:
-    wrapper = (ROOT / ".harness" / "hooks" / "graphify-mode-note.sh").read_text(encoding="utf-8")
     content = (ROOT / "scripts" / "hooks" / "graphify-mode-note.sh").read_text(encoding="utf-8")
 
-    assert "scripts/hooks/graphify-mode-note.sh" in wrapper
     assert "BUILD_INFO.json" in content
     assert "full_refresh" in content
     assert "raw/" in content
@@ -186,7 +180,7 @@ def test_codex_hooks_expose_graphify_pretool_baseline() -> None:
     ]
 
     assert bash_hooks
-    assert bash_hooks[0] == "bash .harness/hooks/graphify-pretool.sh"
+    assert bash_hooks[0] == "bash scripts/hooks/graphify-pretool.sh"
 
     posttool = hooks["hooks"]["PostToolUse"]
     auto_refresh_hooks = [
@@ -197,7 +191,7 @@ def test_codex_hooks_expose_graphify_pretool_baseline() -> None:
     ]
 
     assert auto_refresh_hooks
-    assert auto_refresh_hooks[0] == "bash .harness/hooks/graphify-auto-refresh.sh"
+    assert auto_refresh_hooks[0] == "bash scripts/hooks/graphify-auto-refresh.sh"
 
 
 def test_github_instructions_expose_graphify_full_entrypoint() -> None:
@@ -247,7 +241,6 @@ def test_active_doc_surfaces_no_longer_point_to_legacy_wiki_paths() -> None:
     issue_template = (
         ROOT / ".github" / "ISSUE_TEMPLATE" / "research-attribution-review.yml"
     ).read_text(encoding="utf-8")
-    ideas_readme = (ROOT / "ideas" / "README.md").read_text(encoding="utf-8")
     idea_refine_script = (
         ROOT / ".agents" / "skills" / "idea-refine" / "scripts" / "idea-refine.sh"
     ).read_text(encoding="utf-8")
@@ -258,7 +251,6 @@ def test_active_doc_surfaces_no_longer_point_to_legacy_wiki_paths() -> None:
         docs_manager_agent,
         doc_manager_agent,
         issue_template,
-        ideas_readme,
         idea_refine_script,
     ):
         assert "docs/wiki" not in content
@@ -275,9 +267,7 @@ def test_active_doc_surfaces_no_longer_point_to_legacy_wiki_paths() -> None:
 def test_pr_creation_rules_require_template_based_flow() -> None:
     claude = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
     copilot = (ROOT / ".github" / "copilot-instructions.md").read_text(encoding="utf-8")
-    local_adaptation = (ROOT / ".harness" / "reference" / "local-adaptation.md").read_text(
-        encoding="utf-8"
-    )
+    local_adaptation = (ROOT / "references" / "local-adaptation.md").read_text(encoding="utf-8")
 
     assert ".github/pull_request_template.md" in claude
     assert "gh pr create --body" in claude

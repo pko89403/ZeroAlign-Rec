@@ -61,7 +61,6 @@ def _commit_all(repo: Path, message: str = "seed") -> None:
 
 def _copy_graphify_runtime(repo: Path) -> None:
     for relative in (
-        ".harness/hooks/graphify-auto-refresh.sh",
         "scripts/hooks/common.sh",
         "scripts/hooks/graphify-auto-refresh.sh",
         "scripts/graphify_code_refresh.sh",
@@ -77,7 +76,7 @@ def _copy_graphify_runtime(repo: Path) -> None:
         shutil.copy2(source, target)
 
     subprocess.run(
-        ["chmod", "+x", str(repo / ".harness/hooks/graphify-auto-refresh.sh")],
+        ["chmod", "+x", str(repo / "scripts/hooks/graphify-auto-refresh.sh")],
         check=True,
         capture_output=True,
         text=True,
@@ -103,7 +102,7 @@ def test_graphify_auto_refresh_runs_code_refresh_after_code_only_change(tmp_path
     _copy_graphify_runtime(repo)
     _commit_all(repo)
 
-    auto_refresh = repo / ".harness/hooks/graphify-auto-refresh.sh"
+    auto_refresh = repo / "scripts/hooks/graphify-auto-refresh.sh"
     subprocess.run(
         ["bash", str(auto_refresh)],
         cwd=repo,
@@ -133,7 +132,7 @@ def test_graphify_auto_refresh_runs_full_refresh_after_doc_change(tmp_path: Path
     _copy_graphify_runtime(repo)
     _commit_all(repo)
 
-    auto_refresh = repo / ".harness/hooks/graphify-auto-refresh.sh"
+    auto_refresh = repo / "scripts/hooks/graphify-auto-refresh.sh"
     subprocess.run(
         ["bash", str(auto_refresh)],
         cwd=repo,
@@ -167,7 +166,7 @@ def test_graphify_auto_refresh_bootstrap_does_not_skip_first_doc_change(tmp_path
     _copy_graphify_runtime(repo)
     _commit_all(repo)
 
-    auto_refresh = repo / ".harness/hooks/graphify-auto-refresh.sh"
+    auto_refresh = repo / "scripts/hooks/graphify-auto-refresh.sh"
     _write_file(
         repo / "raw" / "design" / "notes" / "alpha.md",
         "# Alpha\nUses Alpha\n## Context\n첫 변경이다.\n",
@@ -194,7 +193,7 @@ def test_graphify_auto_refresh_bootstrap_runs_code_refresh_for_first_code_change
     _copy_graphify_runtime(repo)
     _commit_all(repo)
 
-    auto_refresh = repo / ".harness/hooks/graphify-auto-refresh.sh"
+    auto_refresh = repo / "scripts/hooks/graphify-auto-refresh.sh"
     _write_file(repo / "src" / "pkg" / "core.py", "class Alpha:\n    value = 2\n")
     subprocess.run(
         ["bash", str(auto_refresh)],

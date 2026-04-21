@@ -11,11 +11,11 @@ Use the `planning-and-task-breakdown` workflow for this repository.
 
 1. Read `SPEC.md` if it exists, then inspect the relevant code and docs.
 2. Stay in read-only planning mode.
-3. Write `tasks/plan.md` for the execution flow and checkpoints.
-4. Write `tasks/todo.md` for the ordered task list with acceptance criteria.
-5. Use repository validations from `.harness/reference/local-adaptation.md`.
+3. Identify the dependency graph between components.
+4. Slice work vertically (one complete path per task) and draft tasks with acceptance criteria + verification steps.
+5. Present the execution flow, checkpoints, and ordered task list in the conversation for the user to review.
+6. Use repository validations from `references/local-adaptation.md`.
 
 ## Related
 
 - Follow `planning-and-task-breakdown` as the source workflow.
-

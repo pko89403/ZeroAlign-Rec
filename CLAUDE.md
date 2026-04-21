@@ -51,9 +51,9 @@ uv run sid-reco compile-sid-index --help
 이 저장소의 repo-local Codex 확장점은 `.agents/skills/`다.
 공식 Codex App built-in slash command와는 별개로, enabled skill은 slash 목록에 나타날 수 있다.
 
-- `/docs-manager` 또는 `/doc-manager` — `raw/` source corpus 관리와 `README.md`, `AGENTS.md`, `.github/copilot-instructions.md`, `.harness/reference/local-adaptation.md` 동기화를 포함한 문서 반영 루틴
+- `/docs-manager` 또는 `/doc-manager` — `raw/` source corpus 관리와 `README.md`, `AGENTS.md`, `.github/copilot-instructions.md`, `references/local-adaptation.md` 동기화를 포함한 문서 반영 루틴
 - `/spec` — 구현 전에 `SPEC.md`를 정리하는 spec-driven workflow
-- `/plan` — `tasks/plan.md`, `tasks/todo.md` 기반 작업 분해
+- `/plan` — spec-driven workflow 후속 작업 분해
 - `/build` — incremental-implementation + TDD 기반 구현 흐름
 - `/test` — TDD / Prove-It 기반 검증 흐름
 - built-in `/review` 또는 `$code-review-and-quality` — 5축 코드 리뷰
@@ -68,28 +68,24 @@ uv run sid-reco compile-sid-index --help
 
 - 활성 스킬 위치: `.agents/skills/`
 - Claude runtime 설정: `.claude/settings.json`
-- 하네스 support 자산 루트: `.harness/`
-- 체크리스트 참조: `references/`
-- upstream 문서 스냅샷: `.harness/reference/`
-- repo hook 스크립트: `.harness/hooks/`
-- archived command prompt 초안: `.harness/reference/command-drafts/`
-- archived persona markdown: `.harness/reference/agent-personas/`
-- phase executor: `scripts/execute.py`
-- phase 산출물: `phases/`
+- Codex hook 설정: `.codex/hooks.json`
+- 체크리스트 및 upstream 참조: `references/`
+- hook 스크립트: `scripts/hooks/`
+- optional phase executor: `scripts/execute.py`
 
 운영 원칙:
 
 1. `raw/`, `graphify-out/`, ADR/설계 노트 작업은 항상 `docs-manager`와 이 `AGENTS.md` 스키마가 우선한다.
 2. 코드 구현, 테스트, 리뷰, 릴리스 흐름은 imported agent skills를 사용할 수 있다.
-3. imported skill의 일반 예시가 이 저장소 구조와 충돌하면 `.harness/reference/local-adaptation.md` 규칙을 우선한다.
+3. imported skill의 일반 예시가 이 저장소 구조와 충돌하면 `references/local-adaptation.md` 규칙을 우선한다.
 4. `raw/design/**` 문서는 계속 한국어로 유지한다.
-5. `tasks/`는 사람이 읽는 계획 산출물, `phases/`는 `scripts/execute.py`가 실행하는 선택적 step bundle로 구분한다.
-6. Claude Code safety hooks는 `.claude/settings.json`과 `.harness/hooks/` 스크립트로 활성화된다.
-7. primary machine-readable knowledge layer는 `graphify-out/`다.
-8. Graphify의 유일한 source corpus는 `raw/`다.
-9. `scripts/graphify_code_refresh.sh`는 code-only bootstrap이고, full refresh는 `graphify-manager` skill이 orchestration 한다.
-10. 사용자가 자연어로 PR 생성을 요청해도 `.github/pull_request_template.md`를 반드시 기준으로 사용한다.
-11. `gh pr create --body` 또는 `--body-file`로 템플릿을 우회하지 않는다. `gh`를 쓸 때는 `--template .github/pull_request_template.md` 또는 동등한 템플릿 기반 경로를 사용한다.
+5. Claude Code safety hooks는 `.claude/settings.json`과 `scripts/hooks/` 스크립트로 활성화된다.
+6. primary machine-readable knowledge layer는 `graphify-out/`다.
+7. Graphify의 유일한 source corpus는 `raw/`다.
+8. `scripts/graphify_code_refresh.sh`는 code-only bootstrap이고, full refresh는 `graphify-manager` skill이 orchestration 한다.
+9. 사용자가 자연어로 PR 생성을 요청해도 `.github/pull_request_template.md`를 반드시 기준으로 사용한다.
+10. `gh pr create --body` 또는 `--body-file`로 템플릿을 우회하지 않는다. `gh`를 쓸 때는 `--template .github/pull_request_template.md` 또는 동등한 템플릿 기반 경로를 사용한다.
+11. 사용자에게 의사결정 옵션을 제시할 때는 공수가 크더라도 근본적으로 '제대로된 방향'을 권장안으로 먼저 제안한다. 공수 절충안이나 현상 유지 옵션은 권장안 뒤에 함께 병기한다.
 
 ---
 

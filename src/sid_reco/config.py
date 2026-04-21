@@ -10,8 +10,7 @@ from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
-ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
-SID_CACHE_DIR = ARTIFACTS_DIR / "sid_cache"
+SID_CACHE_DIR = DATA_DIR / "sid_cache"
 DEFAULT_LLM_BACKEND = "mlx"
 DEFAULT_LLM_MODEL = "mlx-community/Qwen3.5-9B-OptiQ-4bit"
 DEFAULT_EMBED_MODEL = "mlx-community/Qwen3-Embedding-4B-4bit-DWQ"
@@ -63,7 +62,7 @@ class Settings:
 
 def ensure_project_directories() -> None:
     """Create default directories used by the local workflow."""
-    for path in (DATA_DIR, ARTIFACTS_DIR, SID_CACHE_DIR):
+    for path in (DATA_DIR, SID_CACHE_DIR):
         path.mkdir(parents=True, exist_ok=True)
 
 
