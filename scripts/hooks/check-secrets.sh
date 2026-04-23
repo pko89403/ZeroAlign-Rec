@@ -41,5 +41,9 @@ if git_in_repo diff --cached -U0 | grep -Eq '^\+.*(AKIA[0-9A-Z]{16}|ghp_[A-Za-z0
 fi
 
 if [ "$warned" -eq 1 ]; then
-  echo "WARN: review staged changes for accidental secret exposure before pushing." >&2
+  echo "BLOCKED: staged changes contain secret material. Unstage (git reset HEAD -- <file>) and strip the secret before retrying." >&2
+  # exit 2 = Claude Code block signal. PostToolUse는 이미 실행된 git add/commit을
+  # 되돌리진 못하지만, 에이전트에게 "반드시 rollback/재작업" 신호가 주입됨.
+  # pre-commit hook에도 걸려 있으면 거기서 실제로 커밋 자체를 차단.
+  exit 2
 fi
