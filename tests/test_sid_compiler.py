@@ -10,6 +10,7 @@ from sid_reco.sid.compiler import (
     ResidualKMeansLevel,
     TrainedResidualCodebooks,
     build_item_sids,
+    build_query_sid,
     load_codebooks,
     train_codebooks,
     write_codebooks,
@@ -275,6 +276,66 @@ def test_codebook_manifest_uses_relative_path(tmp_path: Path) -> None:
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     assert manifest["codebooks_path"] == "residual_codebooks.npz"
+
+
+@pytest.mark.parametrize("normalize_residuals", [True, False])
+def test_build_query_sid_reproduces_item_assignment(normalize_residuals: bool) -> None:
+    recipe_ids = [101, 102, 103, 104]
+    matrix = np.asarray(
+        [
+            [1.0, 0.2, 0.0],
+            [0.2, 1.0, 0.0],
+            [0.0, 0.0, 1.0],
+            [0.6, 0.6, 0.0],
+        ],
+        dtype=np.float32,
+    )
+    codebooks = train_codebooks(
+        matrix,
+        branching_factor=2,
+        depth=2,
+        normalize_residuals=normalize_residuals,
+    )
+    items = build_item_sids(recipe_ids, matrix, codebooks=codebooks)
+
+    for row_index, item in enumerate(items):
+        query = build_query_sid(matrix[row_index], codebooks=codebooks)
+        assert isinstance(query, QuerySID)
+        assert query.sid_path == item.sid_path
+        assert query.sid_string == item.sid_string
+
+
+def test_build_query_sid_matches_loaded_codebooks(tmp_path: Path) -> None:
+    matrix = np.asarray(
+        [
+            [2.0, 0.0, 0.0],
+            [0.0, 2.0, 0.0],
+            [0.0, 0.0, 2.0],
+            [1.0, 1.0, 0.0],
+        ],
+        dtype=np.float32,
+    )
+    original = train_codebooks(matrix, branching_factor=3, depth=2, normalize_residuals=True)
+    npz_path, _ = write_codebooks(original, out_dir=tmp_path)
+    reloaded = load_codebooks(npz_path)
+
+    for row in matrix:
+        before = build_query_sid(row, codebooks=original)
+        after = build_query_sid(row, codebooks=reloaded)
+        assert before.sid_path == after.sid_path
+        assert before.sid_string == after.sid_string
+
+
+def test_build_query_sid_rejects_invalid_vector_shape() -> None:
+    matrix = np.asarray([[1.0, 0.0], [0.0, 1.0]], dtype=np.float32)
+    codebooks = train_codebooks(matrix, branching_factor=2, depth=1)
+
+    with pytest.raises(ValueError, match="1D"):
+        build_query_sid(np.zeros((2, 2), dtype=np.float32), codebooks=codebooks)
+    with pytest.raises(ValueError, match="dimension"):
+        build_query_sid(np.zeros(3, dtype=np.float32), codebooks=codebooks)
+    with pytest.raises(ValueError, match="1D"):
+        build_query_sid(np.asarray([], dtype=np.float32), codebooks=codebooks)
 
 
 def test_residual_kmeans_level_dataclass_is_usable_directly() -> None:
