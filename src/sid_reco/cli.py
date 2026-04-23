@@ -23,11 +23,11 @@ from sid_reco.llm import MLXTextGenerator
 from sid_reco.mlx_runtime import get_runtime_environment_summary, probe_mlx_runtime
 from sid_reco.recommendation import recommend
 from sid_reco.sid import (
-    assign_trained_residual_kmeans,
+    build_item_sids,
     build_recommendation_stats,
     encode_serialized_items_with_mlx,
     serialize_structured_items,
-    train_residual_codebooks,
+    train_codebooks,
     write_embedded_items,
     write_recommendation_stats,
     write_serialized_items,
@@ -689,7 +689,7 @@ def compile_sid_index_command(
         )
         embedded = encode_serialized_items_with_mlx(serialized_items, settings=settings)
         embedded_summary = write_embedded_items(embedded, out_dir=out_dir)
-        codebooks = train_residual_codebooks(
+        codebooks = train_codebooks(
             embedded.matrix,
             branching_factor=branching_factor,
             depth=depth,
@@ -697,14 +697,15 @@ def compile_sid_index_command(
             max_iter=max_iter,
             tolerance=tolerance,
         )
-        compiled = assign_trained_residual_kmeans(
+        items = build_item_sids(
             [item.recipe_id for item in embedded.items],
             embedded.matrix,
             codebooks=codebooks,
         )
         index_summary = write_sid_index_outputs(
             embedded=embedded,
-            compiled=compiled,
+            codebooks=codebooks,
+            items=items,
             out_dir=out_dir,
         )
         recommendation_stats = build_recommendation_stats(interactions_path)
@@ -725,10 +726,11 @@ def compile_sid_index_command(
     table.add_row("Embedding dim", str(embedded_summary.embedding_dim))
     table.add_row("Branching factor", str(branching_factor))
     table.add_row("Depth", str(depth))
-    table.add_row("Unique SIDs", str(len({item.sid_string for item in compiled.items})))
+    table.add_row("Unique SIDs", str(len({item.sid_string for item in items})))
     table.add_row("Compiled items", str(index_summary.item_count))
     table.add_row("Serialized path", str(serialized_summary.output_path))
     table.add_row("Index path", str(index_summary.index_path))
+    table.add_row("Codebooks path", str(index_summary.codebooks_path))
     table.add_row("Stats path", str(stats_summary.output_path))
     table.add_row("Stats users", str(stats_summary.user_count))
     console.print(table)
