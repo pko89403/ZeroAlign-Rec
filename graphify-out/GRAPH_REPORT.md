@@ -1,7 +1,7 @@
 # Graph Report - /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514  (2026-04-23)
 
 ## Corpus Check
-- 64 files · ~195,999 words
+- 64 files · ~196,028 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -198,9 +198,9 @@ Nodes (1): Load residual codebooks from NPZ and validate against the sibling man
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `SID recommender package.` connect `Community 1` to `Community 0`, `Community 2`, `Community 3`, `Community 5`, `Community 6`, `Community 15`?**
-  _High betweenness centrality (0.058) - this node is a cross-community bridge._
+  _High betweenness centrality (0.059) - this node is a cross-community bridge._
 - **Why does `MLXTextGenerator` connect `Community 5` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 6`?**
-  _High betweenness centrality (0.049) - this node is a cross-community bridge._
+  _High betweenness centrality (0.039) - this node is a cross-community bridge._
 - **Why does `Settings` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 5`, `Community 6`?**
   _High betweenness centrality (0.030) - this node is a cross-community bridge._
 - **Are the 99 inferred relationships involving `MLXTextGenerator` (e.g. with `_FakeTokenizer` and `_FakeTokenListTokenizer`) actually correct?**
