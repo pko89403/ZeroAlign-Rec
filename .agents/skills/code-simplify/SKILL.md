@@ -9,7 +9,7 @@ Use `code-simplification` for behavior-preserving cleanup.
 
 ## Procedure
 
-1. Read `AGENTS.md`, `README.md`, and `references/local-adaptation.md`.
+1. Read `AGENTS.md`, `README.md`, and `.agents/policies/local-adaptation.md`.
 2. Understand the current behavior before changing anything.
 3. Simplify one logical thing at a time.
 4. Re-run the smallest useful validation after each simplification.

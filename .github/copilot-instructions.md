@@ -14,7 +14,7 @@ Read in order before acting:
 2. `graphify-out/graph.json` if present — primary machine-readable codebase graph.
 3. `graphify-out/BUILD_INFO.json` — `mode=code_update` vs `full_refresh` trust signal.
 4. `AGENTS.md` — project schema, 3-layer architecture, operating principles, and skill layer overview.
-5. `references/local-adaptation.md` — domain details (tech stack, main modules, validation commands, Repo-local Codex commands like `spec`/`plan`/`build`/`test`/`ship`/`docs-manager`/`code-simplify`/`graphify-full`/`graphify-manager`) and language conventions. Takes precedence when imported skill examples conflict with this repo.
+5. `.agents/policies/local-adaptation.md` — domain details (tech stack, main modules, validation commands, Repo-local Codex commands like `spec`/`plan`/`build`/`test`/`ship`/`docs-manager`/`code-simplify`/`graphify-full`/`graphify-manager`) and language conventions. Takes precedence when imported skill examples conflict with this repo.
 6. `.agents/skills/graphify-manager/SKILL.md` — full refresh orchestration, graphify rules, and committed graph artifacts.
 
 ## Core Validation Gate

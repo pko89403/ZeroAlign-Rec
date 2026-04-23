@@ -26,7 +26,7 @@ GUARDRAIL_FILES = (
     "AGENTS.md",
     "README.md",
     "SPEC.md",
-    "references/local-adaptation.md",
+    ".agents/policies/local-adaptation.md",
 )
 SubprocessRunner = Callable[..., subprocess.CompletedProcess[str] | Any]
 

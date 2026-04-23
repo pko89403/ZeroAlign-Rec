@@ -265,9 +265,9 @@ Every deployment needs a rollback plan before it happens:
 ```
 ## See Also
 
-- For security pre-launch checks, see `references/security-checklist.md`
-- For performance pre-launch checklist, see `references/performance-checklist.md`
-- For accessibility verification before launch, see `references/accessibility-checklist.md`
+- For security pre-launch checks, see `.agents/playbooks/security.md`
+- For performance pre-launch checklist, see `.agents/playbooks/performance.md`
+- For accessibility verification before launch, see `.agents/playbooks/accessibility.md`
 
 ## Common Rationalizations
 

@@ -45,9 +45,9 @@ def test_load_guardrails_uses_repo_specific_documents(tmp_path: Path) -> None:
     (tmp_path / "AGENTS.md").write_text("# Repo Rules\nAGENTS content\n", encoding="utf-8")
     (tmp_path / "README.md").write_text("# Readme\nREADME content\n", encoding="utf-8")
     (tmp_path / "SPEC.md").write_text("# Spec\nSPEC content\n", encoding="utf-8")
-    references_dir = tmp_path / "references"
-    references_dir.mkdir()
-    (references_dir / "local-adaptation.md").write_text(
+    policies_dir = tmp_path / ".agents" / "policies"
+    policies_dir.mkdir(parents=True)
+    (policies_dir / "local-adaptation.md").write_text(
         "# Local Adaptation\nAdaptation content\n",
         encoding="utf-8",
     )

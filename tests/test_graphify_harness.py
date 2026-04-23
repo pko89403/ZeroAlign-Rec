@@ -120,7 +120,7 @@ def test_raw_readme_exists_with_source_corpus_contract() -> None:
 
     assert "정본 source corpus" in content
     assert "graphify-out/" in content
-    assert "references/" in content
+    assert ".agents/" in content
 
 
 def test_graphify_manager_skill_exists_with_full_refresh_flow() -> None:
@@ -261,7 +261,9 @@ def test_active_doc_surfaces_no_longer_point_to_legacy_wiki_paths() -> None:
 def test_pr_creation_rules_require_template_based_flow() -> None:
     claude = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
     copilot = (ROOT / ".github" / "copilot-instructions.md").read_text(encoding="utf-8")
-    local_adaptation = (ROOT / "references" / "local-adaptation.md").read_text(encoding="utf-8")
+    local_adaptation = (ROOT / ".agents" / "policies" / "local-adaptation.md").read_text(
+        encoding="utf-8"
+    )
 
     assert ".github/pull_request_template.md" in claude
     assert "gh pr create --body" in claude
