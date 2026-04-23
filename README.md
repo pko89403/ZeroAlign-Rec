@@ -384,7 +384,7 @@ Source corpus:
 - `raw/design/`
 - `raw/external/`
 
-Graphify does not treat `.agents/`, `README*`, `SPEC.md`, or `CLAUDE.md`/`AGENTS.md` as source input.
+Graphify does not treat `.agents/`, `README*`, or `CLAUDE.md`/`AGENTS.md` as source input. Issue-scoped specs under `raw/design/specs/ski-NNN-*.md` are part of the source corpus.
 
 ## Copilot and Agent Harness
 
