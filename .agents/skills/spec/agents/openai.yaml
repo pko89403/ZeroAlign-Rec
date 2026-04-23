@@ -1,5 +1,5 @@
 interface:
   display_name: "Spec"
   short_description: "Write a structured spec before implementation"
-  default_prompt: "Use $spec to produce a repository-specific SPEC.md before implementation starts."
+  default_prompt: "Use $spec to produce a repository-specific issue-scoped spec under raw/design/specs/ski-NNN-<slug>.md before implementation starts."
 

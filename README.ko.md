@@ -342,7 +342,7 @@ source corpus:
 - `raw/design/`
 - `raw/external/`
 
-Graphify 입력에는 `.agents/`, `README*`, `SPEC.md`, `CLAUDE.md`/`AGENTS.md`가 포함되지 않는다.
+Graphify 입력에는 `.agents/`, `README*`, `CLAUDE.md`/`AGENTS.md`가 포함되지 않는다. 이슈 단위 스펙은 `raw/design/specs/ski-NNN-*.md`에 두고 source corpus의 일부로 취급한다.
 
 ## Copilot 및 Agent 하네스
 
