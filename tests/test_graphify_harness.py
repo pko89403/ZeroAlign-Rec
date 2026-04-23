@@ -106,23 +106,13 @@ def test_claude_active_surface_no_longer_keeps_full_legacy_workflow() -> None:
     assert "docs/wiki" not in content
     assert "docs/sources" not in content
     assert "raw/" in content
-    assert "graphify-manager" in content
 
 
-def test_claude_contains_upstream_graphify_baseline_with_local_overrides() -> None:
-    content = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+def test_claude_delegates_graphify_details_to_graphify_manager_skill() -> None:
+    claude = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 
-    assert "## graphify" in content
-    assert "This project has a graphify knowledge graph at `graphify-out/`." in content
-    assert (
-        "Before answering architecture or codebase questions, read "
-        "`graphify-out/GRAPH_REPORT.md` for god nodes and community structure." in content
-    )
-    assert "Project overrides:" in content
-    assert "scripts/graphify_code_refresh.sh" in content
-    assert "graphify-out/BUILD_INFO.json" in content
-    assert "raw/" in content
-    assert "graphify-out/wiki/index.md" not in content
+    assert ".agents/skills/graphify-manager/SKILL.md" in claude
+    assert "graphify-out/wiki/index.md" not in claude
 
 
 def test_raw_readme_exists_with_source_corpus_contract() -> None:
@@ -148,6 +138,10 @@ def test_graphify_manager_skill_exists_with_full_refresh_flow() -> None:
     assert "verify gate" in content
     assert "auto-refresh the graph after relevant local edits" in content
     assert "raw/design/adr" in content
+    assert "graphify-out/BUILD_INFO.json" in content
+    assert "graph.html" in content
+    assert "GRAPH_REPORT.md" in content
+    assert "graphify update ." in content
 
 
 def test_graphify_full_wrapper_skill_exists() -> None:
