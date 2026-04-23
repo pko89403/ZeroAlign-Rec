@@ -182,6 +182,11 @@ def _load_id_map(id_map_path: Path) -> list[dict[str, Any]]:
             or not all(isinstance(value, int) for value in sid_path_raw)
         ):
             raise ValueError(f"SID id map line {line_number} has invalid required fields.")
+        expected_sid_string = "-".join(f"<{int(value)}>" for value in sid_path_raw)
+        if expected_sid_string != sid_string:
+            raise ValueError(
+                f"SID id map line {line_number} has inconsistent sid_path and sid_string."
+            )
         entries.append(
             {
                 "faiss_idx": faiss_idx,
