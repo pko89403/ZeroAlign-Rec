@@ -27,12 +27,6 @@
 
 이 둘은 **drift detection 용도**로만 유지한다. 업스트림 변경이 이 repo에 영향이 있는지 주기적으로 대조할 때 사용한다. 운영 규칙은 `local-adaptation.md`와 `CLAUDE.md`가 정본이다.
 
-## Skill-anatomy reference
-
-| 파일 | 용도 |
-|------|------|
-| [`skill-anatomy.md`](skill-anatomy.md) | 새 skill을 쓸 때 `SKILL.md` 구조 규약 참고 |
-
 ## 정책
 
 - 새 체크리스트를 추가할 때는 이 README의 Checklists 표도 함께 갱신한다.
