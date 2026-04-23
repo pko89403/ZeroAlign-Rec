@@ -138,6 +138,7 @@ def recommend(
             total_passes=len(rerank_result.passes),
         ),
         selected_candidate_indices=selected_candidate_indices,
+        query_sid=search_result.query_sid,
     )
 
 

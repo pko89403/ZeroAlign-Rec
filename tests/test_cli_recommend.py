@@ -67,6 +67,8 @@ def test_recommend_cli_returns_ranked_items(tmp_path: Path, monkeypatch) -> None
     assert "Tomato Pasta" in result.stdout
     assert "Veggie Pasta" in result.stdout
     assert "Top candidate support: 3/3" in result.stdout
+    assert "Query SID:" in result.stdout
+    assert "<0>" in result.stdout
 
 
 class _FakeEncoder:

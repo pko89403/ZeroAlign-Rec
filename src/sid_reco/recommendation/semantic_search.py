@@ -13,6 +13,7 @@ import numpy as np
 
 from sid_reco.recommendation.stats_store import load_recommendation_stats_store
 from sid_reco.recommendation.types import InterestSketch, RecommendationRequest
+from sid_reco.sid.compiler import QuerySID, build_query_sid, load_codebooks
 from sid_reco.sid.serialization import serialize_taxonomy_text
 from sid_reco.taxonomy.item_projection import load_taxonomy_master_dictionary
 
@@ -30,6 +31,7 @@ class SemanticCandidate:
     faiss_idx: int
     recipe_id: int
     sid_string: str
+    sid_path: tuple[int, ...]
     score: float
     serialized_text: str
     taxonomy: Mapping[str, tuple[str, ...]]
@@ -50,6 +52,7 @@ class SemanticSearchResult:
     """Semantic retrieval output ready for Module 2.3."""
 
     query_text: str
+    query_sid: QuerySID
     candidates: tuple[SemanticCandidate, ...]
     dropped_candidates: tuple[DroppedCandidate, ...]
     retrieved_count: int
@@ -82,9 +85,15 @@ def search_semantic_candidates(
     if not query_text:
         raise ValueError("Interest sketch did not produce a taxonomy-aligned retrieval query.")
 
-    query_matrix = _normalize_query_matrix(
-        np.asarray(encoder.encode([query_text]), dtype=np.float32)
-    )
+    codebooks = load_codebooks(sid_index_dir / "residual_codebooks.npz")
+
+    raw_vector = np.asarray(encoder.encode([query_text]), dtype=np.float32)
+    if raw_vector.ndim != 2 or raw_vector.shape[0] != 1:
+        raise ValueError("Semantic search encoder must return exactly one query vector.")
+
+    query_matrix = _normalize_query_matrix(raw_vector)
+    query_sid = build_query_sid(raw_vector[0], codebooks=codebooks)
+
     index = faiss.read_index(str(sid_index_dir / "item_index.faiss"))
     score_matrix, idx_matrix = index.search(query_matrix, retrieval_k)
 
@@ -113,6 +122,7 @@ def search_semantic_candidates(
                 faiss_idx=faiss_idx,
                 recipe_id=mapped["recipe_id"],
                 sid_string=mapped["sid_string"],
+                sid_path=mapped["sid_path"],
                 score=float(raw_score),
                 serialized_text=serialized_item["serialized_text"],
                 taxonomy=serialized_item["taxonomy"],
@@ -127,6 +137,7 @@ def search_semantic_candidates(
     final_candidates = tuple(survivors[:survivor_k])
     return SemanticSearchResult(
         query_text=query_text,
+        query_sid=query_sid,
         candidates=final_candidates,
         dropped_candidates=tuple(dropped),
         retrieved_count=sum(1 for value in idx_matrix[0] if int(value) >= 0),
@@ -136,8 +147,6 @@ def search_semantic_candidates(
 
 
 def _normalize_query_matrix(matrix: np.ndarray) -> np.ndarray:
-    if matrix.ndim != 2 or matrix.shape[0] != 1:
-        raise ValueError("Semantic search encoder must return exactly one query vector.")
     row_norms = np.linalg.norm(matrix, axis=1, keepdims=True)
     if float(row_norms[0][0]) == 0.0:
         raise ValueError("Semantic search query vector must be non-zero.")
@@ -164,13 +173,23 @@ def _load_id_map(id_map_path: Path) -> list[dict[str, Any]]:
         faiss_idx = parsed.get("faiss_idx")
         recipe_id = parsed.get("recipe_id")
         sid_string = parsed.get("sid_string")
+        sid_path_raw = parsed.get("sid_path")
         if (
             not isinstance(faiss_idx, int)
             or not isinstance(recipe_id, int)
             or not isinstance(sid_string, str)
+            or not isinstance(sid_path_raw, list)
+            or not all(isinstance(value, int) for value in sid_path_raw)
         ):
             raise ValueError(f"SID id map line {line_number} has invalid required fields.")
-        entries.append({"faiss_idx": faiss_idx, "recipe_id": recipe_id, "sid_string": sid_string})
+        entries.append(
+            {
+                "faiss_idx": faiss_idx,
+                "recipe_id": recipe_id,
+                "sid_string": sid_string,
+                "sid_path": tuple(int(value) for value in sid_path_raw),
+            }
+        )
     entries.sort(key=lambda entry: int(entry["faiss_idx"]))
     return entries
 

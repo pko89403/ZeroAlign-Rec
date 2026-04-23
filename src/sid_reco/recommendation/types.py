@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 
+from sid_reco.sid.compiler import QuerySID
 from sid_reco.taxonomy.dictionary import _to_snake_case
 
 
@@ -60,6 +61,7 @@ class RecommendationResponse:
     rerank_summary: str
     confidence_summary: str
     selected_candidate_indices: tuple[int, ...]
+    query_sid: QuerySID
 
 
 def normalize_recommendation_request(

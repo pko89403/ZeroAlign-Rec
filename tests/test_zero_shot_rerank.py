@@ -170,6 +170,7 @@ def _make_candidate(
         faiss_idx=faiss_idx,
         recipe_id=recipe_id,
         sid_string=sid_string,
+        sid_path=(faiss_idx,),
         score=score,
         serialized_text=f"course: dinner, cuisine: {cuisine}",
         taxonomy={"course": ("dinner",), "cuisine": (cuisine,)},

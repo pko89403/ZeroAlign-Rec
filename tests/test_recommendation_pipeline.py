@@ -100,6 +100,8 @@ def test_recommend_returns_grounded_ranked_items(tmp_path: Path) -> None:
     assert response.selected_candidate_indices == (1, 2)
     assert "example case-italian" in response.rerank_summary
     assert "Top candidate support: 3/3" in response.confidence_summary
+    assert response.query_sid.sid_string == "<0>"
+    assert response.query_sid.sid_path == (0,)
 
 
 def _extract_json_block(prompt: str, marker: str) -> list[dict[str, object]]:
