@@ -386,7 +386,7 @@ function FinalDelivery({ L, conf }) {
                 </div>
                 <div className="final-bottom">
                   <span>{L.final.bootstrap(item.bootstrap_support)}</span>
-                  <span className="final-sid">{item.sid}</span>
+                  <span className="final-sid">{item.sid_string}</span>
                 </div>
               </div>
             </div>
@@ -454,7 +454,8 @@ function JsonTab({ L, result, topK }) {
     },
     items: result.conf.items.map(i => ({
       recipe_id: i.recipe.id,
-      sid_string: i.sid,
+      sid_string: i.sid_string,
+      sid_path: i.sid_path,
       rank: i.rank,
       title: i.recipe.title,
       rationale: i.rationale,
@@ -466,6 +467,7 @@ function JsonTab({ L, result, topK }) {
       popularity: i.recipe.popularity,
       cooccurrence_with_history: i.recipe.cooccurrence,
     })),
+    query_sid: result.conf.query_sid,
     rerank_summary: L.json.rerankSummary(topK),
     confidence_summary: result.conf.items.every(i => i.confidence_band === "HIGH") ? L.json.confAllHigh : L.json.confMixed,
     selected_candidate_indices: result.conf.items.map(i => i.idx),
