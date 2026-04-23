@@ -9,7 +9,7 @@ Use `shipping-and-launch` for repository release checks.
 
 ## Procedure
 
-1. Read `references/local-adaptation.md`.
+1. Read `.agents/policies/local-adaptation.md`.
 2. Verify code quality:
    - `uv run pytest`
    - `uv run ruff check .`

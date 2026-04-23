@@ -1,7 +1,7 @@
-# Graph Report - /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514  (2026-04-23)
+# Graph Report - /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco  (2026-04-23)
 
 ## Corpus Check
-- 64 files · ~196,028 words
+- 64 files · ~195,008 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -52,15 +52,15 @@
 
 ## Surprising Connections (you probably didn't know these)
 - `_interaction()` --rationale_for--> `제약`  [INFERRED]
-  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514/tests/test_foodcom_dataset.py → raw/design/adr/adr-003-neighbor-context-retrieval.md
+  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/tests/test_foodcom_dataset.py → raw/design/adr/adr-003-neighbor-context-retrieval.md
 - `MLXTextGenerator` --rationale_for--> `Context`  [INFERRED]
-  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514/src/sid_reco/llm.py → raw/design/adr/adr-002-foodcom-preprocessing-policy.md
+  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/src/sid_reco/llm.py → raw/design/adr/adr-002-foodcom-preprocessing-policy.md
 - `MLXTextGenerator` --rationale_for--> `부정적/제약`  [INFERRED]
-  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514/src/sid_reco/llm.py → raw/design/adr/adr-004-taxonomy-dictionary-generation.md
+  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/src/sid_reco/llm.py → raw/design/adr/adr-004-taxonomy-dictionary-generation.md
 - `main()` --rationale_for--> `Context`  [INFERRED]
-  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514/src/sid_reco/cli.py → raw/design/adr/adr-005-taxonomy-dictionary-hardening.md
+  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/src/sid_reco/cli.py → raw/design/adr/adr-005-taxonomy-dictionary-hardening.md
 - `doctor()` --rationale_for--> `Context`  [INFERRED]
-  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514/src/sid_reco/cli.py → raw/design/adr/adr-005-taxonomy-dictionary-hardening.md
+  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/src/sid_reco/cli.py → raw/design/adr/adr-005-taxonomy-dictionary-hardening.md
 
 ## Communities
 
@@ -199,10 +199,10 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `SID recommender package.` connect `Community 1` to `Community 0`, `Community 2`, `Community 3`, `Community 5`, `Community 6`, `Community 15`?**
   _High betweenness centrality (0.059) - this node is a cross-community bridge._
-- **Why does `MLXTextGenerator` connect `Community 5` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 6`?**
-  _High betweenness centrality (0.039) - this node is a cross-community bridge._
 - **Why does `Settings` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 5`, `Community 6`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
+  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+- **Why does `MLXTextGenerator` connect `Community 5` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 6`?**
+  _High betweenness centrality (0.036) - this node is a cross-community bridge._
 - **Are the 99 inferred relationships involving `MLXTextGenerator` (e.g. with `_FakeTokenizer` and `_FakeTokenListTokenizer`) actually correct?**
   _`MLXTextGenerator` has 99 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 92 inferred relationships involving `Context` (e.g. with `main()` and `doctor()`) actually correct?**

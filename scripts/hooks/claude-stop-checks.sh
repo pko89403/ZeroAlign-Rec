@@ -15,11 +15,5 @@ uv run ruff check .
 echo "claude stop: uv run ruff format --check ."
 uv run ruff format --check .
 
-echo "claude stop: uv run mypy src"
-uv run mypy src
-
-echo "claude stop: uv run pytest --ignore=tests/test_mlx_runtime.py --ignore=tests/test_cli_smoke_mlx.py --ignore=tests/test_graphify_auto_refresh.py"
-uv run pytest \
-  --ignore=tests/test_mlx_runtime.py \
-  --ignore=tests/test_cli_smoke_mlx.py \
-  --ignore=tests/test_graphify_auto_refresh.py
+# mypy/pytest는 pre-push.sh에만 유지 — Stop hook은 fire-and-forget(핫패스)이라
+# 무거운 게이트는 회피. 매 턴마다 돌리는 비용 대비 차단 효과가 없음.

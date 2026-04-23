@@ -100,6 +100,8 @@ This copies the verified staged artifacts into root `graphify-out/`.
 - `raw/` is the only source corpus for full refresh.
 - Keep Graphify version pinned through the repository scripts and metadata.
 - If full refresh fails verification, report which required documentation sources were missing from the graph.
+- Committed Graphify artifacts: `graph.html`, `GRAPH_REPORT.md`, `graph.json`, `BUILD_INFO.json`.
+- Do not invoke raw `graphify update .` as a substitute for this workflow. That command is AST-only and bypasses the staged producer path.
 
 ## Related
 
