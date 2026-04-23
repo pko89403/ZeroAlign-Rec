@@ -77,7 +77,7 @@ uv run sid-reco compile-sid-index --help
 공식 Codex App built-in slash command와는 별개로, enabled skill은 slash 목록에 나타날 수 있다.
 
 - `/docs-manager` 또는 `/doc-manager` — `raw/` source corpus 관리와 `README.md`, `AGENTS.md`, `.github/copilot-instructions.md`, `.agents/policies/local-adaptation.md` 동기화를 포함한 문서 반영 루틴
-- `/spec` — 구현 전에 `SPEC.md`를 정리하는 spec-driven workflow
+- `/spec` — 구현 전에 `raw/design/specs/ski-NNN-*.md`를 정리하는 spec-driven workflow (이슈 단위 1 파일)
 - `/plan` — spec-driven workflow 후속 작업 분해
 - `/build` — incremental-implementation + TDD 기반 구현 흐름
 - `/test` — TDD / Prove-It 기반 검증 흐름
@@ -89,14 +89,14 @@ uv run sid-reco compile-sid-index --help
 
 ## Output Locations
 
-- 스펙: `SPEC.md`
+- 스펙: `raw/design/specs/ski-NNN-*.md` (이슈 단위 1 파일, ADR 네이밍 규약과 동일 패턴)
 - primary graph artifact: `graphify-out/`
 - source corpus: `raw/`
 
 ## Language Conventions
 
 - `raw/design/**` 문서는 한국어로 유지한다.
-- `SPEC.md`, `tasks/plan.md`, `tasks/todo.md`는 신규 작성 또는 의미있는 개정 시 한국어로 작성한다. 기존 영어 내용은 즉시 번역할 의무는 없다.
+- `raw/design/specs/**`, `tasks/plan.md`, `tasks/todo.md`는 신규 작성 또는 의미있는 개정 시 한국어로 작성한다. 기존 영어 내용은 즉시 번역할 의무는 없다.
 
 > graphify orchestration 세부(실행 경로, 커밋 산출물, BUILD_INFO trust signal, hooks auto-refresh 동작 등)는 [`.agents/skills/graphify-manager/SKILL.md`](../.agents/skills/graphify-manager/SKILL.md)를 참조한다.
 
