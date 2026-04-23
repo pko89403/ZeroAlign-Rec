@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 
 from sid_reco.recommendation import recommend
-from sid_reco.sid.compiler import CompiledSIDItem, CompiledSIDItems, ResidualKMeansLevel
+from sid_reco.sid.compiler import ItemSID, ResidualKMeansLevel, TrainedResidualCodebooks
 from sid_reco.sid.embed_backend import EmbeddedSIDItems
 from sid_reco.sid.indexing import write_sid_index_outputs
 from sid_reco.sid.serialization import SerializedSIDItem, write_serialized_items
@@ -152,15 +152,11 @@ def _write_recommendation_bundle(tmp_path: Path) -> dict[str, Path]:
         embedding_dim=3,
         model_id="test-embed-model",
     )
-    compiled = CompiledSIDItems(
-        items=[
-            CompiledSIDItem(recipe_id=101, sid_path=(0,), sid_string="<0>"),
-            CompiledSIDItem(recipe_id=102, sid_path=(1,), sid_string="<1>"),
-            CompiledSIDItem(recipe_id=103, sid_path=(0,), sid_string="<0>"),
-        ],
+    codebooks = TrainedResidualCodebooks(
         branching_factor=2,
         depth=1,
         embedding_dim=3,
+        normalize_residuals=True,
         levels=(
             ResidualKMeansLevel(
                 level=1,
@@ -172,7 +168,17 @@ def _write_recommendation_bundle(tmp_path: Path) -> dict[str, Path]:
             ),
         ),
     )
-    write_sid_index_outputs(embedded=embedded, compiled=compiled, out_dir=sid_index_dir)
+    sid_items = [
+        ItemSID(sid_path=(0,), sid_string="<0>", recipe_id=101),
+        ItemSID(sid_path=(1,), sid_string="<1>", recipe_id=102),
+        ItemSID(sid_path=(0,), sid_string="<0>", recipe_id=103),
+    ]
+    write_sid_index_outputs(
+        embedded=embedded,
+        codebooks=codebooks,
+        items=sid_items,
+        out_dir=sid_index_dir,
+    )
 
     taxonomy_path.write_text(
         json.dumps(
