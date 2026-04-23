@@ -66,12 +66,13 @@ def test_compile_sid_index_cli_writes_all_outputs(tmp_path: Path, monkeypatch) -
             "2",
             "--no-normalize-residuals",
         ],
+        env={"COLUMNS": "240"},
     )
 
     assert result.exit_code == 0, result.stdout
     assert "SID Compilation Index" in result.stdout
     assert "Codebooks path" in result.stdout
-    assert "residual_codebooks.npz" in result.stdout
+    assert str(out_dir / "residual_codebooks.npz") in result.stdout
     assert (out_dir / "serialized_items.jsonl").exists()
     assert (out_dir / "embeddings.npy").exists()
     assert (out_dir / "embedding_manifest.json").exists()

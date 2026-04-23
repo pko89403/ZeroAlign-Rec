@@ -248,7 +248,7 @@ def load_codebooks(npz_path: Path) -> TrainedResidualCodebooks:
         )
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    with np.load(npz_path) as data:
+    with np.load(npz_path, allow_pickle=False) as data:
         keys = set(data.files)
         for required_scalar in (
             "branching_factor",
@@ -335,10 +335,11 @@ def _validate_manifest_against_npz(
         )
     field_expectations: dict[str, object] = {
         "branching_factor": branching_factor,
+        "codebooks_path": npz_path.name,
         "depth": depth,
         "embedding_dim": embedding_dim,
-        "normalize_residuals": normalize_residuals,
         "level_cluster_counts": level_cluster_counts,
+        "normalize_residuals": normalize_residuals,
     }
     for field, expected in field_expectations.items():
         if field not in manifest:
