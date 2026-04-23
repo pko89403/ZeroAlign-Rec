@@ -157,6 +157,37 @@ def build_item_sids(
     ]
 
 
+def build_query_sid(
+    vector: NDArray[np.float32],
+    *,
+    codebooks: TrainedResidualCodebooks,
+) -> QuerySID:
+    """Assign a hierarchical SID path to a single runtime query vector."""
+    raw_vector = np.asarray(vector, dtype=np.float32)
+    if raw_vector.ndim != 1 or raw_vector.shape[0] == 0:
+        raise ValueError("Query vector must be a non-empty 1D array.")
+    if int(raw_vector.shape[0]) != codebooks.embedding_dim:
+        raise ValueError("Query vector dimension must match the trained codebooks.")
+    if len(codebooks.levels) != codebooks.depth:
+        raise ValueError("Trained codebooks depth must match the number of stored levels.")
+
+    current_residuals = raw_vector.reshape(1, -1).astype(np.float32, copy=True)
+    sid_path: list[int] = []
+    for level in codebooks.levels:
+        level_inputs = _prepare_level_inputs(
+            current_residuals,
+            normalize_residuals=codebooks.normalize_residuals,
+        )
+        labels = _assign_to_centroids(level_inputs, level.centroids)
+        sid_path.append(int(labels[0]))
+        current_residuals = level_inputs - level.centroids[labels]
+
+    return QuerySID(
+        sid_path=tuple(sid_path),
+        sid_string=_format_sid(sid_path),
+    )
+
+
 def write_codebooks(
     codebooks: TrainedResidualCodebooks,
     *,
