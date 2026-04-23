@@ -2,13 +2,14 @@ import json
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from sid_reco.recommendation import (
     InterestSketch,
     normalize_recommendation_request,
     search_semantic_candidates,
 )
-from sid_reco.sid.compiler import CompiledSIDItem, CompiledSIDItems, ResidualKMeansLevel
+from sid_reco.sid.compiler import ItemSID, ResidualKMeansLevel, TrainedResidualCodebooks
 from sid_reco.sid.embed_backend import EmbeddedSIDItems
 from sid_reco.sid.indexing import write_sid_index_outputs
 from sid_reco.sid.serialization import SerializedSIDItem, write_serialized_items
@@ -56,6 +57,10 @@ def test_search_semantic_candidates_returns_enriched_survivors(tmp_path: Path) -
     assert result.survivor_count == 2
     assert result.retrieved_count == 3
     assert result.low_coverage is False
+    assert result.query_sid.sid_string == "<0>"
+    assert result.query_sid.sid_path == (0,)
+    assert [candidate.sid_path for candidate in result.candidates] == [(0,), (0,)]
+    assert [candidate.sid_string for candidate in result.candidates] == ["<0>", "<0>"]
 
 
 def test_search_semantic_candidates_filters_disallowed_items(tmp_path: Path) -> None:
@@ -87,6 +92,38 @@ def test_search_semantic_candidates_filters_disallowed_items(tmp_path: Path) -> 
     assert [candidate.recipe_id for candidate in result.candidates] == [103]
     assert [candidate.recipe_id for candidate in result.dropped_candidates] == [101, 102]
     assert result.low_coverage is True
+    assert result.query_sid.sid_path == (0,)
+    assert result.candidates[0].sid_path == (0,)
+
+
+def test_search_semantic_candidates_raises_when_codebook_missing(tmp_path: Path) -> None:
+    sid_index_dir, taxonomy_path, stats_path = _write_semantic_search_bundle(tmp_path)
+    (sid_index_dir / "residual_codebooks.npz").unlink()
+
+    request = normalize_recommendation_request(
+        query="dinner",
+        hard_filters={"course": ["dinner"]},
+    )
+    sketch = InterestSketch(
+        summary="dinner",
+        positive_facets=("dinner",),
+        negative_facets=(),
+        hard_filters=request.hard_filters,
+        ambiguity_notes=(),
+        taxonomy_values={"course": ("dinner",), "cuisine": ("italian",)},
+    )
+
+    with pytest.raises(FileNotFoundError, match="compile-sid-index"):
+        search_semantic_candidates(
+            request,
+            sketch,
+            sid_index_dir=sid_index_dir,
+            taxonomy_dictionary_path=taxonomy_path,
+            stats_path=stats_path,
+            encoder=_FakeEncoder(),
+            retrieval_k=3,
+            survivor_k=2,
+        )
 
 
 def _write_semantic_search_bundle(tmp_path: Path) -> tuple[Path, Path, Path]:
@@ -129,15 +166,11 @@ def _write_semantic_search_bundle(tmp_path: Path) -> tuple[Path, Path, Path]:
         embedding_dim=3,
         model_id="test-embed-model",
     )
-    compiled = CompiledSIDItems(
-        items=[
-            CompiledSIDItem(recipe_id=101, sid_path=(0,), sid_string="<0>"),
-            CompiledSIDItem(recipe_id=102, sid_path=(1,), sid_string="<1>"),
-            CompiledSIDItem(recipe_id=103, sid_path=(0,), sid_string="<0>"),
-        ],
+    codebooks = TrainedResidualCodebooks(
         branching_factor=2,
         depth=1,
         embedding_dim=3,
+        normalize_residuals=True,
         levels=(
             ResidualKMeansLevel(
                 level=1,
@@ -149,7 +182,17 @@ def _write_semantic_search_bundle(tmp_path: Path) -> tuple[Path, Path, Path]:
             ),
         ),
     )
-    write_sid_index_outputs(embedded=embedded, compiled=compiled, out_dir=sid_index_dir)
+    sid_items = [
+        ItemSID(sid_path=(0,), sid_string="<0>", recipe_id=101),
+        ItemSID(sid_path=(1,), sid_string="<1>", recipe_id=102),
+        ItemSID(sid_path=(0,), sid_string="<0>", recipe_id=103),
+    ]
+    write_sid_index_outputs(
+        embedded=embedded,
+        codebooks=codebooks,
+        items=sid_items,
+        out_dir=sid_index_dir,
+    )
 
     taxonomy_path.write_text(
         json.dumps(

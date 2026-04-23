@@ -48,6 +48,7 @@ from sid_reco.recommendation.zero_shot_rerank import (
     parse_rerank_response,
     run_bootstrap_rerank,
 )
+from sid_reco.sid.compiler import QuerySID
 
 __all__ = [
     "BootstrapRerankPass",
@@ -61,6 +62,7 @@ __all__ = [
     "InterestSketchPromptBundle",
     "DroppedCandidate",
     "ParsedRerankResponse",
+    "QuerySID",
     "RecommendedItem",
     "RecommendationStatsStore",
     "RecommendationRequest",

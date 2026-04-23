@@ -222,9 +222,36 @@ const dcgWeight = pos => 1 / Math.log2(pos + 2);
 
 const mscpBand = mscp => mscp >= 0.8 ? "HIGH" : mscp >= 0.5 ? "MEDIUM" : "LOW";
 
+// Deterministic 0..255 token hash — mock-only stand-in for a residual codebook
+// level. Never compared against real Phase 1 artifacts.
+function hashToken(token) {
+  let hash = 0;
+  const str = String(token ?? "any");
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
+  }
+  return hash & 0xff;
+}
+
 function buildSid(recipe) {
+  const cuisine = recipe.cuisine.toLowerCase();
+  const dish = recipe.dish;
   const flavor = recipe.flavors?.[0] ?? "default";
-  return `SID::${recipe.cuisine.toLowerCase()}::${recipe.dish}::${flavor}::${recipe.id}`;
+  return {
+    sid_string: `SID::${cuisine}::${dish}::${flavor}::${recipe.id}`,
+    sid_path: [hashToken(cuisine), hashToken(dish), hashToken(flavor)],
+  };
+}
+
+function buildQuerySid(sketch) {
+  const pick = facet => (sketch.positive_facets?.[facet]?.[0] ?? "any");
+  const cuisine = pick("cuisine");
+  const dish = pick("dish_type");
+  const flavor = pick("flavor_profile");
+  return {
+    sid_string: `QSID::${cuisine}::${dish}::${flavor}`,
+    sid_path: [hashToken(cuisine), hashToken(dish), hashToken(flavor)],
+  };
 }
 
 window.computeConfidenceAndGround = function (candidates, rerankResult, topK = 3) {
@@ -251,6 +278,7 @@ window.computeConfidenceAndGround = function (candidates, rerankResult, topK = 3
       const appearTopK = rerankResult.passes.filter(p => p.slice(0, topK).includes(entry.idx)).length;
       const bootstrap  = rerankResult.passes.filter(p => p.includes(entry.idx)).length;
       const mscp       = appearTopK / totalPasses;
+      const sid        = buildSid(recipe);
 
       return {
         rank:               rank + 1,
@@ -262,7 +290,8 @@ window.computeConfidenceAndGround = function (candidates, rerankResult, topK = 3
         confidence_band:    mscpBand(mscp),
         bootstrap_support:  bootstrap,
         mapping_mode:       "direct (id_map.jsonl)",
-        sid:                buildSid(recipe),
+        sid_string:         sid.sid_string,
+        sid_path:           sid.sid_path,
       };
     })
     .filter(Boolean);
@@ -296,7 +325,8 @@ window.runPipeline = function ({ query, liked, disliked, hardFilters, topK = 3 }
   const rerank = window.zeroShotRerank(search.top30, sketch, { passes: 5 });
   const t3 = performance.now();
 
-  const conf = window.computeConfidenceAndGround(search.top30, rerank, topK);
+  const confResult = window.computeConfidenceAndGround(search.top30, rerank, topK);
+  const conf = { ...confResult, query_sid: buildQuerySid(sketch) };
   const t4 = performance.now();
 
   return {

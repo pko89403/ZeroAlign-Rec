@@ -1,386 +1,228 @@
-# Spec: Phase 2 - Modular 100% Training-Free LLM Recommendation Engine
-
-## Assumptions I'm Making
+# 스펙: SKI-10 — Query-SID 런타임 재현
 
-1. This feature starts **after Phase 1** and depends on `data/processed/foodcom/sid_index/` produced by `compile-sid-index`.
-2. The recommendation engine must remain **100% training-free**:
-   - no collaborative filtering
-   - no supervised ranker
-   - no fine-tuning
-   - no gradient updates
-3. The online system may use only:
-   - pre-trained LLM capabilities already supported by this repository
-   - Phase 1 FAISS and sidecar artifacts
-   - deterministic runtime filters and mapping logic
-4. The initial external contract must include **both**:
-   - a Python library API
-   - a CLI command
-5. The Phase 2 design should be explicit at the module level rather than described as one opaque end-to-end pipeline.
-6. The user wants the feature organized as four modules:
-   - **Module 2.1: proactive control and user-interest sketch**
-   - **Module 2.2: pure semantic search and hard filtering**
-   - **Module 2.3: explainable zero-shot reranking**
-   - **Module 2.4: confidence verification and elastic mapping**
-7. The recommendation response must return ranked items plus structured explanation fields and downstream-inspectable rationale.
-8. Hallucination policy, position-bias policy, and persistent trace artifacts are still open questions and should remain visible in the spec.
-9. Offline benchmarking/report generation is mostly out of scope for V1.
+## 가정 (Assumptions I'm Making)
 
-## Objective
+1. 이 기능은 기존 Phase 1 `compile-sid-index`와 Phase 2 `recommend` 파이프라인 위에서 동작한다. 둘 다 이미 구현되어 운영 중이다.
+2. `train_codebooks`가 학습한 residual K-means quantizer(`TrainedResidualCodebooks`)는 현재 할당 직후 버려진다. 이 스펙은 이 quantizer에 1급 저장과 런타임 재사용을 부여한다.
+3. 런타임 query는 catalog item과 **같은 SID 공간**에 떨어져야 한다 — 같은 codebook, 같은 정규화 규칙, 같은 residual 시퀀스. 그렇지 않으면 `query_sid`를 item SID와 비교할 수 없다.
+4. `apps/demo`는 실제 Phase 1 artifact를 읽지 않는 브라우저-로컬 mock 파이프라인이다. 이 스펙은 데이터 소스가 아니라 계약 shape만 조정한다.
+5. 기존 `id_map.jsonl`은 이미 item별 `sid_path`를 기록한다. 런타임은 현재 `sid_string`만 로드한다. 이 스펙은 `sid_path`를 검증하고 파이프라인 전체에 보존한다.
+6. 이 스펙은 retrieval score, adaptive radius, bootstrap rerank 정책, confidence aggregation을 수정하지 않는다. 이들은 명시적으로 범위 밖이고 후속 이슈로 남긴다.
+7. 분할 PR보다 단일 PR을 선호한다 — 타입 리팩터와 런타임 재현은 같은 주제다.
+8. 기본 출력 디렉터리 `data/processed/foodcom/sid_index/`는 이미 `data/processed/*`로 `.gitignore` 처리되어 있다. 이 스펙은 새 gitignore 규칙을 추가하지 않는다.
 
-Build the first usable online recommendation engine for this repository so that user intent can be converted into ranked recommendations **without any recommendation-model training**.
+## 목표 (Objective)
 
-This feature should turn the existing Phase 1 offline artifact layer into a runtime engine that:
+런타임 추천 query를 retrieval 대상 catalog item과 재현 가능하게 같은 계층적 SID 공간에 떨어지게 만들고, 그 할당을 추천 응답의 1급 필드로 노출한다.
 
-1. interprets sparse or messy user intent
-2. turns that intent into a structured interest sketch
-3. retrieves candidates through pure semantic search over the Phase 1 vector substrate
-4. applies deterministic hard filters
-5. re-ranks the surviving candidates with LLM reasoning
-6. returns structured recommendation results with explanation and confidence signals
+구체적으로:
 
-The product goal is not just "search plus LLM output." It is a **modular training-free recommender** whose decision points remain inspectable.
+1. `compile-sid-index`가 학습한 residual K-means quantizer를 런타임 artifact(`residual_codebooks.npz` + `residual_codebooks_manifest.json`)로 저장한다.
+2. `recommend` 내부에서 이 quantizer를 로드하고, taxonomy-aligned query 벡터를 **컴파일 시점과 완전히 동일한 residual 정규화 규칙**으로 계층적 SID path에 할당한다.
+3. 결과 `query_sid`를 `SemanticSearchResult`, `RecommendationResponse`, `recommend` CLI, `apps/demo` mock 파이프라인 shape에 노출한다.
+4. 그 과정에서 SID 타입 레이어를 정리해 `ItemSID` / `QuerySID` 두 구체 타입만 남기고, 중복된 `CompiledSIDItems` 번들 타입과 장황한 함수명을 제거한다.
 
-### User-facing intent
+제품 효과는 모든 추천 응답이 query 자신의 SID 좌표를 함께 가지고 나가는 것이다. 이는 향후 query-SID locality를 활용하는 검색 반경·그룹 confidence·rerank prior 작업(명시적으로 유보)의 기초가 된다.
 
-Given:
-
-- a Phase 1 `sid_index/` directory
-- catalog metadata such as `recipes.csv`
-- a user request expressed as free text, item likes/dislikes, and optional hard constraints
+## 비목표 (Non-Goals)
 
-the maintainer should be able to run one command or call one API and obtain:
+이 스펙은 **다음을 포함하지 않는다**:
 
-- ranked recommendations from the existing catalog
-- structured explanation fields per item
-- a rationale for the final order
-- a confidence-oriented signal indicating whether the result set is strong, weak, or semantically stretched
+- `query_sid` 기반 FAISS score·retrieval `k`·survivor cap 조정
+- `query_sid` 근접성에 연동된 adaptive 검색 반경
+- SID-group confidence aggregation
+- bootstrap rerank pass 수·selection size·prompt 내용 변경
+- grounding·최종 payload 조립 변경
+- 어떤 모델의 학습 혹은 파인튜닝
+- `apps/demo`가 실제 artifact를 소비하도록 재작성
+- `TrainedResidualCodebooks`를 `SIDSpace`로 리네임 (유보 — 본 범위에서 구조적 이득 없이 비용만 발생)
+- `compile-sid-index` CLI 명령 이름 변경 (사용자 워크플로 영향)
 
-## Non-Goals
+## 타입 시스템 리팩터 (Type System Refactor)
 
-This spec does **not** include:
+런타임 작업의 구조적 전제 조건이며 같은 PR에 묶는다.
 
-- collaborative filtering or matrix factorization
-- training a learned retriever or learned reranker
-- instruction tuning, preference tuning, or RLHF
-- offline leaderboard/report generation as a V1 requirement
-- generating new items outside the indexed catalog
-- mutating Phase 1 artifacts during online recommendation
+### Before
 
-## Phase 2 Module Breakdown
-
-### Module 2.1: Proactive Control and Taxonomy-Guided User-Interest Sketch
-
-This module converts raw user input into a structured and controllable request representation **using the Phase 1 taxonomy master dictionary as the mandatory vocabulary boundary**.
-
-#### Responsibilities
+```
+TrainedResidualCodebooks        # quantizer
+CompiledSIDItem                 # recipe_id + sid_path + sid_string
+CompiledSIDItems                # items + branching_factor + depth + embedding_dim + levels
+                                #   ^ 4개 필드가 TrainedResidualCodebooks와 중복
+```
 
-- load the Phase 1 taxonomy master dictionary and inject it into the LLM prompt
-- normalize incoming request fields
-- infer the user's likely interests from sparse language and/or item history
-- separate:
-  - positive preferences
-  - negative preferences
-  - must-have constraints
-  - avoid constraints
-  - uncertainty or ambiguity markers
-- compress the user's semantic themes **only within the allowed taxonomy facets and values**
-- produce a machine-readable **interest sketch** for downstream retrieval
+### After
 
-#### Why it exists
+```
+TrainedResidualCodebooks        # quantizer — 유지, 저장 대상으로 승격
+ItemSID                         # recipe_id + sid_path + sid_string   (CompiledSIDItem 대체)
+QuerySID                        # sid_path + sid_string               (신규)
+# CompiledSIDItems 삭제.
+# compile_residual_kmeans 편의 래퍼 삭제.
+# base dataclass 없음 — 두 타입 사이의 2필드 중복은 수용(4줄).
+```
 
-The user may provide incomplete, contradictory, or vague intent. The system should not pass raw text directly into retrieval without first extracting a stable representation. By forcing the sketch into the Phase 1 taxonomy vocabulary, the engine keeps the query space aligned with the item-feature space already indexed in FAISS.
+근거:
 
-#### Minimum outputs
-
-- normalized query summary
-- extracted taxonomy-constrained preference facets
-- hard filters
-- taxonomy-guided semantic anchors for retrieval
-- ambiguity notes for later confidence handling
-- a record of which taxonomy facets and values were selected
+- `item`과 `query`는 실제 코드에서 공통 호출자가 없다. 두 타입을 `isinstance(x, SomeBase)`로 묶어야 할 자리가 현재도 이번 범위에서도 없으므로 base dataclass는 비용 대비 이득이 없다.
+- 삭제되는 `CompiledSIDItems` 번들 타입은 `TrainedResidualCodebooks`가 이미 소유한 4개 필드를 중복 보관한다. 제거하면 공간-shape 메타데이터의 단일 진실 원천이 quantizer로 집중된다.
+- 편의 래퍼는 호출처가 두 곳(CLI + 테스트 한 곳)이다. 두 줄의 명시적 호출로 대체하는 편이 codebook 반환값을 숨기는 얇은 indirection을 유지하는 것보다 저렴하다.
+- 함수 이름에서 `_trained_`, `_residual_`, `assign_*_to_sid` 같은 장황한 수식어는 `TrainedResidualCodebooks` 타입 이름이 이미 전달하므로 제거한다. 남는 이름은 동사(`train`/`write`/`load`/`build`) + 대상으로 간결하다.
 
-#### Required sketching contract
+Python 측 제약:
 
-- the Phase 1 taxonomy master dictionary must be available at runtime
-- Module 2.1 must not emit free-form retrieval vocabulary outside the approved taxonomy for the interest sketch
-- historical preference signals must be compressed into taxonomy-constrained facets before semantic retrieval
-- this module is the primary guardrail against query-generation hallucination at the retrieval stage
+- `ItemSID`와 `QuerySID`는 각각 독립 `@dataclass(frozen=True, slots=True)`이며 상속을 쓰지 않는다. frozen+slots 상속의 함정을 원천 배제한다.
+- `CompiledSIDItem` / `CompiledSIDItems` 삭제는 hard rename이다 — backward-compat alias 없음. 저장소의 "backwards-compat 우회 금지" 관례에 따른다.
 
-### Module 2.2: Pure Semantic Search and Hard Filtering
+## 런타임 artifact 계약 (Runtime Artifact Contract)
 
-This module compresses the first candidate set quickly and accurately by combining:
+모든 신규 artifact는 기존 `sid_index_dir`(기본 `data/processed/foodcom/sid_index/`) 안에 저장한다.
 
-- taxonomy-aligned dense query embedding
-- FAISS-based vector retrieval
-- CPU-driven hard filtering
-- training-free popularity and co-occurrence lookups
+### `residual_codebooks.npz`
 
-Its purpose is to produce a strong, over-sampled candidate pool for Module 2.3 without introducing any learned CF model.
+NumPy archive, float32. 키:
 
-#### Responsibilities
+- `branching_factor` — scalar int32
+- `depth` — scalar int32
+- `embedding_dim` — scalar int32
+- `normalize_residuals` — scalar int32 (0/1)
+- `level_{i}_centroids` (`i ∈ 1..depth`) — shape `(cluster_count_i, embedding_dim)`
+- `level_{i}_cluster_sizes` (`i ∈ 1..depth`) — shape `(cluster_count_i,)` int32
+- `level_{i}_iteration_count` (`i ∈ 1..depth`) — scalar int32
+- `level_{i}_inertia` (`i ∈ 1..depth`) — scalar float32
 
-- load Phase 1 FAISS and sidecar artifacts
-- encode the Module 2.1 taxonomy-guided query with the local MLX embedding model
-- execute semantic retrieval over the indexed item representations
-- apply hard filters after retrieval or during candidate pruning
-- fetch offline popularity and co-occurrence statistics for surviving candidates
-- never use collaborative or learned user-item scoring
-- produce a stable candidate set for reranking
+단일 NPZ 레이아웃은 quantizer를 한 파일로 유지하면서 `ResidualKMeansLevel`이 이미 가진 per-level replay 메타데이터를 보존한다.
 
-#### Required retrieval contract
-
-- retrieval source must be the existing Phase 1 vector corpus
-- retrieval signal must be semantic, not CF-derived
-- the query vector must come from the taxonomy-guided sketch rather than raw unconstrained text
-- initial retrieval must be cosine-similarity search over `item_index.faiss`
-- hard filters must be explicit, deterministic, and CPU-enforced
-- popularity and co-occurrence may be added only as offline statistics, not as a trained CF model
-- candidate identifiers must remain traceable to the catalog and Phase 1 sidecars
-
-#### Minimum outputs
+### `residual_codebooks_manifest.json`
 
-- ordered candidate pool
-- candidate metadata bundle
-- filter-application summary
-- dropped-candidate reasons when filters remove items
-- per-candidate popularity and co-occurrence metadata for Module 2.3
+작고 사람이 읽기 좋은 JSON(정렬):
 
-#### 2.2.1 Taxonomy-Aligned Vector Search
+```json
+{
+  "branching_factor": 256,
+  "depth": 3,
+  "embedding_dim": 3584,
+  "normalize_residuals": true,
+  "level_cluster_counts": [256, 256, 256],
+  "codebooks_path": "residual_codebooks.npz"
+}
+```
 
-- convert the Module 2.1 taxonomy-guided query into a dense vector using the local MLX embedding model
-- search `item_index.faiss` with cosine similarity
-- retrieve an intentionally over-sampled candidate pool, with **Top-100** as the default design target
-- because query and items share the same taxonomy vocabulary, semantic alignment should be maximized at retrieval time
+`codebooks_path`는 **`sid_index_dir` 기준 상대 파일명**이다. 절대경로 금지.
 
-#### 2.2.2 CPU-Driven Over-Sampled Hard Filtering
+### 상위 `manifest.json` 갱신
 
-- apply explicit user constraints after the Top-100 retrieval pass
-- perform filtering in the application layer on CPU
-- prune items that violate the user's stated hard conditions
-- use the over-sampled pool to prevent filter exhaustion
-- forward the strongest surviving **Top-30** candidates by default to Module 2.3
-- if fewer than 30 survive, forward all survivors together with a low-coverage signal
+기존 키는 모두 유지. 신규 키를 append만 한다:
 
-#### 2.2.3 Training-Free Pseudo-CF Signal Integration
+- `normalize_residuals` (bool)
+- `codebooks_path` (상대 파일명, 예: `"residual_codebooks.npz"`)
+- `codebooks_manifest_path` (상대 파일명, 예: `"residual_codebooks_manifest.json"`)
 
-- look up precomputed offline statistics for each surviving candidate
-- include at least:
-  - item popularity
-  - co-occurrence counts with the user's liked-history items
-- do not use these signals as a learned score in Module 2.2
-- instead, attach them as structured JSON metadata so Module 2.3 can reason over semantic fit and weak collaborative evidence together
+기존 manifest 키는 rename·삭제하지 않는다.
 
-### Module 2.3: Resource-Optimized Explainable Zero-Shot Re-ranking
+### 로드 시 검증
 
-This module uses the local LLM as an **explainable zero-shot reranker** while minimizing VRAM/KV-cache pressure, reducing decoding latency, and blocking OOD recommendation outputs.
+`load_codebooks`는 다음을 검증해야 한다:
 
-#### Responsibilities
+- NPZ 키가 manifest의 `branching_factor`, `depth`, `embedding_dim`, `normalize_residuals`, `level_cluster_counts`와 존재·일관성 모두 맞는다.
+- 불일치 시 `ValueError`를 던지며, 메시지에 충돌 필드명과 `compile-sid-index` 재실행 안내를 포함한다.
+- 파일 부재는 `FileNotFoundError`로 remediation hint와 함께 던진다(silent downgrade 금지).
 
-- compare retrieved candidates against the user-interest sketch
-- inject only one dynamically retrieved successful recommendation example at runtime
-- determine final ranking order with schema-constrained outputs
-- keep rationale generation short and cheap to decode
-- return candidate indices rather than generated item names
-- expose why one item outranks another
-- support repeated order-perturbed evaluations for position-bias mitigation
+## 공개 인터페이스 (Public Interfaces)
 
-#### Required reranking contract
-
-- reranking must operate on retrieved candidates only
-- rationale must be returned in structured form
-- output schema must remain parseable and testable
-- ranking and explanation generation should be one coherent reasoning step, not two unrelated passes
-- the model must not generate free-form catalog item names in the final selection output
-- final ranking output must be candidate-index based so the CPU application layer can ground it back to canonical item metadata
-
-#### Minimum outputs
-
-- ranked candidate indices
-- short per-item rationale
-- matched-preference fields
-- caveat/tradeoff fields
-- rerank summary
-- bootstrap-vote or agreement metadata for downstream confidence handling
-
-#### 2.3.1 Context-Efficient Dynamic Few-Shot
-
-- do not rely on a large static prompt stuffed with many examples
-- at runtime, retrieve exactly **one** past successful recommendation example most similar to the current interest sketch
-- inject only that one example into the prompt
-- the retrieved example should contain:
-  - prior interest sketch
-  - compact recommendation rationale pattern
-  - target output format example
-- this keeps the prompt small while preserving domain adaptation
-
-#### 2.3.2 Latency-Optimized Structured Outputs
-
-- use strict structured generation such as JSON Schema, XGrammar, Outlines, or an equivalent constrained-decoding mechanism
-- force rationale length to **1-2 short sentences**
-- do not allow the model to generate raw item titles as the final ranking output
-- require the model to emit only candidate index identifiers, such as `[3, 7, 1, ...]`, for final ordering
-- this minimizes decoding cost and prevents OOD recommendation outputs
-
-#### 2.3.3 Prefix-Cache Friendly Bootstrapping
-
-- preserve the system prompt and user-interest sketch as a reusable prompt prefix
-- vary only the ordering of the Top-30 candidate list beneath that prefix
-- run **3-5** order-perturbed reranking passes, with **5** as the preferred default when latency budget permits
-- aggregate the resulting index-based rankings into a final rerank decision
-- use this bootstrap process as the primary V1 position-bias mitigation mechanism
-
-#### 2.3.4 Grounding and Memory Offloading
-
-- do not place heavy catalog structures or search trees in VRAM
-- let the LLM output candidate indices only
-- let the CPU application layer map those indices back to canonical item metadata
-- use Phase 1 grounding artifacts such as `id_map.jsonl` to resolve index-to-item identity
-- keep grounding outside the LLM so the final returned items stay canonical and deterministic
-
-### Module 2.4: LCR-Based Confidence Verification and Elastic Grounding
-
-This module gathers the repeated index-array outputs from Module 2.3 on CPU, computes a mathematical confidence signal from the model's repeated choices, and delivers a fully grounded final recommendation list with **OOD = 0%** item selection.
-
-#### Responsibilities
-
-- parse repeated rerank outputs on CPU
-- extract only valid candidate indices from the allowed range
-- compute item-level confidence from repeated model agreement
-- ground candidate indices back to canonical SID and item metadata
-- support **elastic grounding** when identifier resolution needs SID-aware fallback
-- prepare the final user-facing payload by combining grounded metadata with short reasoning text
-
-#### Why it exists
-
-A training-free system needs a cheap way to estimate internal model confidence without calling another LLM pass. Because Module 2.3 emits controlled candidate indices rather than free-form item names, clustering can be replaced with CPU-side vote aggregation and deterministic grounding.
-
-#### Minimum outputs
-
-- parsed rerank index votes
-- MSCP confidence scores
-- grounded SID and item identities
-- mapping mode
-- confidence notes
-- final delivery payload that combines grounded metadata and recommendation reasoning
-
-#### 2.4.1 Fast CPU Parsing
-
-- parse the 3-5 repeated Module 2.3 outputs on CPU using simple text parsing or regex extraction
-- accept only valid candidate indices in the allowed range, typically `1..30`
-- discard malformed tokens without invoking the GPU or another LLM pass
-- keep parsing cost effectively constant relative to the much heavier model inference step
-
-#### 2.4.2 LCR-Style MSCP Confidence Computation
-
-- treat repeated candidate-index selections as already-clustered semantic outputs
-- compute **MSCP (Maximum Semantic Cluster Proportion)** from simple frequency counts on CPU
-- for example, if one item is chosen in 4 of 5 rerank passes, its `MSCP = 0.8`
-- use MSCP as the primary confidence signal for final ordering and safe delivery
-- this replaces a heavier LLM-based clustering stage because the output schema is already index-controlled
-
-#### 2.4.3 GRLM-Style Elastic Identifier Grounding
-
-- map the parsed candidate indices back to canonical identities using Phase 1 grounding artifacts
-- use at least:
-  - `id_map.jsonl`
-  - `sid_to_items.json`
-- direct mapping is the default path and should dominate because candidate indices are schema-constrained
-- if direct mapping needs recovery logic, use SID-aware elastic grounding rather than free-form fuzzy generation
-- grounding must preserve `OOD = 0%` item delivery
-
-#### 2.4.4 Explainable Output Delivery
-
-- select the highest-confidence final recommendations, with **Top-3** as the default UI delivery target
-- load canonical item metadata such as title and image URL on CPU
-- combine that metadata with the short reasoning produced in Module 2.3
-- emit a JSON-ready response payload for API/CLI/UI delivery
-
-## Inputs and Outputs
-
-### Required inputs
-
-- `sid_index/` artifact directory from Phase 1
-- taxonomy master dictionary path from Phase 1 taxonomy generation
-- offline statistics store for popularity and co-occurrence lookup
-- dynamic few-shot example store for successful recommendation cases
-- catalog metadata needed to render results
-- user request data, which may include:
-  - natural-language query
-  - liked item IDs
-  - disliked item IDs
-  - hard filters
-  - requested `top_k`
-
-### Required outputs
-
-- ordered recommendation results
-- structured explanation payload per item
-- rerank rationale metadata
-- confidence and elastic-mapping metadata
-- grounded final item metadata resolved by CPU from candidate indices
-
-### Minimum response shape
-
-Each result should support fields equivalent to:
-
-- `recipe_id`
-- `rank`
-- `title`
-- `score` or ordinal placement
-- `explanation_summary`
-- `matched_preferences`
-- `tradeoffs_or_caveats`
-- `rerank_rationale`
-- `confidence_band`
-- `mscp`
-- `mapping_mode`
-- `evidence_refs`
-- `bootstrap_support`
-
-The CLI and Python API may serialize these differently, but they must preserve the same information contract.
-
-## Public Interface
-
-### Proposed Python API
+### `sid_reco.sid.compiler`
 
 ```python
 @dataclass(frozen=True, slots=True)
-class RecommendationRequest:
-    query: str | None
-    liked_item_ids: tuple[int, ...]
-    disliked_item_ids: tuple[int, ...]
-    hard_filters: Mapping[str, tuple[str, ...]]
-    top_k: int
-
+class ItemSID:
+    sid_path: tuple[int, ...]
+    sid_string: str
+    recipe_id: int
 
 @dataclass(frozen=True, slots=True)
-class InterestSketch:
-    summary: str
-    positive_facets: tuple[str, ...]
-    negative_facets: tuple[str, ...]
-    hard_filters: Mapping[str, tuple[str, ...]]
-    ambiguity_notes: tuple[str, ...]
-    taxonomy_values: Mapping[str, tuple[str, ...]]
+class QuerySID:
+    sid_path: tuple[int, ...]
+    sid_string: str
 
+def train_codebooks(matrix, *, branching_factor=256, depth=3,
+                    normalize_residuals=True, max_iter=50,
+                    tolerance=1e-6) -> TrainedResidualCodebooks: ...
 
+def build_item_sids(recipe_ids, matrix, *,
+                    codebooks: TrainedResidualCodebooks
+                    ) -> list[ItemSID]: ...
+
+def build_query_sid(vector, *,
+                    codebooks: TrainedResidualCodebooks
+                    ) -> QuerySID: ...
+
+def write_codebooks(codebooks: TrainedResidualCodebooks, *,
+                    out_dir: Path) -> tuple[Path, Path]:
+    """(npz_path, manifest_path) 반환. 둘 다 out_dir 안."""
+
+def load_codebooks(npz_path: Path) -> TrainedResidualCodebooks:
+    """NPZ에서 quantizer 로드, 형제 manifest와 교차 검증."""
+```
+
+`compile_residual_kmeans`, `assign_trained_residual_kmeans`는 삭제한다.
+`train_residual_codebooks`는 `train_codebooks`로 rename한다 (의미는 `TrainedResidualCodebooks` 타입에 이미 드러남).
+
+### `sid_reco.sid.indexing`
+
+```python
 @dataclass(frozen=True, slots=True)
-class RecommendedItem:
+class SIDIndexWriteSummary:
+    item_count: int
+    embedding_dim: int
+    compiled_sid_path: Path
+    item_to_sid_path: Path
+    sid_to_items_path: Path
+    id_map_path: Path
+    index_path: Path
+    manifest_path: Path
+    codebooks_path: Path            # 신규
+    codebooks_manifest_path: Path   # 신규
+
+def write_sid_index_outputs(
+    *,
+    embedded: EmbeddedSIDItems,
+    codebooks: TrainedResidualCodebooks,
+    items: list[ItemSID],
+    out_dir: Path,
+) -> SIDIndexWriteSummary: ...
+```
+
+### `sid_reco.recommendation.semantic_search`
+
+```python
+@dataclass(frozen=True, slots=True)
+class SemanticCandidate:
+    faiss_idx: int
     recipe_id: int
     sid_string: str
-    rank: int
-    title: str
-    rationale: str
-    matched_preferences: tuple[str, ...]
-    cautions: tuple[str, ...]
-    confidence_band: str
-    mscp: float | None
-    mapping_mode: str
-    evidence_refs: tuple[str, ...]
-    bootstrap_support: int
-    popularity: float | None
-    cooccurrence_with_history: int | None
+    sid_path: tuple[int, ...]       # 신규 — id_map.jsonl에서 보존
+    score: float
+    serialized_text: str
+    taxonomy: Mapping[str, tuple[str, ...]]
+    popularity: int
+    cooccurrence_with_history: int
 
+@dataclass(frozen=True, slots=True)
+class SemanticSearchResult:
+    query_text: str
+    query_sid: QuerySID            # 신규
+    candidates: tuple[SemanticCandidate, ...]
+    dropped_candidates: tuple[DroppedCandidate, ...]
+    retrieved_count: int
+    survivor_count: int
+    low_coverage: bool
+```
 
+내부 변경: encoder 호출이 `raw_vector`를 생성한다. FAISS는 정규화된 사본(기존 동작)을 사용한다. query-SID 할당에는 `raw_vector`를 그대로 쓴다 — quantizer가 학습 시 본 분포와 동일해야 하기 때문.
+
+### `sid_reco.recommendation.types`
+
+```python
 @dataclass(frozen=True, slots=True)
 class RecommendationResponse:
     sketch: InterestSketch
@@ -388,73 +230,31 @@ class RecommendationResponse:
     rerank_summary: str
     confidence_summary: str
     selected_candidate_indices: tuple[int, ...]
+    query_sid: QuerySID            # 신규
 ```
 
-Suggested entrypoint:
+### CLI
 
-```python
-def recommend(
-    *,
-    request: RecommendationRequest,
-    sid_index_dir: Path,
-    taxonomy_dictionary_path: Path,
-    stats_store_path: Path,
-    fewshot_store_path: Path,
-    catalog_path: Path,
-) -> RecommendationResponse:
-    ...
-```
+`compile-sid-index` 결과 테이블에 한 행 추가:
 
-### Proposed CLI
+- `Codebooks path` → `residual_codebooks.npz` 상대 경로
 
-```bash
-uv run sid-reco recommend \
-  --sid-index-dir data/processed/foodcom/sid_index \
-  --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
-  --stats-store-path data/processed/foodcom/recommendation_stats.sqlite \
-  --fewshot-store-path data/processed/foodcom/recommendation_casebank \
-  --catalog-path data/processed/foodcom/recipes.csv \
-  --query "I want hearty but not too heavy comfort food for a weeknight" \
-  --top-k 10
-```
+`recommend` 결과 블록의 기존 summary 아래 한 줄 추가:
 
-Structured-input example:
+- `Query SID: <sid_string>  path=<tuple>`
 
-```bash
-uv run sid-reco recommend \
-  --sid-index-dir data/processed/foodcom/sid_index \
-  --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
-  --stats-store-path data/processed/foodcom/recommendation_stats.sqlite \
-  --fewshot-store-path data/processed/foodcom/recommendation_casebank \
-  --catalog-path data/processed/foodcom/recipes.csv \
-  --liked-item-id 101 \
-  --liked-item-id 225 \
-  --disliked-item-id 87 \
-  --filter dietary_style=vegetarian \
-  --top-k 5
-```
+### `apps/demo`
 
-## Tech Stack
+`window.runPipeline(...)` 반환 shape에 다음 추가:
 
-- Python `3.12`
-- `uv`
-- `typer` + `rich`
-- existing repository modules under `src/sid_reco/`
-- existing local LLM runtime conventions in `src/sid_reco/llm.py`
-- existing Phase 1 FAISS plus sidecar artifact layout under `data/processed/foodcom/sid_index/`
+- `conf.items[i].sid_path: number[]` — mock 계층 경로(기존 `buildSid`가 문자열과 path 모두 반환하도록 확장)
+- `conf.query_sid: { sid_string: string, sid_path: number[] }` — sketch facets에서 mock으로 도출
 
-### Runtime expectations
+`i18n.js` JSON preview와 overview grid copy는 신규 필드가 실제로 노출되는 위치에서만 확장. 그 외 가시 copy 변경 없음.
 
-- **Default**: local-first inference on Apple Silicon
-- **Vector substrate**: existing Phase 1 FAISS index and mapping files
-- **Query vectorization**: Module 2.2 uses the local MLX embedding model to encode the taxonomy-guided sketch
-- **Taxonomy constraint**: Module 2.1 must use the Phase 1 taxonomy master dictionary as the sketching vocabulary
-- **Rerank protocol**: Module 2.3 uses one dynamic few-shot example, constrained structured outputs, and candidate-index grounding
-- **No training step**: runtime behavior comes from prompt design, taxonomy-guided sketching, semantic retrieval, deterministic filters, offline statistics lookup, and LLM reasoning
+## 명령 (Commands)
 
-## Commands
-
-### Existing repository validation commands
+### 기존 검증 명령 (변경 없음)
 
 ```bash
 uv sync --all-groups
@@ -464,260 +264,183 @@ uv run mypy src
 uv run sid-reco doctor
 ```
 
-### Existing prerequisite pipeline
+### 이 스펙을 위한 타겟 검증
 
 ```bash
-uv run sid-reco prepare-foodcom --raw-dir data/raw/foodcom --out-dir data/processed/foodcom
-uv run sid-reco build-neighbor-context \
-  --recipes-path data/processed/foodcom/recipes.csv \
-  --out-dir data/processed/foodcom/neighbor_context \
-  --top-k 5
-uv run sid-reco build-taxonomy-dictionary \
-  --recipes-path data/processed/foodcom/recipes.csv \
-  --out-dir data/processed/foodcom/taxonomy_dictionary \
-  --max-tokens 4096
-uv run sid-reco structure-taxonomy-batch \
-  --recipes-path data/processed/foodcom/recipes.csv \
-  --neighbor-context-path data/processed/foodcom/neighbor_context/neighbor_context.csv \
-  --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
-  --out-path data/processed/foodcom/taxonomy_structured/items.jsonl
-uv run sid-reco compile-sid-index \
-  --structured-items-path data/processed/foodcom/taxonomy_structured/items.jsonl \
-  --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
-  --out-dir data/processed/foodcom/sid_index
-```
-
-### Proposed new online recommendation command
-
-```bash
-uv run sid-reco recommend \
-  --sid-index-dir data/processed/foodcom/sid_index \
-  --taxonomy-dictionary-path data/processed/foodcom/taxonomy_dictionary/food_taxonomy_dictionary.json \
-  --stats-store-path data/processed/foodcom/recommendation_stats.sqlite \
-  --fewshot-store-path data/processed/foodcom/recommendation_casebank \
-  --catalog-path data/processed/foodcom/recipes.csv \
-  --query "Suggest cozy vegetarian dinners with strong comfort-food signals" \
-  --top-k 10
-```
-
-### Proposed targeted validation
-
-```bash
-uv run sid-reco recommend --help
-uv run pytest tests/test_interest_sketch.py tests/test_semantic_search.py tests/test_zero_shot_rerank.py tests/test_confidence_mapping.py tests/test_recommendation_pipeline.py tests/test_cli_recommend.py
+uv run pytest tests/test_sid_compiler.py tests/test_sid_indexing.py \
+              tests/test_cli_compile_sid_index.py tests/test_semantic_search.py \
+              tests/test_recommendation_pipeline.py tests/test_cli_recommend.py
 uv run ruff check .
 uv run mypy src
+node apps/demo/tests/pipeline.test.cjs
+node apps/demo/tests/i18n.test.cjs
 ```
 
-## Project Structure
+### End-to-end smoke (선택, MLX 환경 필요)
 
-### Existing structure
+```bash
+uv run sid-reco compile-sid-index --out-dir data/processed/foodcom/sid_index
+uv run sid-reco recommend --query "cozy weeknight vegetarian dinner" --top-k 3
+```
+
+## 프로젝트 구조 (Project Structure)
+
+### 수정 파일
 
 ```text
-src/sid_reco/                    -> application package
-src/sid_reco/cli.py             -> CLI commands
-src/sid_reco/llm.py             -> local LLM runtime integration
-src/sid_reco/sid/               -> Phase 1 serialization, embeddings, SID, and FAISS artifacts
-tests/                          -> automated tests
-data/processed/foodcom/         -> processed local artifacts
-SPEC.md                         -> shared feature specification
+src/sid_reco/sid/compiler.py              -> 타입 rename, 새 helper, persistence, query 할당
+src/sid_reco/sid/indexing.py              -> 시그니처 변경, codebook artifact write, summary 필드 추가
+src/sid_reco/sid/__init__.py              -> export 갱신
+src/sid_reco/recommendation/semantic_search.py
+                                          -> codebook 로드, query_sid 계산, candidate sid_path 보존
+src/sid_reco/recommendation/types.py      -> RecommendationResponse.query_sid
+src/sid_reco/recommendation/pipeline.py   -> query_sid를 응답까지 전달
+src/sid_reco/recommendation/__init__.py   -> 필요시 QuerySID re-export
+src/sid_reco/cli.py                       -> compile-sid-index 호출 정리, recommend 출력 라인 추가
+apps/demo/data/pipeline.js                -> buildSid + runPipeline shape 확장
+apps/demo/src/app.jsx (최소)              -> query_sid를 결과/JSON preview에 렌더 (신규 필드 노출 위치만)
+apps/demo/src/i18n.js                     -> 신규 필드가 나타나는 EN/KR 라벨
+tests/test_sid_compiler.py                -> codebook round-trip + query-SID 재현성
+tests/test_sid_indexing.py                -> 신규 artifact 파일 + summary 필드 + manifest 키
+tests/test_cli_compile_sid_index.py       -> CLI 출력의 codebook path 확인
+tests/test_semantic_search.py             -> query_sid + candidate sid_path + missing-codebook 에러
+tests/test_recommendation_pipeline.py     -> 응답이 query_sid 포함
+tests/test_cli_recommend.py               -> CLI가 query_sid 라인 출력
+apps/demo/tests/pipeline.test.cjs         -> mock pipeline shape에 query_sid 포함
+apps/demo/tests/i18n.test.cjs             -> 신규 라벨의 EN/KR 동기화
 ```
 
-### Proposed additions
+### 신규 파일
 
-```text
-src/sid_reco/recommendation/__init__.py          -> public recommendation exports
-src/sid_reco/recommendation/types.py             -> request, sketch, and response contracts
-src/sid_reco/recommendation/interest_sketch.py   -> Module 2.1 taxonomy-guided user-interest sketching
-src/sid_reco/recommendation/semantic_search.py   -> Module 2.2 semantic retrieval and hard filtering
-src/sid_reco/recommendation/stats_store.py       -> offline popularity and co-occurrence lookup
-src/sid_reco/recommendation/example_store.py     -> dynamic few-shot example retrieval
-src/sid_reco/recommendation/zero_shot_rerank.py  -> Module 2.3 explainable zero-shot reranking
-src/sid_reco/recommendation/grounding.py         -> CPU-side candidate-index grounding via id_map
-src/sid_reco/recommendation/confidence.py        -> Module 2.4 confidence verification
-src/sid_reco/recommendation/elastic_mapping.py   -> Module 2.4 intent broadening/narrowing logic
-src/sid_reco/recommendation/pipeline.py          -> orchestration layer
-src/sid_reco/recommendation/prompting.py         -> prompt builders and schema templates
-tests/test_interest_sketch.py                    -> Module 2.1 tests
-tests/test_semantic_search.py                    -> Module 2.2 tests
-tests/test_zero_shot_rerank.py                   -> Module 2.3 tests
-tests/test_confidence_mapping.py                 -> Module 2.4 tests
-tests/test_recommendation_pipeline.py            -> end-to-end orchestration tests
-tests/test_cli_recommend.py                      -> CLI integration tests
-```
+없음. 모든 변경이 기존 모듈에 들어간다.
 
-### Optional future artifact location
+### 설계 노트 (`raw/design/notes/`, 한국어)
 
-If persistent traces are later approved, a natural default location would be:
+구현 후 `docs-manager`를 통해 갱신:
 
-```text
-data/recommendation_runs/
-```
+- `sid-compilation-indexing.md` — 출력 목록에 codebook artifact 추가
+- `phase2-recommendation-runtime.md` — 런타임 계약에 `query_sid` 추가
+- `phase2-recommendation-runtime-validation.md` — 신규 테스트 목록 추가
 
-This is intentionally not a mandatory V1 output yet.
+이들은 raw/ 수정이므로 staged Graphify full-refresh 흐름을 트리거한다. 코드 PR의 자동 refresh에 포함되지 않는다.
 
-## Code Style
+## 코드 스타일 (Code Style)
 
-The repository already favors typed functions, `Path`-based I/O, explicit dataclasses, and `rich` CLI summaries. The new recommendation engine should follow the same conventions.
+저장소의 기존 관례를 계승한다:
 
-Key conventions:
+- 각 Python 파일 최상단에 `from __future__ import annotations`
+- 계약 타입은 `@dataclass(frozen=True, slots=True)`
+- I/O는 `Path` 기반. `os.path` 금지.
+- CLI는 `typer` + `rich`, 결과는 `rich.table.Table`
+- rename/삭제된 타입에 대한 backward-compat shim 금지 — 삭제하고 모든 호출처 갱신
+- 누락·무효 artifact에 대한 silent fallback 금지 — remediation 메시지와 함께 raise
+- 타입이 이미 드러내는 *무엇*에 대한 주석 금지; 비자명한 *왜*만 한 줄
 
-- keep module boundaries visible and testable
-- isolate prompt builders from transport and orchestration logic
-- keep semantic retrieval deterministic given the same query vector and filters
-- keep hard filtering explicit
-- do not silently swallow malformed inputs or LLM schema failures
-- expose confidence and mapping results as first-class structured data
+이 스펙 특화:
 
-## Testing Strategy
+- `build_query_sid`는 `normalize_residuals=True`일 때 **raw(L2 정규화 전) encoder output**을 사용해야 한다. `_prepare_level_inputs`가 이미 per-level residual을 정규화하기 때문에 query에서 추가 정규화를 하면 컴파일 시점과 분포가 어긋난다.
+- NPZ round-trip은 float32 centroid 기준 비트-동일이어야 한다. 정밀도 손실 금지.
 
-### Framework and scope
+## 테스트 전략 (Testing Strategy)
 
-- `pytest` for automated tests
-- `ruff` for lint
-- `mypy` for type-checking
+### 프레임워크
 
-### Test levels
+Python은 `pytest` + `ruff` + `mypy`, `apps/demo`는 `node` + 프로젝트 기존 CJS loader.
 
-1. **Module 2.1 - Interest sketch tests**
-   - raw request normalization works
-   - positive and negative preference extraction is stable
-   - taxonomy master dictionary is injected and enforced
-   - hard filters are preserved
-   - ambiguous queries surface ambiguity notes
-   - output sketch stays within approved taxonomy vocabulary
+### 테스트 매트릭스
 
-2. **Module 2.2 - Semantic search tests**
-   - loads Phase 1 artifacts successfully
-   - local MLX query embedding is produced from the taxonomy-guided sketch
-   - FAISS cosine retrieval returns an over-sampled Top-100 pool
-   - hard filters remove disallowed items deterministically
-   - final surviving Top-30 candidate set is stable when enough items survive
-   - dropped-candidate reasons are inspectable
-   - popularity and co-occurrence metadata are attached correctly
+1. **`tests/test_sid_compiler.py`**
+   - 타입: `ItemSID`, `QuerySID`가 예상대로 생성·비교된다.
+   - Round-trip: `write_codebooks` → `load_codebooks` 결과가 원본과 구조적으로 동치(centroid `allclose`, 메타데이터 동일).
+   - **재현성 (핵심 정합성)**: 임베딩 행렬 `M`, codebooks `C = train_codebooks(M)`, `items = build_item_sids(ids, M, codebooks=C)` 에서 모든 행 `k`에 대해 `build_query_sid(M[k], codebooks=C).sid_path == items[k].sid_path`.
+   - 무효 artifact: 잘린 NPZ, `embedding_dim` 불일치 manifest, 형제 manifest 부재 — 각각 충돌 필드명을 명시하는 `ValueError`.
 
-3. **Module 2.3 - Zero-shot rerank tests**
-   - exactly one dynamic few-shot example is injected per request
-   - ranking output parses into the expected structured schema
-   - rationale length stays within the 1-2 sentence limit
-   - the model emits candidate indices rather than generated item names
-   - three order-perturbed rerank passes can be aggregated deterministically
-   - CPU grounding maps candidate indices back to canonical item metadata
+2. **`tests/test_sid_indexing.py`**
+   - `write_sid_index_outputs(codebooks=..., items=...)`가 `residual_codebooks.npz`와 `residual_codebooks_manifest.json` 둘 다 쓴다.
+   - `SIDIndexWriteSummary`에 두 신규 path 노출.
+   - 상위 `manifest.json`이 세 신규 키(상대 경로)를 가진다.
+   - 기존 artifact 계약(compiled_sid.jsonl, id_map.jsonl, item_index.faiss 등) 불변 — 기대 스키마와 명시 동등성 검사.
 
-4. **Module 2.4 - Confidence and elastic-mapping tests**
-   - repeated rerank outputs are parsed on CPU into valid candidate indices
-   - MSCP is computed correctly from repeated selections
-   - direct grounding via `id_map.jsonl` and `sid_to_items.json` resolves canonical identities
-   - fallback elastic grounding preserves `OOD = 0%`
-   - final delivery payload combines grounded metadata with short reasoning text
+3. **`tests/test_cli_compile_sid_index.py`**
+   - CLI 실행 후 두 codebook 파일이 `out_dir`에 존재.
+   - CLI `rich` 출력이 상대 파일명과 함께 `Codebooks path` 행을 포함.
 
-5. **Pipeline tests**
-   - end-to-end run succeeds with stubbed LLM outputs
-   - the module handoff contract remains stable
-   - sparse or contradictory user requests still produce a valid response or explicit failure
+4. **`tests/test_semantic_search.py`**
+   - query 벡터가 fixture item 임베딩과 동일할 때 `SemanticSearchResult.query_sid`가 그 item의 `sid_path`와 같은 `QuerySID`.
+   - `SemanticCandidate.sid_path` tuple이 해당 `faiss_idx`의 `id_map.jsonl` 기록과 일치.
+   - codebook artifact 부재 시 FAISS 검색 이전에 clear error.
 
-6. **CLI integration tests**
-   - `sid-reco recommend` prints human-readable ranked results
-   - invalid paths or malformed options return non-zero exit codes
-   - CLI options map correctly to the internal request model
+5. **`tests/test_recommendation_pipeline.py` / `tests/test_cli_recommend.py`**
+   - stubbed generator/encoder로 `RecommendationResponse.query_sid`가 end-to-end 채워진다.
+   - `recommend` CLI 출력에 `Query SID:` 라인과 예상 `sid_string` 포함.
+   - rerank summary, confidence summary, 아이템 rank가 변경 전 baseline과 바이트-동일("동작 변화 없음" 회귀 가드).
 
-## Boundaries
+6. **`apps/demo/tests/pipeline.test.cjs`**
+   - `runPipeline(...)` 반환에 `conf.query_sid.sid_string`, `conf.query_sid.sid_path` 존재.
+   - 모든 `conf.items[i]`에 기존 `sid` 문자열 외에 `sid_path: number[]` 존재.
+
+7. **`apps/demo/tests/i18n.test.cjs`**
+   - EN, KR 로케일 모두 신규 라벨 키를 가진다 — 로케일 drift 없음.
+
+### 커버리지 태도
+
+모든 신규 공개 함수와 신규 응답 필드는 직접 테스트를 가진다. **재현성 테스트**(항목 1 서브 3)가 단일 최중요 게이트다 — 런타임과 컴파일 경로가 하나의 SID 공간을 공유함을 증명한다.
+
+## 경계 (Boundaries)
 
 ### Always
 
-- keep the system **training-free**
-- keep Phase 1 artifacts as the runtime recommendation corpus
-- preserve all four module boundaries in the implementation
-- keep Module 2.1 taxonomy-guided and vocabulary-constrained by the Phase 1 master dictionary
-- use taxonomy-aligned vector retrieval plus deterministic CPU hard filtering in Module 2.2
-- allow only offline popularity and co-occurrence lookup as auxiliary training-free signals
-- compute final confidence on CPU from repeated candidate-index outputs
-- return structured explanation and confidence fields
-- keep both library API and CLI surfaces aligned
+- `TrainedResidualCodebooks`를 `sid_index_dir` 안의 1급 artifact로 저장한다.
+- query 시점의 residual 정규화 규칙을 컴파일 시점과 동일하게 사용한다 — 코드 기본값이 아니라 저장된 manifest에서 읽는다.
+- `id_map.jsonl`의 `sid_path`를 `SemanticCandidate`에 보존·전달한다.
+- codebook artifact 누락·불일치 시 remediation 메시지와 함께 raise.
+- manifest의 모든 artifact 경로는 `sid_index_dir` 기준 **상대 파일명**.
+- 기존 retrieval, rerank, confidence, grounding 동작을 완전히 동일하게 유지.
+- rename/삭제된 타입·함수를 깔끔히 제거 — alias 금지, re-export 금지, stub 주석 금지.
 
 ### Ask first
 
-- locking a strict hallucination-control rule for V1
-- making persistent trace artifacts mandatory
-- expanding V1 into full offline evaluation/report generation
-- replacing semantic retrieval with a learned retriever
-- adding collaborative or supervised ranking layers
+- 기본 출력 디렉터리 변경.
+- 스펙 수락 이후 NPZ 키 레이아웃 변경(사용자가 컴파일한 시점부터 artifact 호환성 깨짐).
+- `TrainedResidualCodebooks`를 `SIDSpace` 등으로 rename.
+- `compile-sid-index` CLI 명령 이름 변경.
+- `query_sid`를 retrieval scoring 입력으로 승격(명시 유보).
 
 ### Never
 
-- train a collaborative-filtering model for this feature
-- fine-tune a task-specific recommender model
-- recommend items outside the indexed catalog
-- silently invent evidence not tied to the loaded corpus
-- let Module 2.1 emit free-form retrieval terms outside the taxonomy master dictionary
-- replace Module 2.2 with a learned CF model or learned hybrid scorer
-- let Module 2.3 emit free-form final item names instead of candidate indices
-- bypass Module 2.2 with ad hoc manual item injection
-- overwrite Phase 1 `sid_index/` artifacts during runtime recommendation
+- codebook artifact 부재 시 silent downgrade — query-SID를 건너뛰는 "best-effort" 경로 금지.
+- 추천 시점에 codebook을 다시 학습.
+- query 벡터의 정규화를 컴파일 시점 level-input residual 정규화와 다르게 적용.
+- manifest에 절대경로 기재.
+- `item_index.faiss`, retrieval `k`, survivor cap, rerank prompt, grounding 로직 수정.
+- compat alias(`CompiledSIDItem = ItemSID`) 도입 — rename은 hard cut.
+- `apps/demo` mock 파이프라인을 권위 있는 동작으로 취급 — shape 계약 맞춤 용도로만 존재.
 
-## Success Criteria
+## 성공 기준 (Success Criteria)
 
-1. Phase 2 is specified and implemented as four explicit modules: 2.1, 2.2, 2.3, and 2.4.
-2. A new public recommendation surface exists as both:
-   - a Python API
-   - a CLI command
-3. Module 2.1 produces a structured user-interest sketch from raw request input using only the Phase 1 taxonomy master dictionary vocabulary.
-4. Module 2.1 prevents free-form query-sketch hallucination by constraining the sketch to approved taxonomy facets and values.
-5. Module 2.2 vectorizes the taxonomy-guided query with the local MLX embedding model and retrieves a default **Top-100** pool from `item_index.faiss` using cosine similarity.
-6. Module 2.2 applies deterministic CPU hard filtering to the over-sampled pool and forwards a default **Top-30** surviving candidate set when enough items survive.
-7. Module 2.2 attaches offline popularity and co-occurrence statistics as training-free JSON metadata for downstream reasoning.
-8. Module 2.3 injects exactly one dynamically retrieved successful recommendation example per request.
-9. Module 2.3 uses schema-constrained structured generation, short 1-2 sentence rationales, and candidate-index-only final ranking outputs.
-10. Module 2.3 performs 3-5 prefix-cache-friendly order-perturbed rerank passes and aggregates them for position-bias mitigation.
-11. Module 2.4 parses repeated candidate-index outputs on CPU and computes MSCP confidence scores from vote frequencies.
-12. Module 2.4 grounds final selected indices back to canonical SID and item metadata via `id_map.jsonl` and `sid_to_items.json`.
-13. Module 2.4 emits a final explainable delivery payload that combines grounded metadata with short recommendation reasoning.
-14. The system operates without any collaborative-filtering model or training phase.
-15. Recommendation results remain tied to items already present in the catalog.
-16. The architecture fits the repository's existing typed Python and `typer` CLI patterns.
-17. New recommendation tests and existing validation commands pass once implementation is complete.
+1. `compile-sid-index`가 `sid_index_dir`에 `residual_codebooks.npz`와 `residual_codebooks_manifest.json`을 쓰고, 상위 `manifest.json`에 상대 경로 항목을 기록한다.
+2. `load_codebooks`가 quantizer를 비트-정확하게 round-trip(centroid `allclose`, 메타데이터 동일).
+3. 임의의 catalog 임베딩 행 `M[k]`에 대해 `build_query_sid(M[k], codebooks=C)`가 같은 row의 컴파일된 item과 동일한 `sid_path`를 반환. 직접 테스트로 보장.
+4. `SemanticSearchResult`가 `query_sid: QuerySID`를 가지고, 각 `SemanticCandidate`가 `sid_path: tuple[int, ...]`를 가진다.
+5. `RecommendationResponse`가 `query_sid: QuerySID`를 가지고, `recommend` CLI가 출력한다.
+6. 누락·불일치 codebook artifact는 remediation 텍스트가 포함된 지정 에러를 raise. silent fallback 없음.
+7. 동일 stubbed LLM/encoder fixture에서 rerank summary, confidence summary, ranked `recipe_id`, grounded payload가 변경 전 baseline과 동일.
+8. `apps/demo/data/pipeline.js` 반환 shape에 `query_sid`와 per-candidate `sid_path`가 포함되고 `i18n.js` 두 로케일이 동기.
+9. `src/`, `tests/` 어디에도 `CompiledSIDItem`, `CompiledSIDItems`, `compile_residual_kmeans`, `assign_trained_residual_kmeans`, `train_residual_codebooks`, `write_trained_codebooks`, `load_trained_codebooks`, `assign_items_to_sid`, `assign_query_embedding_to_sid`가 import되지 않는다.
+10. `uv run pytest`, `uv run ruff check .`, `uv run mypy src`가 모두 통과하고 `apps/demo/tests/*.cjs` 통과.
 
-## Open Questions
+## 확정 결정 (Resolved Decisions)
 
-1. **Hallucination policy**
-   - Should explanations be restricted to retrieved evidence only in V1?
-   - Or may the LLM add clearly labeled background reasoning?
+1. **NPZ 키 인덱싱** — 1-based (`level_1_*` ... `level_N_*`). [src/sid_reco/sid/compiler.py:121](src/sid_reco/sid/compiler.py:121)의 기존 `ResidualKMeansLevel.level` 관례와 일치.
+2. **할당 타입 구조** — `ItemSID`·`QuerySID` 두 구체 dataclass만 둔다. base dataclass 없음. 공통 필드 `sid_path`·`sid_string`의 2필드 중복(총 4줄)은 상속 인프라보다 저렴하고, 실제 코드에 두 타입을 공통으로 다루는 호출자가 없다.
+3. **함수 네이밍** — `_trained_`·`_residual_` 수식어는 `TrainedResidualCodebooks` 타입 이름이 이미 전달하므로 함수에서 제거. `assign_*_to_sid`의 `assign_` 접두사는 `build_*_sids` / `build_*_sid` 동사로 대체. 결과: `train_codebooks`, `write_codebooks`, `load_codebooks`, `build_item_sids`, `build_query_sid`.
+4. **`apps/demo` mock `query_sid`** — `buildSid` 패턴에 `QSID::` 접두사를 붙여 재사용하며 `sketch.positive_facets` 슬롯(cuisine → dish_type → flavor_profile)을 입력으로 한다. 슬롯 부재 시 `"any"`로 fallback. mock 전용.
+5. **codebook artifact 에러 타입** — 파일 부재는 built-in `FileNotFoundError`, 스키마·shape 불일치는 `ValueError`. 기존 `_load_id_map` 관례와 일치. silent downgrade 방지를 위해 메시지에 재실행 명령 `uv run sid-reco compile-sid-index --out-dir <dir>` 반드시 포함.
+6. **raw/design/notes** — 이 PR에서 제외. 후속 `docs-manager` pass에서 `sid-compilation-indexing.md`, `phase2-recommendation-runtime.md`, `phase2-recommendation-runtime-validation.md`를 갱신하고 staged Graphify full refresh를 실행한다.
 
-2. **Persistent traces**
-   - Should recommendation runs optionally or always write audit artifacts?
+## 리뷰용 구현 노트 (Implementation Notes for Review)
 
-3. **Elastic grounding policy**
-   - How aggressively may the system broaden a user's intent before it should instead say "no strong match found"?
-
-4. **Few-shot example bank**
-   - How should successful recommendation cases be curated and refreshed for dynamic retrieval?
-
-5. **Bootstrap count**
-   - Should V1 default to 3 passes or 5 passes in latency-constrained environments?
-
-## Implementation Notes for Review
-
-- This spec replaces the prior Phase 1 `compile-sid-index` implementation spec in `SPEC.md`.
-- Phase 1 remains a prerequisite layer; this document now defines the next online recommendation stage.
-- The core structure of this feature is now:
-  1. **Module 2.1 - proactive control and taxonomy-guided user-interest sketch**
-  2. **Module 2.2 - pure semantic search and hard filtering**
-  3. **Module 2.3 - explainable zero-shot reranking**
-  4. **Module 2.4 - confidence verification and elastic mapping**
-- The taxonomy master dictionary is now part of the runtime contract for Module 2.1, not only an offline artifact.
-- Module 2.2 now explicitly includes:
-  - local MLX query embedding
-  - FAISS cosine Top-100 retrieval
-  - CPU pruning to a Top-30 survivor set
-  - popularity and co-occurrence metadata lookup for Module 2.3
-- Module 2.3 now explicitly includes:
-  - one dynamic few-shot example per request
-  - constrained structured outputs with short rationales
-  - candidate-index-only final ranking output
-  - 3-5 order-perturbed rerank passes with prefix-cache reuse
-- Module 2.4 now explicitly includes:
-  - CPU parsing of repeated candidate-index outputs
-  - MSCP confidence computation from vote frequencies
-  - direct grounding through `id_map.jsonl` and `sid_to_items.json`
-  - final payload assembly with grounded metadata plus short reasoning
-- Do **not** start implementation until this revised spec is reviewed and accepted.
+- 이 스펙은 이전에 `SPEC.md`를 채우던 Phase 2 end-to-end 스펙을 대체한다. Phase 2 내용은 `src/sid_reco/recommendation/` 하위 실구현 코드로 landed 되었고 의도는 `raw/design/notes/phase2-recommendation-runtime.md`와 AGENTS.md 모듈 테이블에 남는다.
+- 단일 묶음 PR. 타입·네이밍 정리와 런타임 재현이 함께 간다 — 런타임 기능이 `QuerySID`·`build_query_sid`를 도입하고, 정리가 `ItemSID`·`build_item_sids`의 명명·책임 경계를 확정하기 때문이다.
+- `raw/design/notes/` 갱신은 코드 PR에서 의도적으로 분리되어 후속 `docs-manager` pass로 넘긴다. 이는 staged Graphify full-refresh가 안정된 코드 트리 위에서 실행되도록 하기 위함이다.
+- 이 스펙이 리뷰·수락되기 전에는 구현에 착수하지 않는다.

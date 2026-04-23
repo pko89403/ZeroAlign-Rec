@@ -1,13 +1,15 @@
 """SID compilation helpers."""
 
 from sid_reco.sid.compiler import (
-    CompiledSIDItem,
-    CompiledSIDItems,
+    ItemSID,
+    QuerySID,
     ResidualKMeansLevel,
     TrainedResidualCodebooks,
-    assign_trained_residual_kmeans,
-    compile_residual_kmeans,
-    train_residual_codebooks,
+    build_item_sids,
+    build_query_sid,
+    load_codebooks,
+    train_codebooks,
+    write_codebooks,
 )
 from sid_reco.sid.embed_backend import (
     EmbeddedSIDItems,
@@ -32,27 +34,29 @@ from sid_reco.sid.stats import (
 )
 
 __all__ = [
-    "CompiledSIDItem",
-    "CompiledSIDItems",
     "EmbeddedSIDItems",
     "EmbeddedSIDWriteSummary",
-    "ResidualKMeansLevel",
+    "ItemSID",
+    "QuerySID",
     "RecommendationStats",
     "RecommendationStatsWriteSummary",
+    "ResidualKMeansLevel",
     "SIDIndexWriteSummary",
     "SerializedSIDItem",
     "SerializedSIDWriteSummary",
     "TrainedResidualCodebooks",
-    "assign_trained_residual_kmeans",
+    "build_item_sids",
+    "build_query_sid",
     "build_recommendation_stats",
-    "compile_residual_kmeans",
     "encode_serialized_items",
     "encode_serialized_items_with_mlx",
+    "load_codebooks",
     "serialize_structured_items",
     "serialize_taxonomy_text",
-    "train_residual_codebooks",
-    "write_recommendation_stats",
+    "train_codebooks",
+    "write_codebooks",
     "write_embedded_items",
-    "write_sid_index_outputs",
+    "write_recommendation_stats",
     "write_serialized_items",
+    "write_sid_index_outputs",
 ]
