@@ -25,7 +25,6 @@ CLAUDE_TIMEOUT_SECONDS = 1800
 GUARDRAIL_FILES = (
     "AGENTS.md",
     "README.md",
-    "SPEC.md",
     ".agents/policies/local-adaptation.md",
 )
 SubprocessRunner = Callable[..., subprocess.CompletedProcess[str] | Any]
