@@ -134,6 +134,7 @@ def _candidate(
         faiss_idx=recipe_id,
         recipe_id=recipe_id,
         sid_string=sid_string,
+        sid_path=(recipe_id,),
         score=score,
         serialized_text=f"course: dinner, cuisine: {cuisine}",
         taxonomy={"course": ("dinner",), "cuisine": (cuisine,)},

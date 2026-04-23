@@ -1,12 +1,12 @@
 # Graph Report - /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514  (2026-04-23)
 
 ## Corpus Check
-- 64 files · ~194,101 words
+- 64 files · ~195,999 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 997 nodes · 4192 edges · 23 communities detected
-- Extraction: 30% EXTRACTED · 70% INFERRED · 0% AMBIGUOUS · INFERRED: 2918 edges (avg confidence: 0.82)
+- 1010 nodes · 4237 edges · 27 communities detected
+- Extraction: 30% EXTRACTED · 70% INFERRED · 0% AMBIGUOUS · INFERRED: 2960 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -33,14 +33,18 @@
 - [[_COMMUNITY_Community 20|Community 20]]
 - [[_COMMUNITY_Community 21|Community 21]]
 - [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `MLXTextGenerator` - 102 edges
+1. `MLXTextGenerator` - 103 edges
 2. `Context` - 93 edges
-3. `Settings` - 65 edges
-4. `MLXEmbeddingEncoder` - 63 edges
-5. `Context` - 44 edges
-6. `InterestSketch` - 43 edges
+3. `Settings` - 66 edges
+4. `MLXEmbeddingEncoder` - 64 edges
+5. `InterestSketch` - 50 edges
+6. `Context` - 44 edges
 7. `SID recommender package.` - 40 edges
 8. `후속 변경` - 37 edges
 9. `ADR-005: Taxonomy Dictionary 생성 hardening 결정` - 36 edges
@@ -53,48 +57,48 @@
   /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514/src/sid_reco/llm.py → raw/design/adr/adr-002-foodcom-preprocessing-policy.md
 - `MLXTextGenerator` --rationale_for--> `부정적/제약`  [INFERRED]
   /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514/src/sid_reco/llm.py → raw/design/adr/adr-004-taxonomy-dictionary-generation.md
-- `TaxonomyPayload` --rationale_for--> `Context`  [INFERRED]
-  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514/src/sid_reco/taxonomy/dictionary.py → raw/design/adr/adr-005-taxonomy-dictionary-hardening.md
-- `TaxonomyPromptBundle` --rationale_for--> `Context`  [INFERRED]
-  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514/src/sid_reco/taxonomy/dictionary.py → raw/design/adr/adr-005-taxonomy-dictionary-hardening.md
+- `main()` --rationale_for--> `Context`  [INFERRED]
+  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514/src/sid_reco/cli.py → raw/design/adr/adr-005-taxonomy-dictionary-hardening.md
+- `doctor()` --rationale_for--> `Context`  [INFERRED]
+  /Users/skiiwoo/PERSONAL/Training-Free-SID-Reco/.claude/worktrees/elated-sammet-50a514/src/sid_reco/cli.py → raw/design/adr/adr-005-taxonomy-dictionary-hardening.md
 
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.04
-Nodes (202): build_neighbor_context_command(), build_taxonomy_dictionary_command(), compile_sid_index_command(), doctor(), main(), _parse_hard_filters(), prepare_foodcom(), CLI entry points for local development. (+194 more)
+Cohesion: 0.03
+Nodes (148): Run the full training-free recommendation pipeline., Run the full training-free recommendation pipeline., _assign_to_centroids(), build_item_sids(), build_query_sid(), _canonicalize_clusters(), _centroids_close(), _fit_deterministic_kmeans() (+140 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.03
-Nodes (153): Run the full training-free recommendation pipeline., Run the full training-free recommendation pipeline., _assign_to_centroids(), build_item_sids(), build_query_sid(), _canonicalize_clusters(), _centroids_close(), _fit_deterministic_kmeans() (+145 more)
+Nodes (132): QuerySID, Hierarchical SID assignment for one runtime query vector., FewShotExample, load_fewshot_examples(), _normalize_matrix(), Dynamic few-shot example retrieval for Module 2.3., Small protocol for few-shot example encoding., One successful recommendation example used for dynamic prompting. (+124 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.03
-Nodes (136): compute_bootstrap_confidence(), _confidence_band(), ConfidenceCandidate, _MutableConfidenceAggregate, Module 2.4 CPU confidence aggregation for bootstrap rerank outputs., Create a compact confidence summary for final delivery., Aggregated confidence evidence for one candidate across rerank passes., Compute per-candidate MSCP and aggregate rationale evidence on CPU. (+128 more)
+Cohesion: 0.08
+Nodes (117): Run the full training-free recommendation pipeline., Diagnose whether the current environment can initialize MLX safely., smoke_mlx(), build_bounded_taxonomy_payload(), build_taxonomy_dictionary(), build_taxonomy_dictionary_prompt(), _evenly_spaced_indices(), generate_taxonomy_dictionary() (+109 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.06
-Nodes (141): build_bounded_taxonomy_payload(), build_taxonomy_dictionary(), build_taxonomy_dictionary_prompt(), _evenly_spaced_indices(), generate_taxonomy_dictionary(), load_taxonomy_items(), normalize_taxonomy_dictionary(), _parse_string_list() (+133 more)
+Cohesion: 0.04
+Nodes (97): from_settings(), MLXEmbeddingEncoder, Local MLX embedding utilities., Lazy wrapper around an MLX embedding model., Build an encoder from application settings., Encode a batch of texts into normalized embedding vectors., Encode a single text and return one embedding vector., Load the embedding model only once. (+89 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.04
-Nodes (100): Project-level configuration helpers., Resolve relative paths against the project root., _resolve_project_path(), from_settings(), MLXEmbeddingEncoder, Local MLX embedding utilities., Lazy wrapper around an MLX embedding model., Build an encoder from application settings. (+92 more)
+Cohesion: 0.07
+Nodes (99): apply_k_core_filter(), build_manifest(), build_recipe_stats(), build_temporal_splits(), DatasetSummary, _ensure_columns(), filter_positive_interactions(), load_raw_interactions() (+91 more)
 
 ### Community 5 - "Community 5"
+Cohesion: 0.06
+Nodes (96): Related, Taxonomy Item Structuring, 개요, 동작 규칙, 사용법/설정, 실행 명령, 현재 구현과 GRLM 레퍼런스의 대응, 현재 상태 (+88 more)
+
+### Community 6 - "Community 6"
+Cohesion: 0.05
+Nodes (83): build_neighbor_context_command(), build_taxonomy_dictionary_command(), compile_sid_index_command(), doctor(), main(), _parse_hard_filters(), prepare_foodcom(), CLI entry points for local development. (+75 more)
+
+### Community 7 - "Community 7"
 Cohesion: 0.09
 Nodes (0): 
 
-### Community 6 - "Community 6"
+### Community 8 - "Community 8"
 Cohesion: 0.12
 Nodes (7): App(), avgMscp(), buildLangHref(), escapeHtml(), JsonView(), MetricsStrip(), OverviewGrid()
-
-### Community 7 - "Community 7"
-Cohesion: 0.3
-Nodes (16): build_item_projection_context(), build_item_projection_prompt(), _QueuedGenerator, test_build_item_projection_context_loads_target_neighbors_and_taxonomy(), test_build_item_projection_context_requires_top5_neighbors(), test_build_item_projection_prompt_embeds_target_neighbors_and_vocab(), test_finalize_item_taxonomy_canonicalizes_variants_and_drops_weak_american_bias(), test_finalize_item_taxonomy_drops_contradictory_dietary_labels() (+8 more)
-
-### Community 8 - "Community 8"
-Cohesion: 0.21
-Nodes (12): _FakeEncoder, _FakeGenerator, _make_candidate(), _make_sketch(), test_parse_rerank_response_rejects_long_reasoning(), test_parse_rerank_response_rejects_wrong_selection_size(), test_run_bootstrap_rerank_injects_one_dynamic_example_and_runs_multiple_passes(), test_run_bootstrap_rerank_limits_structured_output_to_selection_size() (+4 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.39
@@ -114,27 +118,27 @@ Nodes (2): _EmptyTaxonomyGenerator, _FakeGenerator
 
 ### Community 13 - "Community 13"
 Cohesion: 0.33
-Nodes (5): _FakeTokenizer, _FakeTokenListTokenizer, test_generate_raises_runtime_error_when_probe_fails(), test_generate_supports_chat_template_that_returns_token_ids(), test_generate_uses_chat_template()
-
-### Community 14 - "Community 14"
-Cohesion: 0.33
 Nodes (6): _ProjectionGenerator, test_structure_taxonomy_batch_cli_can_include_evidence(), test_structure_taxonomy_batch_cli_writes_jsonl(), test_structure_taxonomy_item_cli_can_include_evidence(), test_structure_taxonomy_item_cli_prints_json(), _write_projection_inputs()
 
-### Community 15 - "Community 15"
+### Community 14 - "Community 14"
 Cohesion: 0.71
 Nodes (6): _clean_env(), _copy_script(), _init_repo(), test_graphify_full_refresh_produces_staged_outputs_with_doc_context(), test_graphify_full_refresh_reports_partial_state_on_semantic_failure(), _write_file()
 
-### Community 16 - "Community 16"
-Cohesion: 0.43
-Nodes (4): _FakeEncoder, test_compile_sid_index_cli_reports_missing_taxonomy_dictionary(), test_compile_sid_index_cli_writes_all_outputs(), _write_sid_inputs()
+### Community 15 - "Community 15"
+Cohesion: 0.4
+Nodes (5): GroundingDecision, Module 2.4 SID-aware fallback mapping helpers., Resolved canonical identity for a recommendation candidate., Resolve a candidate through direct id_map lookup, then SID fallback., resolve_grounding()
 
-### Community 17 - "Community 17"
+### Community 16 - "Community 16"
 Cohesion: 0.4
 Nodes (1): _FakeEncoder
 
-### Community 18 - "Community 18"
+### Community 17 - "Community 17"
 Cohesion: 1.0
 Nodes (2): _recipe_row(), test_prepare_foodcom_cli_writes_processed_outputs()
+
+### Community 18 - "Community 18"
+Cohesion: 1.0
+Nodes (0): 
 
 ### Community 19 - "Community 19"
 Cohesion: 1.0
@@ -146,38 +150,64 @@ Nodes (0):
 
 ### Community 21 - "Community 21"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): Normalized request contract for recommendation entrypoints.
 
 ### Community 22 - "Community 22"
+Cohesion: 1.0
+Nodes (1): Taxonomy-constrained representation of user intent.
+
+### Community 23 - "Community 23"
+Cohesion: 1.0
+Nodes (1): Final recommendation payload for one catalog item.
+
+### Community 24 - "Community 24"
+Cohesion: 1.0
+Nodes (1): Public response contract for recommendation entrypoints.
+
+### Community 25 - "Community 25"
+Cohesion: 1.0
+Nodes (1): Normalize runtime request fields into a stable typed contract.
+
+### Community 26 - "Community 26"
 Cohesion: 1.0
 Nodes (1): Load residual codebooks from NPZ and validate against the sibling manifest.
 
 ## Knowledge Gaps
-- **204 isolated node(s):** `Shared recommendation contracts.`, `Normalized request contract for recommendation entrypoints.`, `Taxonomy-constrained representation of user intent.`, `Final recommendation payload for one catalog item.`, `Public response contract for recommendation entrypoints.` (+199 more)
+- **204 isolated node(s):** `Load and query offline recommendation statistics.`, `Lookup-friendly popularity and co-occurrence statistics.`, `Load recommendation statistics persisted by compile-sid-index.`, `Module 2.4 SID-aware fallback mapping helpers.`, `Resolved canonical identity for a recommendation candidate.` (+199 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 19`** (2 nodes): `test_git_hooks_delegate_to_shared_scripts_with_repo_root_fallback()`, `test_git_hook_scripts.py`
+- **Thin community `Community 18`** (2 nodes): `test_git_hooks_delegate_to_shared_scripts_with_repo_root_fallback()`, `test_git_hook_scripts.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 20`** (1 nodes): `app.jsx`
+- **Thin community `Community 19`** (1 nodes): `app.jsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 21`** (1 nodes): `i18n.js`
+- **Thin community `Community 20`** (1 nodes): `i18n.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 22`** (1 nodes): `Load residual codebooks from NPZ and validate against the sibling manifest.`
+- **Thin community `Community 21`** (1 nodes): `Normalized request contract for recommendation entrypoints.`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 22`** (1 nodes): `Taxonomy-constrained representation of user intent.`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 23`** (1 nodes): `Final recommendation payload for one catalog item.`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 24`** (1 nodes): `Public response contract for recommendation entrypoints.`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 25`** (1 nodes): `Normalize runtime request fields into a stable typed contract.`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 26`** (1 nodes): `Load residual codebooks from NPZ and validate against the sibling manifest.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `SID recommender package.` connect `Community 2` to `Community 1`, `Community 3`, `Community 4`?**
+- **Why does `SID recommender package.` connect `Community 1` to `Community 0`, `Community 2`, `Community 3`, `Community 5`, `Community 6`, `Community 15`?**
   _High betweenness centrality (0.058) - this node is a cross-community bridge._
-- **Why does `MLXTextGenerator` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 4`, `Community 13`?**
-  _High betweenness centrality (0.040) - this node is a cross-community bridge._
-- **Why does `Settings` connect `Community 1` to `Community 0`, `Community 2`, `Community 3`, `Community 4`, `Community 16`?**
-  _High betweenness centrality (0.033) - this node is a cross-community bridge._
-- **Are the 98 inferred relationships involving `MLXTextGenerator` (e.g. with `_FakeTokenizer` and `_FakeTokenListTokenizer`) actually correct?**
-  _`MLXTextGenerator` has 98 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `MLXTextGenerator` connect `Community 5` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 6`?**
+  _High betweenness centrality (0.049) - this node is a cross-community bridge._
+- **Why does `Settings` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 5`, `Community 6`?**
+  _High betweenness centrality (0.030) - this node is a cross-community bridge._
+- **Are the 99 inferred relationships involving `MLXTextGenerator` (e.g. with `_FakeTokenizer` and `_FakeTokenListTokenizer`) actually correct?**
+  _`MLXTextGenerator` has 99 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 92 inferred relationships involving `Context` (e.g. with `main()` and `doctor()`) actually correct?**
   _`Context` has 92 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 63 inferred relationships involving `Settings` (e.g. with `_FakeEncoder` and `_FakeEncoder`) actually correct?**
-  _`Settings` has 63 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 58 inferred relationships involving `MLXEmbeddingEncoder` (e.g. with `_FakeArray` and `Settings`) actually correct?**
-  _`MLXEmbeddingEncoder` has 58 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 64 inferred relationships involving `Settings` (e.g. with `_FakeEncoder` and `_FakeEncoder`) actually correct?**
+  _`Settings` has 64 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 59 inferred relationships involving `MLXEmbeddingEncoder` (e.g. with `_FakeArray` and `Settings`) actually correct?**
+  _`MLXEmbeddingEncoder` has 59 INFERRED edges - model-reasoned connections that need verification._

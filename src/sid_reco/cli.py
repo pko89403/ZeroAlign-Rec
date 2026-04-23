@@ -874,6 +874,7 @@ def recommend_command(
     console.print(table)
     console.print(response.rerank_summary)
     console.print(response.confidence_summary)
+    console.print(f"Query SID: {response.query_sid.sid_string}  path={response.query_sid.sid_path}")
 
 
 def _parse_hard_filters(raw_filters: list[str]) -> dict[str, list[str]]:
