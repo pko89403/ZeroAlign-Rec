@@ -56,7 +56,7 @@
 - **Training-free recommendation experiments**: SID 기반 추천 흐름을 별도 model training 없이 빠르게 검증할 수 있다.
 - **Local-first inference**: `mlx-lm`과 `mlx-embeddings`를 사용해 Apple Silicon에서 로컬 추론을 수행한다.
 - **Taxonomy-aware pipeline**: dataset preparation, neighbor index, taxonomy dictionary, item structuring을 단계별로 분리해 재현 가능하게 다룬다.
-- **Agent-friendly repository**: Copilot/Codex용 `.github/`, `.agents/skills/`, `references/`, `AGENTS.md`가 함께 정리되어 있다.
+- **Agent-friendly repository**: Copilot/Codex용 `.github/`, `.agents/`, `AGENTS.md`가 함께 정리되어 있다.
 
 ## 요구 사항
 
@@ -285,7 +285,7 @@ uv run mypy src
 | `graphify-out/` | primary committed knowledge graph artifacts |
 | `.github/` | Copilot-facing instructions and agent personas |
 | `.agents/skills/` | repo-local agent skills |
-| `references/` | shared checklists and upstream snapshots |
+| `.agents/playbooks/` | shared checklists |
 | `scripts/hooks/` | Claude Code / Codex CLI hook entrypoints |
 | `AGENTS.md` | top-level repository rules and schema |
 
@@ -342,7 +342,7 @@ source corpus:
 - `raw/design/`
 - `raw/external/`
 
-Graphify 입력에는 `references/`, `README*`, `SPEC.md`, `CLAUDE.md`/`AGENTS.md`가 포함되지 않는다.
+Graphify 입력에는 `.agents/`, `README*`, `SPEC.md`, `CLAUDE.md`/`AGENTS.md`가 포함되지 않는다.
 
 ## Copilot 및 Agent 하네스
 
@@ -354,7 +354,7 @@ Graphify 입력에는 `references/`, `README*`, `SPEC.md`, `CLAUDE.md`/`AGENTS.m
 - specialized personas: `.github/agents/`
 - repo-local skills: `.agents/skills/`
 - hook scripts: `scripts/hooks/`
-- local adaptation rules: `references/local-adaptation.md`
+- local adaptation rules: `.agents/policies/local-adaptation.md`
 - optional phase executor: `scripts/execute.py`
 
 주요 shortcut:

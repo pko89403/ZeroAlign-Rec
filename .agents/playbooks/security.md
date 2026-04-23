@@ -1,4 +1,4 @@
-# Security Checklist
+# Security
 
 Quick reference for web application security. Use alongside the `security-and-hardening` skill.
 

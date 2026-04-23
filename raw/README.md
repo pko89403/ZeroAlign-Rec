@@ -13,7 +13,7 @@
 
 - `raw/`는 입력이다.
 - `graphify-out/`는 generated output이다.
-- `references/`는 하네스 체크리스트/참고자료이며 Graphify source가 아니다.
+- `.agents/policies/`, `.agents/playbooks/`는 하네스 운영 규칙/체크리스트이며 Graphify source가 아니다.
 
 ## 운영 원칙
 

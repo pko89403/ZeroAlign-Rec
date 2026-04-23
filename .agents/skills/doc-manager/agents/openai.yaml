@@ -1,4 +1,4 @@
 interface:
   display_name: "Doc Manager"
   short_description: "Alias for the repository docs and harness sync workflow"
-  default_prompt: "Use $doc-manager to run the repository docs-manager workflow for README.md, AGENTS.md, .github/copilot-instructions.md, references/local-adaptation.md, and the `raw/` Graphify source corpus."
+  default_prompt: "Use $doc-manager to run the repository docs-manager workflow for README.md, AGENTS.md, .github/copilot-instructions.md, .agents/policies/local-adaptation.md, .agents/skills/graphify-manager/SKILL.md, and the `raw/` Graphify source corpus."

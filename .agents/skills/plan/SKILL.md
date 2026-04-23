@@ -14,7 +14,7 @@ Use the `planning-and-task-breakdown` workflow for this repository.
 3. Identify the dependency graph between components.
 4. Slice work vertically (one complete path per task) and draft tasks with acceptance criteria + verification steps.
 5. Present the execution flow, checkpoints, and ordered task list in the conversation for the user to review.
-6. Use repository validations from `references/local-adaptation.md`.
+6. Use repository validations from `.agents/policies/local-adaptation.md`.
 
 ## Related
 
