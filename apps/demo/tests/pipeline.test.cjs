@@ -60,7 +60,7 @@ test("buildSid via runPipeline: recipe with empty flavors falls back to 'default
       query: "fresh light lunch", liked: [113], disliked: [], hardFilters: {}, topK: 3,
     });
     for (const it of res.conf.items) {
-      assert.ok(!it.sid.includes("undefined"), `SID has undefined: ${it.sid}`);
+      assert.ok(!it.sid_string.includes("undefined"), `SID has undefined: ${it.sid_string}`);
     }
   } finally {
     target.flavors = saved;
@@ -160,7 +160,12 @@ test("computeConfidenceAndGround: SID matches `SID::cuisine::dish::flavor::id` f
   const rr = W.zeroShotRerank(search.top30, sk);
   const conf = W.computeConfidenceAndGround(search.top30, rr, 3);
   for (const it of conf.items) {
-    assert.match(it.sid, /^SID::[a-z-]+::[a-z-]+::[a-z-]+::\d+$/);
+    assert.match(it.sid_string, /^SID::[a-z-]+::[a-z-]+::[a-z-]+::\d+$/);
+    assert.ok(Array.isArray(it.sid_path) && it.sid_path.length === 3);
+    for (const level of it.sid_path) {
+      assert.ok(Number.isInteger(level) && level >= 0 && level <= 255,
+        `sid_path level out of range: ${level}`);
+    }
   }
 });
 
@@ -211,4 +216,28 @@ test("runPipeline: returns sketch/search/rerank/conf/timings; timings include si
     assert.equal(typeof result.timings[k], "number");
     assert.ok(result.timings[k] > 0);
   }
+});
+
+test("runPipeline: conf.query_sid exposes sid_string and sid_path with integer levels", () => {
+  const result = W.runPipeline({
+    query: "I want hearty but not too heavy comfort food for a weeknight. Vegetarian.",
+    liked: [110, 111], disliked: [], hardFilters: { dietary_style: ["vegetarian"] }, topK: 3,
+  });
+  const qs = result.conf.query_sid;
+  assert.ok(qs && typeof qs === "object", "conf.query_sid must be an object");
+  assert.match(qs.sid_string, /^QSID::/);
+  assert.ok(Array.isArray(qs.sid_path) && qs.sid_path.length === 3);
+  for (const level of qs.sid_path) {
+    assert.ok(Number.isInteger(level) && level >= 0 && level <= 255,
+      `query_sid level out of range: ${level}`);
+  }
+});
+
+test("runPipeline: buildQuerySid falls back to 'any' when a sketch facet is missing", () => {
+  // Empty query and no liked items → no positive_facets beyond defaults.
+  const result = W.runPipeline({
+    query: "", liked: [], disliked: [], hardFilters: {}, topK: 3,
+  });
+  assert.ok(result.conf.query_sid.sid_string.includes("any"),
+    `expected 'any' fallback, got ${result.conf.query_sid.sid_string}`);
 });
