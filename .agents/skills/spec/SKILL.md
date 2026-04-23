@@ -9,9 +9,9 @@ Use the `spec-driven-development` workflow for this repository.
 
 ## Procedure
 
-1. Read `AGENTS.md`, `README.md`, and `.agents/policies/local-adaptation.md`.
+1. Read `AGENTS.md`, `README.md`, and `.agents/policies/local-adaptation.md`. `raw/design/specs/` 하위 파일명만 스캔해 다음 번호와 기존 패턴을 확인한다 (내용 선탐독 불필요).
 2. Clarify the objective, acceptance criteria, constraints, and boundaries.
-3. Produce a structured `SPEC.md` in the repository root.
+3. 새 spec은 `raw/design/specs/ski-NNN-<slug>.md` 형식으로 생성한다. `NNN`은 3자리 zero-pad된 다음 번호, `<slug>`는 짧은 영어 kebab-case 요약.
 4. Include repository-specific commands such as:
    - `uv run pytest`
    - `uv run ruff check .`

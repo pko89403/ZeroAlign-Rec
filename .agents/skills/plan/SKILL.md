@@ -9,7 +9,7 @@ Use the `planning-and-task-breakdown` workflow for this repository.
 
 ## Procedure
 
-1. Read `SPEC.md` if it exists, then inspect the relevant code and docs.
+1. 사용자가 지정한 `raw/design/specs/ski-NNN-*.md`를 먼저 읽는다. 지정이 없으면 `raw/design/specs/` 하위에서 가장 최근 파일을 기준으로 확인한 뒤, 관련 코드와 문서를 검사한다.
 2. Stay in read-only planning mode.
 3. Identify the dependency graph between components.
 4. Slice work vertically (one complete path per task) and draft tasks with acceptance criteria + verification steps.

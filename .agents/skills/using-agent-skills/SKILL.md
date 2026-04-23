@@ -18,7 +18,7 @@ In this repository, the imported skill pack runs with these local rules:
 - Repository-specific command substitutions live in `.agents/policies/local-adaptation.md`.
 - Primary verification commands are `uv run pytest`, `uv run ruff check .`, `uv run mypy src`, and `uv run sid-reco doctor`.
 - Shared checklists live in `.agents/playbooks/`.
-- Idea artifacts belong in `ideas/`; spec/task artifacts belong in `SPEC.md` and `tasks/`.
+- Idea artifacts belong in `ideas/`; spec artifacts belong in `raw/design/specs/ski-NNN-*.md`; task artifacts belong in `tasks/`.
 
 ## Skill Discovery
 
