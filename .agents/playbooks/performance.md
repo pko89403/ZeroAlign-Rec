@@ -1,4 +1,4 @@
-# Performance Checklist
+# Performance
 
 Quick reference checklist for web application performance. Use alongside the `performance-optimization` skill.
 

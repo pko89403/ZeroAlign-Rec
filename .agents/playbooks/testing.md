@@ -1,4 +1,4 @@
-# Testing Patterns Reference
+# Testing
 
 Quick reference for common testing patterns across the stack. Use alongside the `test-driven-development` skill.
 

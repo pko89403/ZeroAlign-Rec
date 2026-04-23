@@ -18,7 +18,6 @@ upstream 문서와 충돌하면 이 문서를 우선한다.
 |---|---|
 | `docs/decisions/` | `raw/design/adr/` |
 | `CLAUDE.md` | `AGENTS.md` |
-| `references/` | `.agents/policies/`, `.agents/playbooks/` |
 | `.claude/commands/` | `.agents/skills/<shortcut>/SKILL.md` wrapper skills |
 | `.claude/settings.json` | `.claude/settings.json` active safety hooks |
 | Graphify primary graph | `graphify-out/GRAPH_REPORT.md`, `graphify-out/graph.json` |
