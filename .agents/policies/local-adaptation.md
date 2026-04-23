@@ -18,7 +18,7 @@ upstream 문서와 충돌하면 이 문서를 우선한다.
 |---|---|
 | `docs/decisions/` | `raw/design/adr/` |
 | `CLAUDE.md` | `AGENTS.md` |
-| `references/` | `references/` |
+| `references/` | `.agents/policies/`, `.agents/playbooks/` |
 | `.claude/commands/` | `.agents/skills/<shortcut>/SKILL.md` wrapper skills |
 | `.claude/settings.json` | `.claude/settings.json` active safety hooks |
 | Graphify primary graph | `graphify-out/GRAPH_REPORT.md`, `graphify-out/graph.json` |
@@ -77,7 +77,7 @@ uv run sid-reco compile-sid-index --help
 이 저장소의 repo-local Codex 확장점은 `.agents/skills/`다.
 공식 Codex App built-in slash command와는 별개로, enabled skill은 slash 목록에 나타날 수 있다.
 
-- `/docs-manager` 또는 `/doc-manager` — `raw/` source corpus 관리와 `README.md`, `AGENTS.md`, `.github/copilot-instructions.md`, `references/local-adaptation.md` 동기화를 포함한 문서 반영 루틴
+- `/docs-manager` 또는 `/doc-manager` — `raw/` source corpus 관리와 `README.md`, `AGENTS.md`, `.github/copilot-instructions.md`, `.agents/policies/local-adaptation.md` 동기화를 포함한 문서 반영 루틴
 - `/spec` — 구현 전에 `SPEC.md`를 정리하는 spec-driven workflow
 - `/plan` — spec-driven workflow 후속 작업 분해
 - `/build` — incremental-implementation + TDD 기반 구현 흐름

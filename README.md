@@ -56,7 +56,7 @@ Source lives under [`apps/demo/`](apps/demo/). Open `index.html` over any local 
 - **Training-free recommendation experiments**: validate SID-based recommendation flows without separate model training.
 - **Local-first inference**: run `mlx-lm` and `mlx-embeddings` locally on Apple Silicon.
 - **Taxonomy-aware pipeline**: separate dataset preparation, neighbor index construction, taxonomy dictionary generation, and item structuring into reproducible steps.
-- **Agent-friendly repository**: keep `.github/`, `.agents/skills/`, `references/`, and `AGENTS.md` organized for Copilot/Codex workflows.
+- **Agent-friendly repository**: keep `.github/`, `.agents/`, and `AGENTS.md` organized for Copilot/Codex workflows.
 
 ## Requirements
 
@@ -327,7 +327,7 @@ uv run sid-reco structure-taxonomy-batch --help
 | `graphify-out/` | primary committed knowledge graph artifacts |
 | `.github/` | Copilot-facing instructions and agent personas |
 | `.agents/skills/` | repo-local agent skills |
-| `references/` | shared checklists and upstream snapshots |
+| `.agents/playbooks/` | shared checklists |
 | `scripts/hooks/` | Claude Code / Codex CLI hook entrypoints |
 | `AGENTS.md` | top-level repository rules and schema |
 
@@ -384,7 +384,7 @@ Source corpus:
 - `raw/design/`
 - `raw/external/`
 
-Graphify does not treat `references/`, `README*`, `SPEC.md`, or `CLAUDE.md`/`AGENTS.md` as source input.
+Graphify does not treat `.agents/`, `README*`, `SPEC.md`, or `CLAUDE.md`/`AGENTS.md` as source input.
 
 ## Copilot and Agent Harness
 
@@ -396,7 +396,7 @@ This repository also maintains a Copilot/Codex-friendly harness.
 - specialized personas: `.github/agents/`
 - repo-local skills: `.agents/skills/`
 - hook scripts: `scripts/hooks/`
-- local adaptation rules: `references/local-adaptation.md`
+- local adaptation rules: `.agents/policies/local-adaptation.md`
 - optional phase executor: `scripts/execute.py`
 
 Main shortcuts:
