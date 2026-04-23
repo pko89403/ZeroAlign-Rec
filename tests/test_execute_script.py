@@ -201,7 +201,7 @@ def test_claude_settings_enable_repo_specific_safety_hooks() -> None:
         if entry["matcher"] == "Write"
         for hook in entry["hooks"]
     ]
-    assert any("graphify-out/" in command for command in write_commands)
+    assert any("graphify-out" in command for command in write_commands)
 
 
 def test_claude_stop_script_uses_repo_validation_chain() -> None:
@@ -210,6 +210,6 @@ def test_claude_stop_script_uses_repo_validation_chain() -> None:
 
     assert "uv run ruff check ." in content
     assert "uv run ruff format --check ." in content
-    assert "uv run mypy src" in content
-    assert "--ignore=tests/test_mlx_runtime.py" in content
-    assert "--ignore=tests/test_cli_smoke_mlx.py" in content
+    # Stop hook은 hot-path라 mypy/pytest 제외. 두 검증은 pre-push.sh로 위임.
+    assert "uv run mypy src" not in content
+    assert "uv run pytest" not in content
