@@ -10,7 +10,7 @@ from pathlib import Path
 import faiss  # type: ignore[import-untyped]
 import numpy as np
 
-from sid_reco.sid.compiler import CompiledSIDItems
+from sid_reco.sid.compiler import ItemSID, TrainedResidualCodebooks, write_codebooks
 from sid_reco.sid.embed_backend import EmbeddedSIDItems, FloatMatrix
 
 
@@ -26,16 +26,19 @@ class SIDIndexWriteSummary:
     id_map_path: Path
     index_path: Path
     manifest_path: Path
+    codebooks_path: Path
+    codebooks_manifest_path: Path
 
 
 def write_sid_index_outputs(
     *,
     embedded: EmbeddedSIDItems,
-    compiled: CompiledSIDItems,
+    codebooks: TrainedResidualCodebooks,
+    items: list[ItemSID],
     out_dir: Path,
 ) -> SIDIndexWriteSummary:
-    """Persist compiled SID outputs, mapping files, and a CPU FAISS index."""
-    _validate_embedded_and_compiled(embedded=embedded, compiled=compiled)
+    """Persist compiled SID outputs, codebook artifacts, mappings, and a CPU FAISS index."""
+    _validate_embedded_codebooks_and_items(embedded=embedded, codebooks=codebooks, items=items)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     compiled_sid_path = out_dir / "compiled_sid.jsonl"
@@ -50,16 +53,14 @@ def write_sid_index_outputs(
     item_to_sid: dict[str, str] = {}
     sid_to_items: dict[str, list[int]] = defaultdict(list)
 
-    for faiss_idx, (embedded_item, compiled_item) in enumerate(
-        zip(embedded.items, compiled.items, strict=True)
-    ):
-        sid_path = list(compiled_item.sid_path)
+    for faiss_idx, (embedded_item, item) in enumerate(zip(embedded.items, items, strict=True)):
+        sid_path = list(item.sid_path)
         compiled_lines.append(
             json.dumps(
                 {
-                    "recipe_id": compiled_item.recipe_id,
+                    "recipe_id": item.recipe_id,
                     "sid_path": sid_path,
-                    "sid_string": compiled_item.sid_string,
+                    "sid_string": item.sid_string,
                 },
                 ensure_ascii=False,
                 sort_keys=True,
@@ -71,14 +72,14 @@ def write_sid_index_outputs(
                     "faiss_idx": faiss_idx,
                     "recipe_id": embedded_item.recipe_id,
                     "sid_path": sid_path,
-                    "sid_string": compiled_item.sid_string,
+                    "sid_string": item.sid_string,
                 },
                 ensure_ascii=False,
                 sort_keys=True,
             )
         )
-        item_to_sid[str(compiled_item.recipe_id)] = compiled_item.sid_string
-        sid_to_items[compiled_item.sid_string].append(compiled_item.recipe_id)
+        item_to_sid[str(item.recipe_id)] = item.sid_string
+        sid_to_items[item.sid_string].append(item.recipe_id)
 
     compiled_sid_path.write_text("\n".join(compiled_lines) + "\n", encoding="utf-8")
     item_to_sid_path.write_text(
@@ -101,16 +102,21 @@ def write_sid_index_outputs(
     index.add(normalized_matrix)
     faiss.write_index(index, str(index_path))
 
+    codebooks_path, codebooks_manifest_path = write_codebooks(codebooks, out_dir=out_dir)
+
     manifest_path.write_text(
         json.dumps(
             {
-                "branching_factor": compiled.branching_factor,
-                "depth": compiled.depth,
+                "branching_factor": codebooks.branching_factor,
+                "codebooks_manifest_path": codebooks_manifest_path.name,
+                "codebooks_path": codebooks_path.name,
+                "depth": codebooks.depth,
                 "embedding_dim": embedded.embedding_dim,
                 "index_type": "faiss.IndexFlatIP",
                 "item_count": len(embedded.items),
-                "level_cluster_counts": [level.cluster_count for level in compiled.levels],
+                "level_cluster_counts": [level.cluster_count for level in codebooks.levels],
                 "model_id": embedded.model_id,
+                "normalize_residuals": codebooks.normalize_residuals,
             },
             ensure_ascii=False,
             sort_keys=True,
@@ -128,21 +134,26 @@ def write_sid_index_outputs(
         id_map_path=id_map_path,
         index_path=index_path,
         manifest_path=manifest_path,
+        codebooks_path=codebooks_path,
+        codebooks_manifest_path=codebooks_manifest_path,
     )
 
 
-def _validate_embedded_and_compiled(
+def _validate_embedded_codebooks_and_items(
     *,
     embedded: EmbeddedSIDItems,
-    compiled: CompiledSIDItems,
+    codebooks: TrainedResidualCodebooks,
+    items: list[ItemSID],
 ) -> None:
-    if len(embedded.items) != len(compiled.items):
-        raise ValueError("Embedded items and compiled SID items must align by recipe_id.")
-    if embedded.embedding_dim != compiled.embedding_dim:
-        raise ValueError("Embedded items and compiled SID items must share embedding_dim.")
-    for embedded_item, compiled_item in zip(embedded.items, compiled.items, strict=True):
-        if embedded_item.recipe_id != compiled_item.recipe_id:
-            raise ValueError("Embedded items and compiled SID items must align by recipe_id.")
+    if len(embedded.items) != len(items):
+        raise ValueError("Embedded items and SID items must align by recipe_id.")
+    if embedded.embedding_dim != codebooks.embedding_dim:
+        raise ValueError("Embedded items and trained codebooks must share embedding_dim.")
+    if len(codebooks.levels) != codebooks.depth:
+        raise ValueError("Trained codebooks depth must match the number of stored levels.")
+    for embedded_item, item in zip(embedded.items, items, strict=True):
+        if embedded_item.recipe_id != item.recipe_id:
+            raise ValueError("Embedded items and SID items must align by recipe_id.")
 
 
 def _normalize_embedding_matrix(matrix: FloatMatrix) -> FloatMatrix:

@@ -66,10 +66,13 @@ def test_compile_sid_index_cli_writes_all_outputs(tmp_path: Path, monkeypatch) -
             "2",
             "--no-normalize-residuals",
         ],
+        env={"COLUMNS": "240"},
     )
 
     assert result.exit_code == 0, result.stdout
     assert "SID Compilation Index" in result.stdout
+    assert "Codebooks path" in result.stdout
+    assert str(out_dir / "residual_codebooks.npz") in result.stdout
     assert (out_dir / "serialized_items.jsonl").exists()
     assert (out_dir / "embeddings.npy").exists()
     assert (out_dir / "embedding_manifest.json").exists()
@@ -80,6 +83,8 @@ def test_compile_sid_index_cli_writes_all_outputs(tmp_path: Path, monkeypatch) -
     assert (out_dir / "item_index.faiss").exists()
     assert (out_dir / "manifest.json").exists()
     assert (out_dir / "recommendation_stats.json").exists()
+    assert (out_dir / "residual_codebooks.npz").exists()
+    assert (out_dir / "residual_codebooks_manifest.json").exists()
 
     serialized_payloads = [
         json.loads(line)
@@ -109,6 +114,18 @@ def test_compile_sid_index_cli_writes_all_outputs(tmp_path: Path, monkeypatch) -
     assert manifest["item_count"] == 3
     assert len(manifest["level_cluster_counts"]) == 2
     assert manifest["model_id"] == "test-embed-model"
+    assert manifest["normalize_residuals"] is False
+    assert manifest["codebooks_path"] == "residual_codebooks.npz"
+    assert manifest["codebooks_manifest_path"] == "residual_codebooks_manifest.json"
+
+    codebooks_manifest = json.loads(
+        (out_dir / "residual_codebooks_manifest.json").read_text(encoding="utf-8")
+    )
+    assert codebooks_manifest["branching_factor"] == 3
+    assert codebooks_manifest["depth"] == 2
+    assert codebooks_manifest["embedding_dim"] == 3
+    assert codebooks_manifest["normalize_residuals"] is False
+    assert codebooks_manifest["codebooks_path"] == "residual_codebooks.npz"
 
     item_to_sid = json.loads((out_dir / "item_to_sid.json").read_text(encoding="utf-8"))
     assert sorted(item_to_sid) == ["101", "102", "103"]
