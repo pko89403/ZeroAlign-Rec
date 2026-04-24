@@ -42,9 +42,7 @@ def test_graphify_eval_graph_quality_passes_for_document_context_fixture() -> No
     assert not result.missing_node_ids
 
 
-def test_graphify_eval_graph_quality_rejects_code_only_fixture_for_document_context_expectation() -> (
-    None
-):
+def test_graphify_eval_rejects_code_only_for_doc_context() -> None:
     module = _load_graphify_eval_module()
     result = module.evaluate_graph_quality_from_paths(
         graph_path=GRAPH_FIXTURES / "code_only_graph.json",
