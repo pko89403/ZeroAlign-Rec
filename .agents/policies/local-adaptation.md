@@ -114,6 +114,7 @@ uv run sid-reco compile-sid-index --help
   - `phases/`는 `.gitignore`에 등록된 로컬 스크래치 디렉터리 — phase 메타데이터는 커밋 대상이 아니고 사용자 개인 worktree 안에서만 유지된다.
   - executor를 실제로 쓸 때는 `mkdir -p phases/<phase>` 후 `index.json`을 생성해서 bootstrap한다.
 - Claude Code active safety hooks는 `.claude/settings.json`과 `scripts/hooks/claude-stop-checks.sh`를 기준으로 읽는다.
+- Codex graphify awareness hook은 `.codex/hooks.json`의 PreToolUse Bash matcher에 `scripts/hooks/pretool-graphify-awareness.sh`를 등록한다. upstream `graphify codex install`을 재실행하면 repo-local 경로가 upstream inline command로 덮어써지므로 재실행을 금지하고, upstream awareness 메시지 변경은 스크립트를 수동으로 갱신한다.
 - 이 저장소는 upstream `/graphify` 사용 모델을 따르며, repo-local Graphify split이나 staged refresh contract를 별도로 문서화하지 않는다.
 - 기본 `/graphify .` 입력 경계는 루트 `.graphifyignore`가 결정한다.
 - 사용자가 자연어로 PR 생성을 요청해도 `.github/pull_request_template.md`를 반드시 기준으로 사용한다.
