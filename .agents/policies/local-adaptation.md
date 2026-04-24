@@ -84,8 +84,7 @@ uv run sid-reco compile-sid-index --help
 - built-in `/review` 또는 `$code-review-and-quality` — 5축 코드 리뷰
 - `/code-simplify` — 동작 보존 단순화 검토
 - `/ship` — 배포/릴리스 전 체크리스트
-- `/graphify-manager` — full refresh orchestration (producer → verify → sync)
-- `/graphify-full` — graphify-manager wrapper로 full refresh 1회 실행
+- `/graphify` — upstream-style single public Graphify entrypoint. `graphify claude install`, `graphify codex install`, `graphify opencode install`, `graphify copilot install` 계열을 assistant integration 기준선으로 읽고, 기본 `/graphify .` 입력 경계는 `.graphifyignore`로 해석한다.
 
 ## Output Locations
 
@@ -98,7 +97,7 @@ uv run sid-reco compile-sid-index --help
 - `raw/design/**` 문서는 한국어로 유지한다.
 - `SPEC.md`, `tasks/plan.md`, `tasks/todo.md`는 신규 작성 또는 의미있는 개정 시 한국어로 작성한다. 기존 영어 내용은 즉시 번역할 의무는 없다.
 
-> graphify orchestration 세부(실행 경로, 커밋 산출물, BUILD_INFO trust signal, hooks auto-refresh 동작 등)는 [`.agents/skills/graphify-manager/SKILL.md`](../.agents/skills/graphify-manager/SKILL.md)를 참조한다.
+> upstream `/graphify` 절차는 [`.agents/skills/graphify/SKILL.md`](../.agents/skills/graphify/SKILL.md)를, 기본 corpus 제외 규칙은 저장소 루트의 `.graphifyignore`를 참조한다.
 
 ## Notes
 
@@ -115,8 +114,7 @@ uv run sid-reco compile-sid-index --help
   - `phases/`는 `.gitignore`에 등록된 로컬 스크래치 디렉터리 — phase 메타데이터는 커밋 대상이 아니고 사용자 개인 worktree 안에서만 유지된다.
   - executor를 실제로 쓸 때는 `mkdir -p phases/<phase>` 후 `index.json`을 생성해서 bootstrap한다.
 - Claude Code active safety hooks는 `.claude/settings.json`과 `scripts/hooks/claude-stop-checks.sh`를 기준으로 읽는다.
-- curated full refresh가 필요하면 `scripts/graphify_prepare_corpus.sh`로 `.graphify-work/corpus/`를 준비하고, `scripts/graphify_full_refresh.py` -> `scripts/graphify_verify_full_refresh.py` -> `scripts/graphify_sync_staged.sh` 순서를 따른다.
-- repo-local full refresh orchestration entrypoint는 `.agents/skills/graphify-manager/SKILL.md`다.
-- `graphify-out/BUILD_INFO.json`의 `mode`가 `full_refresh`이고 `verified=true`이면 현재 `raw/` source corpus가 그래프에 반영된 상태로 본다.
+- 이 저장소는 upstream `/graphify` 사용 모델을 따르며, repo-local Graphify split이나 staged refresh contract를 별도로 문서화하지 않는다.
+- 기본 `/graphify .` 입력 경계는 루트 `.graphifyignore`가 결정한다.
 - 사용자가 자연어로 PR 생성을 요청해도 `.github/pull_request_template.md`를 반드시 기준으로 사용한다.
 - `gh pr create --body` 또는 `--body-file`는 템플릿을 우회할 수 있으므로, 템플릿 기반 본문을 먼저 만들지 않은 상태에서는 사용하지 않는다.

@@ -1,0 +1,36 @@
+{
+  "runs": [
+    {
+      "task_id": "find-default-boundary-files",
+      "variant": "baseline",
+      "first_response_correct": false,
+      "turns_to_success": 4,
+      "wrong_file_count": 1,
+      "duration_seconds": 120.0
+    },
+    {
+      "task_id": "find-default-boundary-files",
+      "variant": "graph",
+      "first_response_correct": true,
+      "turns_to_success": 2,
+      "wrong_file_count": 0,
+      "duration_seconds": 70.0
+    },
+    {
+      "task_id": "explain-upstream-entrypoint",
+      "variant": "baseline",
+      "first_response_correct": true,
+      "turns_to_success": 3,
+      "wrong_file_count": 1,
+      "duration_seconds": 90.0
+    },
+    {
+      "task_id": "explain-upstream-entrypoint",
+      "variant": "graph",
+      "first_response_correct": true,
+      "turns_to_success": 1,
+      "wrong_file_count": 0,
+      "duration_seconds": 45.0
+    }
+  ]
+}

@@ -4,6 +4,34 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+REMOVED_GRAPHIFY_CONTRACT_TOKENS = (
+    "code_update",
+    "full_refresh",
+    "BUILD_INFO.json",
+    "scripts/graphify_prepare_corpus.sh",
+    "scripts/graphify_full_refresh.py",
+    "scripts/graphify_verify_full_refresh.py",
+    "scripts/graphify_sync_staged.sh",
+    "PostToolUse auto-refresh",
+)
+LEGACY_GRAPHIFY_RUNTIME_PATHS = (
+    "scripts/graphify_code_refresh.sh",
+    "scripts/graphify_prepare_corpus.sh",
+    "scripts/graphify_full_refresh.py",
+    "scripts/graphify_semantic_adapter.py",
+    "scripts/graphify_verify_full_refresh.py",
+    "scripts/graphify_sync_staged.sh",
+    "scripts/graphify_ci_candidate.sh",
+    "scripts/hooks/graphify-auto-refresh.sh",
+    "scripts/hooks/graphify-pretool.sh",
+    "scripts/hooks/graphify-mode-note.sh",
+    "graphify-out/BUILD_INFO.json",
+)
+LEGACY_GRAPHIFY_TEST_PATHS = (
+    "tests/test_graphify_auto_refresh.py",
+    "tests/test_graphify_producer.py",
+    "tests/test_graphify_workflow.py",
+)
 
 
 def test_gitignore_ignores_only_graphify_runtime_cache() -> None:
@@ -16,44 +44,50 @@ def test_gitignore_ignores_only_graphify_runtime_cache() -> None:
 
 
 def test_graphifyignore_excludes_non_curated_paths() -> None:
-    content = (ROOT / ".graphifyignore").read_text(encoding="utf-8")
+    lines = {
+        line.strip()
+        for line in (ROOT / ".graphifyignore").read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    }
 
-    assert ".agents/" in content
-    assert "scripts/" in content
-    assert "tasks/" in content
+    assert ".agents/" in lines
+    assert "scripts/" in lines
+    assert "tasks/" in lines
+    assert "AGENTS.md" in lines
+    assert "CLAUDE.md" in lines
+    assert "README.md" in lines
+    assert "README.ko.md" in lines
+    assert "SPEC.md" in lines
+    assert "graphify-out/" in lines
+    assert "apps/demo/screenshots/" in lines
+    assert "assets/branding/" in lines
+    assert "tests/fixtures/graphify/" in lines
 
 
-def test_claude_settings_prefer_graphify_before_raw_search() -> None:
+def test_readmes_explain_graphifyignore_as_default_corpus_boundary() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_ko = (ROOT / "README.ko.md").read_text(encoding="utf-8")
+
+    for content in (readme, readme_ko):
+        assert ".graphifyignore" in content
+        assert "AGENTS.md" in content
+        assert "graphify-out/" in content
+        assert "apps/demo/screenshots/" in content
+
+
+def test_claude_settings_do_not_register_graphify_specific_hooks() -> None:
     settings = json.loads((ROOT / ".claude" / "settings.json").read_text(encoding="utf-8"))
+    encoded = json.dumps(settings)
 
-    pretool = settings["hooks"]["PreToolUse"]
-    graphify_hooks = [
-        hook["command"]
-        for entry in pretool
-        if entry["matcher"] == "Glob|Grep"
-        for hook in entry["hooks"]
-    ]
-
-    assert graphify_hooks
-    assert graphify_hooks[0] == "bash scripts/hooks/graphify-pretool.sh"
-
-    posttool = settings["hooks"]["PostToolUse"]
-    auto_refresh_hooks = [
-        hook["command"]
-        for entry in posttool
-        if entry["matcher"] == "Write|Edit|Bash"
-        for hook in entry["hooks"]
-    ]
-
-    assert auto_refresh_hooks
-    assert auto_refresh_hooks[0] == "bash scripts/hooks/graphify-auto-refresh.sh"
+    assert "graphify-pretool.sh" not in encoded
+    assert "graphify-auto-refresh.sh" not in encoded
 
 
-def test_session_start_mentions_graphify_priority() -> None:
+def test_session_start_no_longer_uses_graphify_mode_note() -> None:
     content = (ROOT / "scripts" / "hooks" / "session-start.sh").read_text(encoding="utf-8")
 
-    assert "graphify-mode-note.sh" in content
-    assert "BUILD_INFO.json" in content
+    assert "graphify-mode-note.sh" not in content
+    assert "BUILD_INFO.json" not in content
 
 
 def test_docs_manager_skill_switches_to_graphify_first() -> None:
@@ -63,8 +97,11 @@ def test_docs_manager_skill_switches_to_graphify_first() -> None:
 
     assert "Graphify-first" in content
     assert "Raw Source Maintenance" in content
-    assert "scripts/graphify_code_refresh.sh" in content
-    assert "scripts/graphify_full_refresh.py" in content
+    assert ".graphifyignore" in content
+    assert ".agents/skills/graphify/SKILL.md" in content
+    assert "graphify-manager" not in content
+    for token in REMOVED_GRAPHIFY_CONTRACT_TOKENS:
+        assert token not in content
 
 
 def test_graphify_artifacts_exist() -> None:
@@ -73,31 +110,14 @@ def test_graphify_artifacts_exist() -> None:
     assert (ROOT / "graphify-out" / "graph.html").exists()
 
 
-def test_code_refresh_script_pins_graphify_version_and_writes_build_info() -> None:
-    script = (ROOT / "scripts" / "graphify_code_refresh.sh").read_text(encoding="utf-8")
-
-    assert "graphifyy==0.4.23" in script
-    assert "graphify update ." in script
-    assert "BUILD_INFO.json" in script
-    assert "command -v graphify" not in script
+def test_legacy_graphify_runtime_files_are_removed() -> None:
+    for relative in LEGACY_GRAPHIFY_RUNTIME_PATHS:
+        assert not (ROOT / relative).exists()
 
 
-def test_build_info_records_supported_graph_mode() -> None:
-    build_info = json.loads((ROOT / "graphify-out" / "BUILD_INFO.json").read_text(encoding="utf-8"))
-
-    assert build_info["graphify_version"] == "0.4.23"
-    assert build_info["mode"] in {"code_update", "full_refresh"}
-    assert build_info["command"]
-    if build_info["mode"] == "full_refresh":
-        assert build_info["verified"] is True
-        assert build_info["verification_profile"] == "raw-source-coverage-v3"
-
-
-def test_corpus_prep_script_excludes_python_caches() -> None:
-    script = (ROOT / "scripts" / "graphify_prepare_corpus.sh").read_text(encoding="utf-8")
-
-    assert "__pycache__" in script
-    assert ".pyc" in script
+def test_legacy_graphify_runtime_tests_are_removed() -> None:
+    for relative in LEGACY_GRAPHIFY_TEST_PATHS:
+        assert not (ROOT / relative).exists()
 
 
 def test_claude_active_surface_no_longer_keeps_full_legacy_workflow() -> None:
@@ -108,11 +128,14 @@ def test_claude_active_surface_no_longer_keeps_full_legacy_workflow() -> None:
     assert "raw/" in content
 
 
-def test_claude_delegates_graphify_details_to_graphify_manager_skill() -> None:
+def test_claude_points_to_upstream_graphify_skill_without_local_split_language() -> None:
     claude = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 
-    assert ".agents/skills/graphify-manager/SKILL.md" in claude
+    assert ".agents/skills/graphify/SKILL.md" in claude
+    assert ".agents/skills/graphify-manager/SKILL.md" not in claude
     assert "graphify-out/wiki/index.md" not in claude
+    for token in REMOVED_GRAPHIFY_CONTRACT_TOKENS:
+        assert token not in claude
 
 
 def test_raw_readme_exists_with_source_corpus_contract() -> None:
@@ -123,103 +146,118 @@ def test_raw_readme_exists_with_source_corpus_contract() -> None:
     assert ".agents/" in content
 
 
-def test_graphify_manager_skill_exists_with_full_refresh_flow() -> None:
-    content = (ROOT / ".agents" / "skills" / "graphify-manager" / "SKILL.md").read_text(
-        encoding="utf-8"
+def test_graphify_skill_matches_upstream_v4_orchestration_model() -> None:
+    content = (ROOT / ".agents" / "skills" / "graphify" / "SKILL.md").read_text(encoding="utf-8")
+
+    assert "/graphify" in content
+    assert "result = detect(Path('INPUT_PATH'))" in content
+    assert "from graphify.transcribe import transcribe_all" in content
+    assert "from graphify.extract import collect_files, extract" in content
+    assert "from graphify.cache import check_semantic_cache" in content
+    assert 'subagent_type="general-purpose"' in content
+    assert "from graphify.build import build_from_json" in content
+    assert "python3 -m graphify.watch INPUT_PATH --debounce 3" in content
+    assert "graphify hook install" in content
+    assert "--watch" in content
+    assert "graphify_prepare_corpus.sh" not in content
+    assert "graphify_full_refresh.py" not in content
+    assert "graphify_verify_full_refresh.py" not in content
+    assert "graphify_sync_staged.sh" not in content
+    assert "Surface Parity" not in content
+    assert "PostToolUse auto-refresh" not in content
+
+
+def test_graphify_docs_call_out_upstream_baseline_and_graphifyignore_boundary() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_ko = (ROOT / "README.ko.md").read_text(encoding="utf-8")
+
+    for content in (readme, readme_ko):
+        assert "graphify copilot install" in content
+        assert "graphify hook install" in content
+        assert "--watch" in content
+        assert ".graphifyignore" in content
+        for token in REMOVED_GRAPHIFY_CONTRACT_TOKENS:
+            assert token not in content
+
+
+def test_legacy_graphify_wrapper_skills_are_removed() -> None:
+    assert not (ROOT / ".agents" / "skills" / "graphify-manager" / "SKILL.md").exists()
+    assert not (ROOT / ".agents" / "skills" / "graphify-full" / "SKILL.md").exists()
+
+
+def test_local_adaptation_exposes_graphify_single_entrypoint() -> None:
+    content = (ROOT / ".agents" / "policies" / "local-adaptation.md").read_text(encoding="utf-8")
+
+    assert "/graphify" in content
+    assert ".graphifyignore" in content
+    assert "graphify-manager" not in content
+    assert "graphify-full" not in content
+    for token in REMOVED_GRAPHIFY_CONTRACT_TOKENS:
+        assert token not in content
+
+
+def test_core_graphify_docs_do_not_describe_removed_local_layer() -> None:
+    docs = (
+        (ROOT / "AGENTS.md").read_text(encoding="utf-8"),
+        (ROOT / "CLAUDE.md").read_text(encoding="utf-8"),
+        (ROOT / ".github" / "copilot-instructions.md").read_text(encoding="utf-8"),
+        (ROOT / ".agents" / "policies" / "local-adaptation.md").read_text(encoding="utf-8"),
+        (ROOT / "README.md").read_text(encoding="utf-8"),
+        (ROOT / "README.ko.md").read_text(encoding="utf-8"),
+        (ROOT / ".agents" / "skills" / "docs-manager" / "SKILL.md").read_text(encoding="utf-8"),
+        (ROOT / ".agents" / "skills" / "doc-manager" / "SKILL.md").read_text(encoding="utf-8"),
+        (ROOT / ".agents" / "skills" / "docs-manager" / "agents" / "openai.yaml").read_text(
+            encoding="utf-8"
+        ),
+        (ROOT / ".agents" / "skills" / "doc-manager" / "agents" / "openai.yaml").read_text(
+            encoding="utf-8"
+        ),
     )
 
-    assert "graphify_prepare_corpus.sh" in content
-    assert "uv run --with graphifyy==0.4.23 python scripts/graphify_full_refresh.py" in content
-    assert "graphify_verify_full_refresh.py" in content
-    assert "graphify_sync_staged.sh" in content
-    assert "detect" in content
-    assert "AST extraction" in content
-    assert "semantic extraction" in content
-    assert "verify gate" in content
-    assert "auto-refresh the graph after relevant local edits" in content
-    assert "raw/design/adr" in content
-    assert "graphify-out/BUILD_INFO.json" in content
-    assert "graph.html" in content
-    assert "GRAPH_REPORT.md" in content
-    assert "graphify update ." in content
+    for content in docs:
+        for token in REMOVED_GRAPHIFY_CONTRACT_TOKENS:
+            assert token not in content
 
 
-def test_graphify_full_wrapper_skill_exists() -> None:
-    content = (ROOT / ".agents" / "skills" / "graphify-full" / "SKILL.md").read_text(
-        encoding="utf-8"
-    )
-
-    assert "graphify-manager" in content
-    assert "staged producer path" in content
-
-
-def test_graphify_mode_helper_mentions_full_refresh_policy() -> None:
-    content = (ROOT / "scripts" / "hooks" / "graphify-mode-note.sh").read_text(encoding="utf-8")
-
-    assert "BUILD_INFO.json" in content
-    assert "full_refresh" in content
-    assert "raw/" in content
-    assert "raw source coverage" in content
-
-
-def test_codex_hooks_expose_graphify_pretool_baseline() -> None:
+def test_codex_hooks_do_not_register_graphify_specific_hooks() -> None:
     hooks = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))
+    encoded = json.dumps(hooks)
 
-    pretool = hooks["hooks"]["PreToolUse"]
-    bash_hooks = [
-        hook["command"]
-        for entry in pretool
-        if entry["matcher"] == "Bash"
-        for hook in entry["hooks"]
-    ]
-
-    assert bash_hooks
-    assert bash_hooks[0] == "bash scripts/hooks/graphify-pretool.sh"
-
-    posttool = hooks["hooks"]["PostToolUse"]
-    auto_refresh_hooks = [
-        hook["command"]
-        for entry in posttool
-        if entry["matcher"] == "Write|Edit|Bash"
-        for hook in entry["hooks"]
-    ]
-
-    assert auto_refresh_hooks
-    assert auto_refresh_hooks[0] == "bash scripts/hooks/graphify-auto-refresh.sh"
+    assert "graphify-pretool.sh" not in encoded
+    assert "graphify-auto-refresh.sh" not in encoded
 
 
-def test_github_instructions_expose_graphify_full_entrypoint() -> None:
+def test_github_instructions_expose_graphify_single_entrypoint() -> None:
     content = (ROOT / ".github" / "copilot-instructions.md").read_text(encoding="utf-8")
 
-    assert "/graphify-full" in content or "graphify-full" in content
+    assert "/graphify" in content or "graphify" in content
+    assert "graphify-full" not in content
+    assert "graphify-manager" not in content
 
 
-def test_ci_workflow_has_graphify_candidate_job_without_auto_sync() -> None:
+def test_ci_workflow_no_longer_has_graphify_candidate_job() -> None:
     content = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
-    graphify_job = content.split("graphify-full-refresh-candidate:", maxsplit=1)[1]
 
-    assert "graphify-full-refresh-candidate:" in content
-    assert "dorny/paths-filter@v3" in content
-    assert "scripts/graphify_prepare_corpus.sh" in graphify_job
-    assert "scripts/graphify_ci_candidate.sh" in graphify_job
-    assert "raw/**" in graphify_job
-    assert ".github/workflows/ci.yml" in graphify_job
-    assert "upload-artifact@v4" in graphify_job
-    assert "scripts/graphify_full_refresh.py" in graphify_job
-    assert "astral-sh/setup-uv@v5" not in graphify_job
-    assert "run: bash scripts/graphify_sync_staged.sh" not in graphify_job
+    assert "graphify-full-refresh-candidate:" not in content
+    assert "scripts/graphify_prepare_corpus.sh" not in content
+    assert "scripts/graphify_ci_candidate.sh" not in content
+    assert "scripts/graphify_full_refresh.py" not in content
 
 
-def test_docs_manager_marks_full_refresh_as_explicit_only() -> None:
+def test_docs_manager_mentions_graphifyignore_not_legacy_runtime() -> None:
     content = (ROOT / ".agents" / "skills" / "docs-manager" / "SKILL.md").read_text(
         encoding="utf-8"
     )
 
     assert "raw/" in content
+    assert ".graphifyignore" in content
     assert "legacy wiki" not in content
 
 
 def test_active_doc_surfaces_no_longer_point_to_legacy_wiki_paths() -> None:
+    doc_manager_skill = (ROOT / ".agents" / "skills" / "doc-manager" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
     documentation_skill = (
         ROOT / ".agents" / "skills" / "documentation-and-adrs" / "SKILL.md"
     ).read_text(encoding="utf-8")
@@ -240,6 +278,7 @@ def test_active_doc_surfaces_no_longer_point_to_legacy_wiki_paths() -> None:
     ).read_text(encoding="utf-8")
 
     for content in (
+        doc_manager_skill,
         documentation_skill,
         meta_skill,
         docs_manager_agent,
@@ -250,10 +289,16 @@ def test_active_doc_surfaces_no_longer_point_to_legacy_wiki_paths() -> None:
         assert "docs/wiki" not in content
         assert "docs/sources" not in content
 
+    assert "docs/harness workflow" in doc_manager_skill
+    assert "wiki maintenance" not in doc_manager_skill
     assert "raw/design/adr/" in documentation_skill
     assert "raw/design/notes/" in documentation_skill
     assert "raw/" in meta_skill
+    assert "graph refresh / graph status" in meta_skill
+    assert "→ graphify" in meta_skill
     assert "raw/design/adr" in docs_manager_agent
+    assert ".agents/skills/graphify/SKILL.md" in docs_manager_agent
+    assert ".agents/skills/graphify/SKILL.md" in doc_manager_agent
     assert "raw/design/notes" in issue_template
     assert 'IDEAS_DIR="ideas"' in idea_refine_script
 

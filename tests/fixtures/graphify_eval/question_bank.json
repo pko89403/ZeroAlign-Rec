@@ -1,0 +1,65 @@
+{
+  "minimum_pass_rate": 1.0,
+  "minimum_why_source_rate": 1.0,
+  "questions": [
+    {
+      "id": "what-core-alpha",
+      "kind": "what",
+      "prompt": "Which source file defines Alpha in the document-context fixture?",
+      "required_terms": [
+        "alpha",
+        "src/pkg/core.py"
+      ],
+      "required_sources": [
+        "src/pkg/core.py"
+      ],
+      "minimum_citations": 1,
+      "allow_abstain": false
+    },
+    {
+      "id": "why-runtime-note",
+      "kind": "why",
+      "prompt": "Which document provides runtime rationale for Alpha?",
+      "required_terms": [
+        "runtime",
+        "alpha"
+      ],
+      "required_sources": [
+        "raw/design/notes/phase2-recommendation-runtime.md"
+      ],
+      "minimum_citations": 1,
+      "allow_abstain": false
+    },
+    {
+      "id": "path-adr-to-alpha",
+      "kind": "path",
+      "prompt": "Explain the relationship path from ADR 001 to Alpha.",
+      "required_terms": [
+        "adr 001",
+        "references",
+        "alpha"
+      ],
+      "required_sources": [
+        "raw/design/adr/adr-001-dev-environment.md",
+        "src/pkg/core.py"
+      ],
+      "minimum_citations": 2,
+      "allow_abstain": false
+    },
+    {
+      "id": "explain-document-context-state",
+      "kind": "explain",
+      "prompt": "Why is this fixture treated as a graph with document context rather than code only?",
+      "required_terms": [
+        "document context",
+        "raw"
+      ],
+      "required_sources": [
+        "raw/design/specs/recommendation-v2.md",
+        "raw/design/notes/phase2-recommendation-runtime.md"
+      ],
+      "minimum_citations": 1,
+      "allow_abstain": false
+    }
+  ]
+}

@@ -12,20 +12,20 @@ Read in order before acting:
 
 1. `graphify-out/GRAPH_REPORT.md` if present — architecture and community structure.
 2. `graphify-out/graph.json` if present — primary machine-readable codebase graph.
-3. `graphify-out/BUILD_INFO.json` — `mode=code_update` vs `full_refresh` trust signal.
-4. `AGENTS.md` — project schema, 3-layer architecture, operating principles, and skill layer overview.
-5. `.agents/policies/local-adaptation.md` — domain details (tech stack, main modules, validation commands, Repo-local Codex commands like `spec`/`plan`/`build`/`test`/`ship`/`docs-manager`/`code-simplify`/`graphify-full`/`graphify-manager`) and language conventions. Takes precedence when imported skill examples conflict with this repo.
-6. `.agents/skills/graphify-manager/SKILL.md` — full refresh orchestration, graphify rules, and committed graph artifacts.
+3. `AGENTS.md` — project schema, 3-layer architecture, operating principles, Graphify usage model, and path boundaries.
+4. `.agents/policies/local-adaptation.md` — domain details (tech stack, main modules, validation commands, Repo-local Codex commands like `spec`/`plan`/`build`/`test`/`ship`/`docs-manager`/`code-simplify`/`graphify`) and language conventions. Takes precedence when imported skill examples conflict with this repo.
+5. `.agents/skills/graphify/SKILL.md` — upstream-style `/graphify` public entrypoint and follow-up graph workflow.
+6. `.graphifyignore` — default corpus exclusions for `/graphify .`.
 
 ## Core Validation Gate
 
 `uv sync --all-groups`, `uv run ruff check .`, `uv run mypy src`, `uv run pytest`. See `AGENTS.md` for domain-specific `sid-reco` commands.
 
-## Graphify Trigger Model
+## Graphify Usage Model
 
-- Hooks and session-start rules use the current graph and `BUILD_INFO.json` as trust signals.
-- PostToolUse hooks may auto-refresh the graph after relevant local edits.
-- CI leaves a candidate/reminder note but does not run the full refresh producer, verify staged output, or promote root `graphify-out/`.
+- Treat `.agents/skills/graphify/SKILL.md` as the authoritative upstream `/graphify` behavior.
+- Treat `.graphifyignore` as the default corpus boundary for `/graphify .`.
+- Do not assume a separate repo-local Graphify split or staged refresh contract unless the user explicitly asks for custom migration work.
 
 ## Pull Request Rule
 
