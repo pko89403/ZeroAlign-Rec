@@ -1,12 +1,12 @@
 ---
 name: doc-manager
-description: Alias wrapper for docs-manager. Use when the user explicitly types /doc-manager by habit and intends to run the repository wiki/docs workflow.
+description: Alias wrapper for docs-manager. Use when the user explicitly types /doc-manager by habit and intends to run the repository docs/harness workflow.
 ---
 
 # Doc Manager
 
 This is an alias for `docs-manager`.
-`docs-manager` now includes the repository's docs/harness sync routine as well as wiki maintenance.
+`docs-manager` now includes the repository's docs/harness sync routine, Graphify artifact review, and `.graphifyignore` corpus-boundary maintenance.
 
 ## Procedure
 

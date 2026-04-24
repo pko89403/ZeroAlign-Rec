@@ -1,6 +1,0 @@
-{
-  "graphify_version": "0.4.23",
-  "mode": "code_update",
-  "command": "uvx --from graphifyy==0.4.23 graphify update .",
-  "generated_at": "2026-04-23T04:13:37.078532+00:00"
-}

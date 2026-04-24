@@ -1,0 +1,34 @@
+{
+  "answers": [
+    {
+      "question_id": "what-core-alpha",
+      "answer": "Alpha is represented by the code node in src/pkg/core.py, so the what answer points to src/pkg/core.py.",
+      "cited_sources": [
+        "src/pkg/core.py"
+      ]
+    },
+    {
+      "question_id": "why-runtime-note",
+      "answer": "The runtime note explains Alpha runtime behavior, so the why answer comes from raw/design/notes/phase2-recommendation-runtime.md.",
+      "cited_sources": [
+        "raw/design/notes/phase2-recommendation-runtime.md"
+      ]
+    },
+    {
+      "question_id": "path-adr-to-alpha",
+      "answer": "ADR 001 references Alpha directly, so the path is ADR 001 -> references -> Alpha in src/pkg/core.py.",
+      "cited_sources": [
+        "raw/design/adr/adr-001-dev-environment.md",
+        "src/pkg/core.py"
+      ]
+    },
+    {
+      "question_id": "explain-document-context-state",
+      "answer": "This fixture has document context because it includes raw design context rather than code only. The raw spec and runtime note are present in the graph.",
+      "cited_sources": [
+        "raw/design/specs/recommendation-v2.md",
+        "raw/design/notes/phase2-recommendation-runtime.md"
+      ]
+    }
+  ]
+}

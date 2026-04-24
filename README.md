@@ -344,39 +344,16 @@ Primary graph artifacts:
 
 Refresh command:
 
-```bash
-scripts/graphify_code_refresh.sh
-```
+Use the repo-local `/graphify` skill as the single public Graphify entrypoint.
+This repository follows the upstream `/graphify` mental model directly rather than
+documenting a separate repo-local Graphify split or staged refresh contract.
 
-The current wrapper uses `graphify update .`, which gives an AST-only refresh for committed code graph bootstrap.
-Full semantic refresh is available through the staged producer flow, using `src/`, `tests/`, and `raw/`
-as the full-refresh source boundary.
-PostToolUse hooks now try to refresh the graph automatically after relevant local edits.
-Code-only changes can land as `code_update`, while `raw/` changes run the staged
-full-refresh flow and promote verified results into root `graphify-out/`.
+The assistant integration baseline follows upstream Graphify install surfaces:
+`graphify claude install`, `graphify codex install`, `graphify opencode install`, and
+`graphify copilot install`.
 
-For full-refresh staging:
-
-```bash
-scripts/graphify_prepare_corpus.sh
-```
-
-Full refresh orchestration lives in the repo-local `graphify-manager` / `graphify-full` skill
-and runs the staged producer command below:
-
-```bash
-uv run --with graphifyy==0.4.23 python scripts/graphify_full_refresh.py .graphify-work/corpus
-```
-
-After a staged full refresh, run:
-
-```bash
-python3 scripts/graphify_verify_full_refresh.py .graphify-work/corpus/graphify-out
-bash scripts/graphify_sync_staged.sh
-```
-
-CI only prepares a reminder/candidate note when relevant files change.
-It does not run the full refresh producer, verify staged output, or promote root `graphify-out/`.
+Upstream surfaces such as `graphify hook install`, `graphify hook status`, and `--watch`
+should be read as upstream Graphify capabilities, not as a separate repo-local workflow contract.
 
 Source corpus:
 
@@ -384,7 +361,11 @@ Source corpus:
 - `raw/design/`
 - `raw/external/`
 
-Graphify does not treat `.agents/`, `README*`, `SPEC.md`, or `CLAUDE.md`/`AGENTS.md` as source input.
+The default `/graphify .` corpus boundary is managed through `.graphifyignore`.
+This repository excludes repo-meta docs such as `AGENTS.md`, `CLAUDE.md`, top-level READMEs,
+and `SPEC.md`, plus generated outputs in `graphify-out/`, UI screenshots in
+`apps/demo/screenshots/`, branding assets in `assets/branding/`, and
+Graphify-only fixtures in `tests/fixtures/graphify/` unless you explicitly target them.
 
 ## Copilot and Agent Harness
 
@@ -401,6 +382,7 @@ This repository also maintains a Copilot/Codex-friendly harness.
 
 Main shortcuts:
 
+- `/graphify` — upstream-style Graphify entrypoint for refresh, graph status, and graph-oriented follow-up flows
 - `/docs-manager` or `/doc-manager` — Graphify sync/review plus `raw/` source corpus and harness sync
 - `/spec`
 - `/plan`
@@ -416,9 +398,8 @@ build-neighbor-context -> build-taxonomy-dictionary -> structure-taxonomy-item|b
 ```
 
 For codebase or architecture questions, read `graphify-out/GRAPH_REPORT.md` first and use
-`graphify-out/graph.json` as the primary machine-readable graph. Check `graphify-out/BUILD_INFO.json`:
-- `mode=code_update` means the graph reflects code-only refresh
-- `mode=full_refresh` with `verified=true` means the graph reflects the current `raw/` source corpus
+`graphify-out/graph.json` as the primary machine-readable graph. If the graph lacks needed source
+context, inspect `raw/` directly.
 
 ## Research References
 

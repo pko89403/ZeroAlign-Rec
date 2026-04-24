@@ -1,0 +1,33 @@
+{
+  "answers": [
+    {
+      "question_id": "what-core-alpha",
+      "answer": "Alpha is represented by the code node in src/pkg/core.py, so the what answer points to src/pkg/core.py.",
+      "cited_sources": [
+        "src/pkg/core.py"
+      ]
+    },
+    {
+      "question_id": "why-runtime-note",
+      "answer": "Alpha seems related to runtime behavior, but this answer only cites code.",
+      "cited_sources": [
+        "src/pkg/core.py"
+      ]
+    },
+    {
+      "question_id": "path-adr-to-alpha",
+      "answer": "ADR 001 references Alpha directly, so the path is ADR 001 -> references -> Alpha in src/pkg/core.py.",
+      "cited_sources": [
+        "raw/design/adr/adr-001-dev-environment.md",
+        "src/pkg/core.py"
+      ]
+    },
+    {
+      "question_id": "explain-document-context-state",
+      "answer": "This is a graph about code, but the answer does not explain the document context or raw context.",
+      "cited_sources": [
+        "src/pkg/core.py"
+      ]
+    }
+  ]
+}

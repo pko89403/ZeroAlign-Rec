@@ -15,6 +15,7 @@ In this repository, the imported skill pack runs with these local rules:
 
 - `AGENTS.md` is the top-level rules file and schema document.
 - Work on `raw/`, ADR pages, design notes, or Graphify source-corpus sync must use `docs-manager` first.
+- graph refresh / graph status work should route to `graphify`.
 - Repository-specific command substitutions live in `.agents/policies/local-adaptation.md`.
 - Primary verification commands are `uv run pytest`, `uv run ruff check .`, `uv run mypy src`, and `uv run sid-reco doctor`.
 - Shared checklists live in `.agents/playbooks/`.
@@ -28,6 +29,7 @@ When a task arrives, identify the development phase and apply the corresponding 
 Task arrives
     │
     ├── Raw/source/ADR/note work? ────→ docs-manager
+    ├── graph refresh / graph status? → graphify
     ├── Vague idea/need refinement? ──→ idea-refine
     ├── New project/feature/change? ──→ spec-driven-development
     ├── Have a spec, need tasks? ──────→ planning-and-task-breakdown

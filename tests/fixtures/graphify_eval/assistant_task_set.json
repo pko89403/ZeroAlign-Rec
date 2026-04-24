@@ -1,0 +1,26 @@
+{
+  "minimum_accuracy_gain": 0.25,
+  "minimum_turn_reduction_rate": 0.2,
+  "minimum_duration_reduction_rate": 0.1,
+  "maximum_wrong_file_delta": 0,
+  "tasks": [
+    {
+      "id": "find-default-boundary-files",
+      "kind": "impact",
+      "prompt": "Identify which files define the default `/graphify .` corpus boundary.",
+      "required_files": [
+        ".graphifyignore",
+        "README.md"
+      ]
+    },
+    {
+      "id": "explain-upstream-entrypoint",
+      "kind": "why",
+      "prompt": "Explain why the repository keeps `.agents/skills/graphify/SKILL.md` as a pure upstream skill.",
+      "required_files": [
+        "AGENTS.md",
+        ".agents/skills/graphify/SKILL.md"
+      ]
+    }
+  ]
+}

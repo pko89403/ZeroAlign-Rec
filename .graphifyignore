@@ -16,10 +16,16 @@ build/
 htmlcov/
 .coverage
 .coverage.*
-graphify-out/cache/
-graphify-out/memory/
+graphify-out/
 
-# Harness/support paths excluded from the initial curated corpus
+# Repo metadata and generated artifacts are not part of the default graph corpus
+AGENTS.md
+CLAUDE.md
+README.md
+README.ko.md
+SPEC.md
+
+# Harness/support paths excluded from the default upstream /graphify corpus
 .agents/
 .claude/
 .github/
@@ -28,3 +34,8 @@ ideas/
 phases/
 scripts/
 tasks/
+
+# Product media and graph fixtures are kept out unless explicitly targeted
+apps/demo/screenshots/
+assets/branding/
+tests/fixtures/graphify/

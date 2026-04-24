@@ -34,15 +34,6 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Glob|Grep",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash scripts/hooks/graphify-pretool.sh"
-          }
-        ]
-      },
-      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -83,15 +74,6 @@
       }
     ],
     "PostToolUse": [
-      {
-        "matcher": "Write|Edit|Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash scripts/hooks/graphify-auto-refresh.sh"
-          }
-        ]
-      },
       {
         "matcher": "Bash",
         "hooks": [

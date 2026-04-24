@@ -1,0 +1,29 @@
+{
+  "name": "graphify document context fixture",
+  "min_nodes": 7,
+  "min_links": 8,
+  "min_semantic_links": 8,
+  "minimum_relation_type_count": 4,
+  "required_node_ids": [
+    "adr_one",
+    "note_runtime",
+    "spec_design",
+    "core_alpha"
+  ],
+  "required_source_files": [
+    "raw/design/adr/adr-001-dev-environment.md",
+    "raw/design/notes/phase2-recommendation-runtime.md",
+    "raw/design/specs/recommendation-v2.md",
+    "raw/design/diagrams/flow.png",
+    "raw/external/papers/sid-paper.pdf",
+    "raw/external/datasets/foodcom.md",
+    "src/pkg/core.py"
+  ],
+  "required_relation_types": [
+    "references",
+    "links_to",
+    "rationale_for",
+    "semantically_related"
+  ],
+  "max_ambiguous_ratio": 0.0
+}
